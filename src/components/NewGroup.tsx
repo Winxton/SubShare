@@ -14,7 +14,7 @@ import spotify from './images/spotify.png';
 
 import youtubeImage from './images/youtube.png';
 import crunchyrollImage from './images/crunchyroll.png';
-import {Friend} from './components/Friend'
+import {Friend} from './Friend'
 
 function NewGroup() {
   const [searchText, setSearchText] = React.useState<string>('');
