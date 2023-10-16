@@ -1,77 +1,36 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { Box, Button } from '@chakra-ui/react';
 
-import { Button, Text, Box, Flex, Square, Input, Wrap, WrapItem } from '@chakra-ui/react';
-import { Heading } from '@chakra-ui/react';
-import { Image } from '@chakra-ui/react';
+import NewGroup from './NewGroup';
+import ViewGroup from './ViewGroup';
+import GroupList from './GroupList';
 
-import netflixImage from './images/netflix.png';
-import hboImage from './images/hbo.png';
+const Home = () => {
+  return <h2>Home Page</h2>;
+};
 
-import disney from './images/disney.png';
-import spotify from './images/spotify.png';
-
-import youtubeImage from './images/youtube.png';
-import crunchyrollImage from './images/crunchyroll.png';
 
 function App() {
-  const [searchText, setSearchText] = React.useState<string>('');
-
-  const subscriptions = [
-    {
-      name: 'Netflix',
-      image: netflixImage,
-    },
-    {
-      name: 'HBO',
-      image: hboImage,
-    },
-    {
-      name: 'Disney',
-      image: disney,
-    },
-    {
-      name: 'Spotify',
-      image: spotify,
-    },
-    {
-      name: 'Youtube',
-      image: youtubeImage,
-    },
-    {
-      name: 'Crunchy',
-      image: crunchyrollImage,
-    },
-  ];
-
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setSearchText(event.target.value);
-  }
-
-  const filteredSubscriptions = subscriptions.filter((subscription) => {
-    return subscription.name.toLowerCase().includes(searchText.toLowerCase());
-  });
-
   return (
-    <div className="App">
-      <Box>
-        <Heading size="lg">Create Group</Heading>
-        <Heading size="md">Subscriptions</Heading>
+    <Router>
+        <Box mb="5">
+          <Button><Link to="/">My Groups</Link></Button>
+          <Button ml="2"><Link to="/new-group">New Group</Link></Button>
+          <Button ml="2"><Link to="/view-group">View a Group</Link></Button>
+        </Box>
 
-        <Input placeholder="Search Subscriptions" size="sm" value={searchText} onChange={handleInputChange} />
-        <Wrap>
-          {filteredSubscriptions.map((subscription) => (
-            <WrapItem key={subscription.name} margin="5px">
-              <Square size="150px" border="1px solid grey">
-                <Image src={subscription.image} alt={subscription.name} />
-              </Square>
-            </WrapItem>
-          ))}
-        </Wrap>
-      </Box>
-    </div>
+        <Routes>
+          <Route path="/" Component={GroupList} />
+          <Route path="/new-group" Component={NewGroup} />
+          <Route path="/view-group" Component={ViewGroup} />
+        </Routes>
+    </Router>
   );
+
+  return <NewGroup />;
 }
 
 export default App;
