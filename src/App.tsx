@@ -2,14 +2,16 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import { Button } from '@chakra-ui/react'
+
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-      <div className="bg-blue-500">
+      <div className="bg-green-500">
           This div has a blue background.
         </div>
-      </header>
+
+        <Button variant="outline">Button</Button>
     </div>
   );
 }
