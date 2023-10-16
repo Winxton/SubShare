@@ -2,7 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-import { Button,Text, Box, Flex, Square } from '@chakra-ui/react'
+import { Button,Text, Box, Flex, Square, Input } from '@chakra-ui/react'
 import { SimpleGrid } from '@chakra-ui/react'
 import { Heading } from '@chakra-ui/react'
 import { Image } from '@chakra-ui/react'
@@ -18,6 +18,8 @@ import crunchyrollImage from './images/crunchyroll.png';
 
 
 function App() {
+  const [searchText, setSearchText] = React.useState<string>('');
+
   const subscriptions = [
     {
       name: 'Netflix',
@@ -42,17 +44,25 @@ function App() {
       name: 'Crunchy',
       image: crunchyrollImage
     },
-    
-
   ]
+
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setSearchText(event.target.value)
+  }
+
+  const filteredSubscriptions = subscriptions.filter((subscription) => {
+    return subscription.name.toLowerCase().includes(searchText.toLowerCase())
+  })
 
   return (
     <div className="App">
-
       <Box>
+        <Heading size='lg'>Create Group</Heading>
         <Heading size='md'>Subscriptions</Heading>
+
+        <Input placeholder='Search Subscriptions' size='sm' value={searchText} onChange={handleInputChange} />
         <Flex >
-          {subscriptions.map((subscription) => (
+          {filteredSubscriptions.map((subscription) => (
             <Square margin="5px" size='150px' border="1px solid grey">
               <Image src={subscription.image} alt="netflix" />
             </Square>
