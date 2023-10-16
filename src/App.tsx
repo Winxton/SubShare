@@ -9,8 +9,14 @@ import { Image } from '@chakra-ui/react'
 
 import netflixImage from './images/netflix.png';
 import hboImage from './images/hbo.png';
+
 import disney from './images/disney.png'
 import spotify from './images/spotify.png'
+
+import youtubeImage from './images/youtube.png';
+import crunchyrollImage from './images/crunchyroll.png';
+
+
 function App() {
   const subscriptions = [
     {
@@ -28,7 +34,16 @@ function App() {
     {
       name: 'Spotify',
       image: spotify
-    }
+    },
+    { name: 'Youtube',
+      image: youtubeImage
+    },
+    {
+      name: 'Crunchy',
+      image: crunchyrollImage
+    },
+    
+
   ]
 
   return (
