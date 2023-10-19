@@ -1,20 +1,19 @@
 import React from 'react';
 import logo from './logo.svg';
-import './App.css';
 
 import { Button, Text, Box, Flex, Square, Input, Wrap, WrapItem } from '@chakra-ui/react';
 import { Heading } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/react';
 
-import netflixImage from './images/netflix.png';
-import hboImage from './images/hbo.png';
+import netflixImage from '../images/netflix.png';
+import hboImage from '../images/hbo.png';
 
-import disney from './images/disney.png';
-import spotify from './images/spotify.png';
+import disney from '../images/disney.png';
+import spotify from '../images/spotify.png';
 
-import youtubeImage from './images/youtube.png';
-import crunchyrollImage from './images/crunchyroll.png';
-import {Friend} from './components/Friend'
+import youtubeImage from '../images/youtube.png';
+import crunchyrollImage from '../images/crunchyroll.png';
+import {Friend} from './Friend'
 
 function NewGroup() {
   const [searchText, setSearchText] = React.useState<string>('');
