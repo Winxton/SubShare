@@ -8,10 +8,11 @@ import {
   Text,
   Stack,
   StackDivider,
-  Image,
 } from "@chakra-ui/react";
-import netflixImage from "./images/netflix.png";
-import spotify from "./images/spotify.png";
+import { Subscription } from "./Subscription";
+import netflixImage from "../images/netflix.png";
+import spotify from "../images/spotify.png";
+import disney from "../images/disney.png";
 export default function GroupList() {
   const theme = useTheme();
   const subscriptionCost = "$8.10";
@@ -21,10 +22,22 @@ export default function GroupList() {
     {
       name: "Netflix",
       image: netflixImage,
+      cost: "$3.75",
+      members: "3/5",
     },
     {
       name: "Spotify",
       image: spotify,
+      cost: "$4.33",
+      members: "2/6",
+    },
+  ];
+  const friendSubscriptions = [
+    {
+      name: "Disney",
+      image: disney,
+      cost: "3.75",
+      members: "3/6",
     },
   ];
   return (
@@ -69,34 +82,23 @@ export default function GroupList() {
         align="stretch"
       >
         <Text fontWeight="bold">My Groups</Text>
-        <Box>
-          {" "}
-          <Flex className="profile" margin="10px">
-            <Image
-              src={subscriptions[0].image}
-              alt={subscriptions[0].name}
-              marginRight="10px"
-            />
-            <Box>
-              <Text fontWeight="bold"> Total Subscriptions</Text>
-              <Text>
-                You owe{" "}
-                <Text as="span" fontWeight="bold">
-                  {subscriptionCost}
-                </Text>
-                /month
-              </Text>
-              <Text fontWeight="bold" color="green">
-                {savings}
-                <Text as="span" fontSize="xs" color="black" fontWeight="normal">
-                  {" "}
-                  Saved
-                </Text>
-              </Text>
-            </Box>
-          </Flex>
-        </Box>
-        <Box>2</Box>
+        {subscriptions.map((subscription) => (
+          <Subscription
+            image={subscription.image}
+            cost={subscription.cost}
+            name={subscription.name}
+            members={subscription.members}
+          />
+        ))}
+        <Text fontWeight="bold">Friend Groups</Text>
+        {friendSubscriptions.map((subscription) => (
+          <Subscription
+            image={subscription.image}
+            cost={subscription.cost}
+            name={subscription.name}
+            members={subscription.members}
+          />
+        ))}
       </Stack>
     </Container>
   );
