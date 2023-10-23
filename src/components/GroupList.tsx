@@ -12,16 +12,6 @@ import {
   useDisclosure
 } from "@chakra-ui/react";
 
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-} from '@chakra-ui/react'
-
 import { Subscription } from "./Subscription";
 import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
@@ -132,23 +122,7 @@ export default function GroupList() {
         ))}
       </Stack>
 
-    <Modal isOpen={isOpen} onClose={onClose} size="xl" >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Create New Group</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <NewGroup/>
-        </ModalBody>
-
-        <ModalFooter>
-          <Button variant='ghost' mr={3} onClick={onClose}>
-            Close
-          </Button>
-          <Button>Create Group</Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+      {isOpen && <NewGroup onClose={onClose}/>}
 
     </Container>
   );

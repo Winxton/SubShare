@@ -13,6 +13,18 @@ import {
   HStack,
   VStack,
 } from "@chakra-ui/react";
+
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react'
+
+
 import { Heading } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/react";
 
@@ -29,7 +41,7 @@ import { Friend as FriendComponent } from "./Friend";
 import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 
-function NewGroup() {
+function NewGroup(props: { onClose: () => void}) {
   const [searchText, setSearchText] = React.useState<string>("");
   const [searchFriend, setSearchFriend] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] = React.useState<Subscription | null>(null);
@@ -54,7 +66,7 @@ function NewGroup() {
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
   }
-  function handleInputChangef(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleInputChangefriend(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchFriend(event.target.value);
   }
   const filteredSubscriptions = subscriptions.filter((subscription) => {
@@ -64,55 +76,73 @@ function NewGroup() {
     return friend.name.toLowerCase().includes(searchFriend.toLowerCase());
   });
 
+  function renderNewGroup() {
+    return <Box>
+    <Heading size="lg">Create Group</Heading>
+    <Heading size="md">Subscriptions</Heading>
+
+    <Input
+      placeholder="Search Subscriptions"
+      size="sm"
+      value={searchText}
+      onChange={handleInputChange}
+    />
+    <Wrap>
+      {filteredSubscriptions.map((subscription) => {
+        const isSelected = selectedSubscription?.name === subscription.name;
+        return (
+        <WrapItem key={subscription.name} margin="5px" onClick={() => setSelectedSubscription(subscription)} border={isSelected ? '1px solid blue' : 'none'} borderRadius={'md'}>
+          <Square size="150px" border="1px solid grey">
+            <Image src={subscription.image} alt={subscription.name} />
+          </Square>
+        </WrapItem>
+      )})}
+    </Wrap>
+
+    <Heading size="md">Friends</Heading>
+      <Input
+        placeholder="Search Friends"
+        size="sm"
+        value={searchFriend}
+        onChange={handleInputChangefriend}
+      />
+      <VStack>
+      {filteredFriends.map((friend) => {
+        const isSelected = selectedFriends.some((selectedFriend) => selectedFriend.name === friend.name);
+
+        return (
+          <Flex width="100%" onClick={() => {
+            const newSelectedFriends = isSelected
+              ? selectedFriends.filter((selectedFriend) => selectedFriend.name !== friend.name)
+              : [...selectedFriends, friend];
+            setSelectedFriends(newSelectedFriends);
+          }}>
+            <FriendComponent name={friend.name} isSelected={isSelected} image={friend.image} isMe={false}></FriendComponent>
+          </Flex>
+        );
+      })}
+      </VStack>
+  </Box>
+  }
+
   return (
-    <div className="App">
-      <Box>
-        <Heading size="lg">Create Group</Heading>
-        <Heading size="md">Subscriptions</Heading>
+    <Modal isOpen={true} onClose={() => {}} size="xl">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Create New Group</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          {renderNewGroup()}
+        </ModalBody>
 
-        <Input
-          placeholder="Search Subscriptions"
-          size="sm"
-          value={searchText}
-          onChange={handleInputChange}
-        />
-        <Wrap>
-          {filteredSubscriptions.map((subscription) => {
-            const isSelected = selectedSubscription?.name === subscription.name;
-            return (
-            <WrapItem key={subscription.name} margin="5px" onClick={() => setSelectedSubscription(subscription)} border={isSelected ? '1px solid blue' : 'none'} borderRadius={'md'}>
-              <Square size="150px" border="1px solid grey">
-                <Image src={subscription.image} alt={subscription.name} />
-              </Square>
-            </WrapItem>
-          )})}
-        </Wrap>
-
-        <Heading size="md">Friends</Heading>
-          <Input
-            placeholder="Search Friends"
-            size="sm"
-            value={searchFriend}
-            onChange={handleInputChangef}
-          />
-          <VStack>
-          {filteredFriends.map((friend) => {
-            const isSelected = selectedFriends.some((selectedFriend) => selectedFriend.name === friend.name);
-
-            return (
-              <Flex width="100%" onClick={() => {
-                const newSelectedFriends = isSelected
-                  ? selectedFriends.filter((selectedFriend) => selectedFriend.name !== friend.name)
-                  : [...selectedFriends, friend];
-                setSelectedFriends(newSelectedFriends);
-              }}>
-                <FriendComponent name={friend.name} isSelected={isSelected} image={friend.image} isMe={false}></FriendComponent>
-              </Flex>
-            );
-          })}
-          </VStack>
-      </Box>
-    </div>
+        <ModalFooter>
+          <Button variant='ghost' mr={3} onClick={props.onClose}>
+            Close
+          </Button>
+          <Button>Create Group</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
 
