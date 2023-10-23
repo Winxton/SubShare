@@ -25,10 +25,10 @@ export default function ViewGroup() {
     owedAmount: "$3.75",
     savedAmount: "$0.75",
     members: [
-      { name: "Albert Snow", image: friend1, isOwner: true },
-      { name: "Chrisa Jenkins", image: friend2 },
-      { name: "Bobby Miller", image: friend3 },
-      { name: "Christine", image: friend4 , isYou: true },
+      { name: "Albert Snow", image: friend1, isOwner: true,isMe: false },
+      { name: "Chrisa Jenkins", image: friend2,isMe: false },
+      { name: "Bobby Miller", image: friend3,isMe: false },
+      { name: "Christine", image: friend4 , isMe: true },
     ],
   };
 
@@ -79,8 +79,8 @@ export default function ViewGroup() {
           </Heading>
 
           {group.members.map((member) => (
-  <Friend name={member.name} image={member.image} isMe={member.isYou} />
-))}
+            <Friend name={member.name} image={member.image} isMe={member.isMe} />
+          ))}
         </VStack>
       </Box>
     </Container>
