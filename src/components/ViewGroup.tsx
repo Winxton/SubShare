@@ -1,3 +1,5 @@
+import React from "react";
+import { useParams } from "react-router-dom";
 import {
   Container,
   Heading,
@@ -20,15 +22,18 @@ import { Friend } from "./Friend";
 
 export default function ViewGroup() {
   const theme = useTheme();
+  const { groupName } = useParams();
+
+  // Use the `groupName` as part of the group name
   const group = {
-    name: "Albert's Spotify Group",
+    name: `${groupName}'s Spotify Group`,
     owedAmount: "$3.75",
     savedAmount: "$0.75",
     members: [
-      { name: "Albert Snow", image: friend1, isOwner: true,isMe: false },
-      { name: "Chrisa Jenkins", image: friend2,isMe: false },
-      { name: "Bobby Miller", image: friend3,isMe: false },
-      { name: "Christine", image: friend4 , isMe: true },
+      { name: "Albert Snow", image: friend1, isOwner: true, isMe: false },
+      { name: "Chrisa Jenkins", image: friend2, isMe: false },
+      { name: "Bobby Miller", image: friend3, isMe: false },
+      { name: "Christine", image: friend4, isMe: true },
     ],
   };
 
@@ -58,12 +63,13 @@ export default function ViewGroup() {
             />
           </Center>
 
-          <Text mt={2} textAlign="center">
-            You owe Albert{" "}
-            <Text as="span" fontWeight="bold">
-              {group.owedAmount}
-            </Text>
-          </Text>
+    <Text mt={2} textAlign="center">
+      You owe {group.members.find((member) => member.isMe)?.name || "me"}{" "}
+      <Text as="span" fontWeight="bold">
+        {group.owedAmount}
+      </Text>
+    </Text>
+
 
           <Text textAlign="center">
             <Text as="span" fontWeight="bold" color="green">

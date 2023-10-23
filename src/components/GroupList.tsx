@@ -17,7 +17,8 @@ import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
 import NewGroup from './NewGroup'
-
+import React from "react";
+import { Link } from "react-router-dom";
 
 
 export default function GroupList() {
@@ -103,24 +104,29 @@ export default function GroupList() {
         </Box>
       </Flex>
 
-        {subscriptions.map((subscription) => (
-          <Subscription
-            image={subscription.image}
-            cost={subscription.cost}
-            name={subscription.name}
-            members={subscription.members}
-          />
+      {subscriptions.map((subscription) => (
+          <Link to={`/view-group/${subscription.name}`} key={subscription.name}>
+            <Subscription
+              image={subscription.image}
+              cost={subscription.cost}
+              name={subscription.name}
+              members={subscription.members}
+            />
+          </Link>
         ))}
         <Text fontWeight="bold">Friend Groups</Text>
         {friendSubscriptions.map((subscription) => (
-          <Subscription
-            image={subscription.image}
-            cost={subscription.cost}
-            name={subscription.name}
-            members={subscription.members}
-          />
+          <Link to={`/group/${subscription.name}`} key={subscription.name}>
+            <Subscription
+              image={subscription.image}
+              cost={subscription.cost}
+              name={subscription.name}
+              members={subscription.members}
+            />
+          </Link>
         ))}
       </Stack>
+
 
       {isOpen && <NewGroup onClose={onClose}/>}
 

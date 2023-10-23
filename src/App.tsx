@@ -16,10 +16,10 @@ const Home = () => {
 function App() {
   return (
     <Router>
-        <Routes>
-          <Route path="/" Component={GroupList} />
-          <Route path="/view-group" Component={ViewGroup} />
-        </Routes>
+      <Routes>
+        <Route path="/" element={<GroupList />} />
+        <Route path="/view-group/:groupName" element={<ViewGroup />} />
+      </Routes>
     </Router>
   );
 }
