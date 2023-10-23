@@ -1,46 +1,71 @@
-import React from 'react';
-import logo from './logo.svg';
+import React from "react";
+import logo from "./logo.svg";
 
-import { Button, Text, Box, Flex, Square, Input, Wrap, WrapItem } from '@chakra-ui/react';
-import { Heading } from '@chakra-ui/react';
-import { Image } from '@chakra-ui/react';
+import {
+  Button,
+  Text,
+  Box,
+  Flex,
+  Square,
+  Input,
+  Wrap,
+  WrapItem,
+  HStack,
+  VStack,
+} from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
+import { Image } from "@chakra-ui/react";
 
-import netflixImage from '../images/netflix.png';
-import hboImage from '../images/hbo.png';
+import netflixImage from "../images/netflix.png";
+import hboImage from "../images/hbo.png";
 
-import disney from '../images/disney.png';
-import spotify from '../images/spotify.png';
+import disney from "../images/disney.png";
+import spotify from "../images/spotify.png";
 
-import youtubeImage from '../images/youtube.png';
-import crunchyrollImage from '../images/crunchyroll.png';
-import {Friend} from './Friend'
+import youtubeImage from "../images/youtube.png";
+import crunchyrollImage from "../images/crunchyroll.png";
+import { Friend } from "./Friend";
 
 function NewGroup() {
-  const [searchText, setSearchText] = React.useState<string>('');
-
+  const [searchText, setSearchText] = React.useState<string>("");
+  const [searchFriend, setSearchFriend] = React.useState<string>("");
+  const friends = [
+    {
+      name: "winston",
+    },
+    {
+      name: "nina",
+    },
+    {
+      name: "tommy",
+    },
+    {
+      name: "young",
+    },
+  ];
   const subscriptions = [
     {
-      name: 'Netflix',
+      name: "Netflix",
       image: netflixImage,
     },
     {
-      name: 'HBO',
+      name: "HBO",
       image: hboImage,
     },
     {
-      name: 'Disney',
+      name: "Disney",
       image: disney,
     },
     {
-      name: 'Spotify',
+      name: "Spotify",
       image: spotify,
     },
     {
-      name: 'Youtube',
+      name: "Youtube",
       image: youtubeImage,
     },
     {
-      name: 'Crunchy',
+      name: "Crunchy",
       image: crunchyrollImage,
     },
   ];
@@ -48,9 +73,14 @@ function NewGroup() {
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
   }
-
+  function handleInputChangef(event: React.ChangeEvent<HTMLInputElement>) {
+    setSearchFriend(event.target.value);
+  }
   const filteredSubscriptions = subscriptions.filter((subscription) => {
     return subscription.name.toLowerCase().includes(searchText.toLowerCase());
+  });
+  const filteredFriends = friends.filter((friend) => {
+    return friend.name.toLowerCase().includes(searchFriend.toLowerCase());
   });
 
   return (
@@ -59,7 +89,12 @@ function NewGroup() {
         <Heading size="lg">Create Group</Heading>
         <Heading size="md">Subscriptions</Heading>
 
-        <Input placeholder="Search Subscriptions" size="sm" value={searchText} onChange={handleInputChange} />
+        <Input
+          placeholder="Search Subscriptions"
+          size="sm"
+          value={searchText}
+          onChange={handleInputChange}
+        />
         <Wrap>
           {filteredSubscriptions.map((subscription) => (
             <WrapItem key={subscription.name} margin="5px">
@@ -71,8 +106,17 @@ function NewGroup() {
         </Wrap>
 
         <Heading size="md">Friends</Heading>
-        <Friend name="Tommy"></Friend>
-
+        <Input
+          placeholder="Search Friends"
+          size="sm"
+          value={searchFriend}
+          onChange={handleInputChangef}
+        />
+        <VStack>
+          {filteredFriends.map((friend) => (
+            <Friend name={friend.name}></Friend>
+          ))}
+        </VStack>
       </Box>
     </div>
   );
