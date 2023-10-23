@@ -53,15 +53,13 @@ export default function GroupList() {
   ];
 
   return (
-    <Container bg={theme.colors.secondary[600]}>
+    <Container maxW='3xl'>
       <Box
         className="Header"
-        bg={theme.colors.primary[500]}
         w="100%"
         p={4}
-        color="white"
       >
-        <Heading as="h1" size="1xl" textAlign="center">
+        <Heading as="h1" size="md" textAlign="left">
           Groups
         </Heading>
       </Box>
