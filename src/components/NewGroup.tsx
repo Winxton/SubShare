@@ -126,7 +126,7 @@ function NewGroup(props: { onClose: () => void}) {
   }
 
   return (
-    <Modal isOpen={true} onClose={() => {}} size="xl">
+    <Modal isOpen={true} onClose={props.onClose} size="xl">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Create New Group</ModalHeader>
