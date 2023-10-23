@@ -114,7 +114,7 @@ export default function GroupList() {
         ))}
         <Text fontWeight="bold">Friend Groups</Text>
         {friendSubscriptions.map((subscription) => (
-          <Link to={`/group/${subscription.name}`} key={subscription.name}>
+          <Link to={`/view-group/${subscription.name}`} key={subscription.name}>
             <Subscription
               image={subscription.image}
               cost={subscription.cost}
