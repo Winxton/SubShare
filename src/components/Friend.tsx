@@ -1,12 +1,14 @@
-
-import { Flex, Text } from '@chakra-ui/react';
+import { Flex, Text, Image } from '@chakra-ui/react';
 
 export function Friend(props: {
-    name: string,
+    name: string;
+    image?: string; // Make image an optional property
+    isMe?: boolean; // Make isMe an optional property
 }) {
     return (
-        <Flex>
+        <Flex alignItems="start" justifyContent="flex-start">
+            {props.image && <Image src={props.image} alt={props.name} boxSize="50px" mr={2} />}
             <Text>{props.name}</Text>
         </Flex>
-    )
+    );
 }
