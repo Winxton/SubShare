@@ -114,7 +114,7 @@ function NewGroup() {
         />
         <VStack>
           {filteredFriends.map((friend) => (
-            <Friend name={friend.name}></Friend>
+            <Friend name={friend.name} isMe={false}></Friend>
           ))}
         </VStack>
       </Box>
