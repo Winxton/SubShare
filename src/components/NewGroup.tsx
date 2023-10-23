@@ -24,50 +24,31 @@ import spotify from "../images/spotify.png";
 
 import youtubeImage from "../images/youtube.png";
 import crunchyrollImage from "../images/crunchyroll.png";
-import { Friend } from "./Friend";
+
+import { Friend as FriendComponent } from "./Friend";
+import { Friend } from "../models/Friend";
+import { Subscription } from "../models/Subscription";
 
 function NewGroup() {
   const [searchText, setSearchText] = React.useState<string>("");
   const [searchFriend, setSearchFriend] = React.useState<string>("");
+  const [selectedSubscription, setSelectedSubscription] = React.useState<Subscription | null>(null);
+  const [selectedFriends, setSelectedFriends] = React.useState<Friend[]>([]);
+
   const friends = [
-    {
-      name: "winston",
-    },
-    {
-      name: "nina",
-    },
-    {
-      name: "tommy",
-    },
-    {
-      name: "young",
-    },
-  ];
+    new Friend("winston", "https://bit.ly/sage-adebayo"),
+    new Friend("nina", "https://bit.ly/dan-abramov"),
+    new Friend("tommy", "https://bit.ly/code-beast"),
+    new Friend("young", "https://bit.ly/sage-adebayo"),
+  ]
+
   const subscriptions = [
-    {
-      name: "Netflix",
-      image: netflixImage,
-    },
-    {
-      name: "HBO",
-      image: hboImage,
-    },
-    {
-      name: "Disney",
-      image: disney,
-    },
-    {
-      name: "Spotify",
-      image: spotify,
-    },
-    {
-      name: "Youtube",
-      image: youtubeImage,
-    },
-    {
-      name: "Crunchy",
-      image: crunchyrollImage,
-    },
+    new Subscription("Netflix", netflixImage, 20),
+    new Subscription("HBO", hboImage, 20),
+    new Subscription("Disney", disney, 20),
+    new Subscription("Spotify", spotify, 20),
+    new Subscription("Youtube", youtubeImage, 20),
+    new Subscription("Crunchy", crunchyrollImage, 20),
   ];
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -96,27 +77,40 @@ function NewGroup() {
           onChange={handleInputChange}
         />
         <Wrap>
-          {filteredSubscriptions.map((subscription) => (
-            <WrapItem key={subscription.name} margin="5px">
+          {filteredSubscriptions.map((subscription) => {
+            const isSelected = selectedSubscription?.name === subscription.name;
+            return (
+            <WrapItem key={subscription.name} margin="5px" onClick={() => setSelectedSubscription(subscription)} border={isSelected ? '1px solid blue' : 'none'} borderRadius={'md'}>
               <Square size="150px" border="1px solid grey">
                 <Image src={subscription.image} alt={subscription.name} />
               </Square>
             </WrapItem>
-          ))}
+          )})}
         </Wrap>
 
         <Heading size="md">Friends</Heading>
-        <Input
-          placeholder="Search Friends"
-          size="sm"
-          value={searchFriend}
-          onChange={handleInputChangef}
-        />
-        <VStack>
-          {filteredFriends.map((friend) => (
-            <Friend name={friend.name} isMe={false}></Friend>
-          ))}
-        </VStack>
+          <Input
+            placeholder="Search Friends"
+            size="sm"
+            value={searchFriend}
+            onChange={handleInputChangef}
+          />
+          <VStack>
+          {filteredFriends.map((friend) => {
+            const isSelected = selectedFriends.some((selectedFriend) => selectedFriend.name === friend.name);
+
+            return (
+              <Flex width="100%" onClick={() => {
+                const newSelectedFriends = isSelected
+                  ? selectedFriends.filter((selectedFriend) => selectedFriend.name !== friend.name)
+                  : [...selectedFriends, friend];
+                setSelectedFriends(newSelectedFriends);
+              }}>
+                <FriendComponent name={friend.name} isSelected={isSelected} image={friend.image} isMe={false}></FriendComponent>
+              </Flex>
+            );
+          })}
+          </VStack>
       </Box>
     </div>
   );

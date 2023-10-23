@@ -8,13 +8,32 @@ import {
   Text,
   Stack,
   StackDivider,
+  Button,
+  useDisclosure
 } from "@chakra-ui/react";
+
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react'
+
 import { Subscription } from "./Subscription";
 import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
+import NewGroup from './NewGroup'
+
+
+
 export default function GroupList() {
   const theme = useTheme();
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   const subscriptionCost = "$8.10";
   const savings = "$14.90";
   const profilePicture = "https://bit.ly/sage-adebayo";
@@ -32,6 +51,7 @@ export default function GroupList() {
       members: "2/6",
     },
   ];
+
   const friendSubscriptions = [
     {
       name: "Disney",
@@ -40,6 +60,7 @@ export default function GroupList() {
       members: "3/6",
     },
   ];
+
   return (
     <Container bg={theme.colors.secondary[600]}>
       <Box
@@ -80,8 +101,18 @@ export default function GroupList() {
         divider={<StackDivider borderColor="gray.200" />}
         spacing={4}
         align="stretch"
+        borderRadius={'md'}
+        padding="2"
       >
-        <Text fontWeight="bold">My Groups</Text>
+      <Flex align="center" justify="space-between">
+        <Box>
+          <Text fontWeight="bold">My Groups</Text>
+        </Box>
+        <Box>
+          <Button colorScheme="blue" onClick={onOpen}>New Group</Button>
+        </Box>
+      </Flex>
+
         {subscriptions.map((subscription) => (
           <Subscription
             image={subscription.image}
@@ -100,6 +131,25 @@ export default function GroupList() {
           />
         ))}
       </Stack>
+
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" >
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Create New Group</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <NewGroup/>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button variant='ghost' mr={3} onClick={onClose}>
+            Close
+          </Button>
+          <Button>Create Group</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+
     </Container>
   );
 }

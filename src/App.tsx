@@ -16,12 +16,6 @@ const Home = () => {
 function App() {
   return (
     <Router>
-        <Box mb="5">
-          <Button><Link to="/">My Groups</Link></Button>
-          <Button ml="2"><Link to="/new-group">New Group</Link></Button>
-          <Button ml="2"><Link to="/view-group">View a Group</Link></Button>
-        </Box>
-
         <Routes>
           <Route path="/" Component={GroupList} />
           <Route path="/new-group" Component={NewGroup} />
