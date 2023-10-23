@@ -6,8 +6,8 @@ export function Friend(props: {
     isMe?: boolean; // Make isMe an optional property
 }) {
     return (
-        <Flex alignItems="start" justifyContent="flex-start">
-            {props.image && <Image src={props.image} alt={props.name} boxSize="50px" mr={2} />}
+        <Flex alignItems="start" justifyContent="flex-start" bgColor={'white'} borderRadius="lg" padding="2" width={'100%'}>
+            {props.image && <Image borderRadius="full" src={props.image} alt={props.name} boxSize="50px" mr={2} />}
             <Text>{props.name}</Text>
         </Flex>
     );
