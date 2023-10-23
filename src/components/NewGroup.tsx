@@ -22,8 +22,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-} from '@chakra-ui/react'
-
+} from "@chakra-ui/react";
 
 import { Heading } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/react";
@@ -40,11 +39,13 @@ import crunchyrollImage from "../images/crunchyroll.png";
 import { Friend as FriendComponent } from "./Friend";
 import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
+import { Group } from "../models/Group";
 
-function NewGroup(props: { onClose: () => void}) {
+function NewGroup(props: { onClose: () => void }) {
   const [searchText, setSearchText] = React.useState<string>("");
   const [searchFriend, setSearchFriend] = React.useState<string>("");
-  const [selectedSubscription, setSelectedSubscription] = React.useState<Subscription | null>(null);
+  const [selectedSubscription, setSelectedSubscription] =
+    React.useState<Subscription | null>(null);
   const [selectedFriends, setSelectedFriends] = React.useState<Friend[]>([]);
 
   const friends = [
@@ -52,7 +53,7 @@ function NewGroup(props: { onClose: () => void}) {
     new Friend("nina", "https://bit.ly/dan-abramov"),
     new Friend("tommy", "https://bit.ly/code-beast"),
     new Friend("young", "https://bit.ly/sage-adebayo"),
-  ]
+  ];
 
   const subscriptions = [
     new Subscription("Netflix", netflixImage, 20),
@@ -77,52 +78,75 @@ function NewGroup(props: { onClose: () => void}) {
   });
 
   function renderNewGroup() {
-    return <Box>
-    <Heading size="lg">Create Group</Heading>
-    <Heading size="md">Subscriptions</Heading>
+    return (
+      <Box>
+        <Heading size="lg">Create Group</Heading>
+        <Heading size="md">Subscriptions</Heading>
 
-    <Input
-      placeholder="Search Subscriptions"
-      size="sm"
-      value={searchText}
-      onChange={handleInputChange}
-    />
-    <Wrap>
-      {filteredSubscriptions.map((subscription) => {
-        const isSelected = selectedSubscription?.name === subscription.name;
-        return (
-        <WrapItem key={subscription.name} margin="5px" onClick={() => setSelectedSubscription(subscription)} border={isSelected ? '1px solid blue' : 'none'} borderRadius={'md'}>
-          <Square size="150px" border="1px solid grey">
-            <Image src={subscription.image} alt={subscription.name} />
-          </Square>
-        </WrapItem>
-      )})}
-    </Wrap>
+        <Input
+          placeholder="Search Subscriptions"
+          size="sm"
+          value={searchText}
+          onChange={handleInputChange}
+        />
+        <Wrap>
+          {filteredSubscriptions.map((subscription) => {
+            const isSelected = selectedSubscription?.name === subscription.name;
+            return (
+              <WrapItem
+                key={subscription.name}
+                margin="5px"
+                onClick={() => {
+                  setSelectedSubscription(subscription);
+                }}
+                border={isSelected ? "1px solid blue" : "none"}
+                borderRadius={"md"}
+              >
+                <Square size="150px" border="1px solid grey">
+                  <Image src={subscription.image} alt={subscription.name} />
+                </Square>
+              </WrapItem>
+            );
+          })}
+        </Wrap>
 
-    <Heading size="md">Friends</Heading>
-      <Input
-        placeholder="Search Friends"
-        size="sm"
-        value={searchFriend}
-        onChange={handleInputChangefriend}
-      />
-      <VStack>
-      {filteredFriends.map((friend) => {
-        const isSelected = selectedFriends.some((selectedFriend) => selectedFriend.name === friend.name);
+        <Heading size="md">Friends</Heading>
+        <Input
+          placeholder="Search Friends"
+          size="sm"
+          value={searchFriend}
+          onChange={handleInputChangefriend}
+        />
+        <VStack>
+          {filteredFriends.map((friend) => {
+            const isSelected = selectedFriends.some(
+              (selectedFriend) => selectedFriend.name === friend.name
+            );
 
-        return (
-          <Flex width="100%" onClick={() => {
-            const newSelectedFriends = isSelected
-              ? selectedFriends.filter((selectedFriend) => selectedFriend.name !== friend.name)
-              : [...selectedFriends, friend];
-            setSelectedFriends(newSelectedFriends);
-          }}>
-            <FriendComponent name={friend.name} isSelected={isSelected} image={friend.image} isMe={false}></FriendComponent>
-          </Flex>
-        );
-      })}
-      </VStack>
-  </Box>
+            return (
+              <Flex
+                width="100%"
+                onClick={() => {
+                  const newSelectedFriends = isSelected
+                    ? selectedFriends.filter(
+                        (selectedFriend) => selectedFriend.name !== friend.name
+                      )
+                    : [...selectedFriends, friend];
+                  setSelectedFriends(newSelectedFriends);
+                }}
+              >
+                <FriendComponent
+                  name={friend.name}
+                  isSelected={isSelected}
+                  image={friend.image}
+                  isMe={false}
+                ></FriendComponent>
+              </Flex>
+            );
+          })}
+        </VStack>
+      </Box>
+    );
   }
 
   return (
@@ -131,15 +155,29 @@ function NewGroup(props: { onClose: () => void}) {
       <ModalContent>
         <ModalHeader>Create New Group</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          {renderNewGroup()}
-        </ModalBody>
+        <ModalBody>{renderNewGroup()}</ModalBody>
 
         <ModalFooter>
-          <Button variant='ghost' mr={3} onClick={props.onClose}>
+          <Button variant="ghost" mr={3} onClick={props.onClose}>
             Close
           </Button>
-          <Button>Create Group</Button>
+          <Button
+            onClick={() => {
+              if (selectedSubscription && selectedFriends.length > 0) {
+                const newGroup = new Group(
+                  selectedSubscription,
+                  selectedFriends
+                );
+                console.log(newGroup);
+                setSelectedSubscription(null);
+                setSelectedFriends([]);
+              } else {
+                console.log("error");
+              }
+            }}
+          >
+            Create Group
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
