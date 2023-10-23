@@ -18,13 +18,10 @@ function App() {
     <Router>
         <Routes>
           <Route path="/" Component={GroupList} />
-          <Route path="/new-group" Component={NewGroup} />
           <Route path="/view-group" Component={ViewGroup} />
         </Routes>
     </Router>
   );
-
-  return <NewGroup />;
 }
 
 export default App;
