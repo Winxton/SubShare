@@ -23,7 +23,6 @@ import { Link } from "react-router-dom";
 import { Group } from "../models/Group";
 
 
-
 export default function GroupList() {
   const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -32,12 +31,8 @@ export default function GroupList() {
   const subscriptionCost = "$8.10";
   const savings = "$14.90";
   const profilePicture = "https://bit.ly/sage-adebayo";
-  
-  
+
   useEffect(() => {
-    // TODO(Nina) Fetch the list of groups from the backend.
-    //https://localhost:4000/api/groups
-    
     fetch("http://localhost:4000/api/groups")
     .then((response) => {
       if (!response.ok) {
@@ -46,26 +41,21 @@ export default function GroupList() {
       return response.json();
     })
     .then((data) => {
-      console.log(data)
       setGroups(data.map((groupData: any) => {
         return new Group(
-          
-          new Subscription(groupData.subscription.name,netflixImage, groupData.subscription.cost),
+          new Subscription(groupData.subscription.name, groupData.subscription.image, groupData.subscription.cost),
           groupData.members
         );
       }));
       setLoading(false);
     })
+  }, [isOpen]);
 
-  
-
-
-
-  }, []);
   if (loading) {
     return <div>Loading...</div>;
   }
-  const friendSubscriptions = [
+
+  const invitedSubscriptions = [
     {
       name: "Disney",
       image: disney,
@@ -73,6 +63,8 @@ export default function GroupList() {
       members: "3/6",
     },
   ];
+
+  console.log("GROUPS")
   console.log(groups)
   return (
     <Container maxW='3xl'>
@@ -125,7 +117,6 @@ export default function GroupList() {
       </Flex>
       
       {groups.map((group) => (
-        
           <Link to={`/view-group/${group.subscription.name}`} key={group.subscription.name}>
             <SubscriptionComponent
               image={group?.subscription?.image}
@@ -135,8 +126,8 @@ export default function GroupList() {
             />
           </Link>
         ))}
-        <Text fontWeight="bold">Friend Groups</Text>
-        {friendSubscriptions.map((subscription) => (
+        <Text fontWeight="bold">Invited Groups</Text>
+        {invitedSubscriptions.map((subscription) => (
           <Link to={`/view-group/${subscription.name}`} key={subscription.name}>
             <SubscriptionComponent
               image={subscription.image}
