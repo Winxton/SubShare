@@ -81,9 +81,10 @@ app.post('/api/groups', (req, res) => {
 });
 
 // Delete a group
-app.delete('/api/groups/:index', (req, res) => {
-    const index = parseInt(req.params.index, 10);
-    if (index >= 0 && index < groups.length) {
+app.delete('/api/groups/:name', (req, res) => {
+    const groupName = req.params.name;
+    const index = groups.findIndex(group => group.subscription.name === groupName);
+    if (index !== -1) {
         const deletedGroup = groups.splice(index, 1);
         res.json(deletedGroup);
     } else {
