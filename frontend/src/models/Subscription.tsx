@@ -4,5 +4,5 @@
  * For example, Netflix.
  */
 export class Subscription {
-    constructor(public name: string, public image: string, public cost: number) {}
+    constructor(public name: string, image: string, public cost: number) {}
 }
