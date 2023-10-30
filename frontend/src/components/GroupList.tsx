@@ -46,10 +46,11 @@ export default function GroupList() {
       return response.json();
     })
     .then((data) => {
-      
+      console.log(data)
       setGroups(data.map((groupData: any) => {
         return new Group(
-          new Subscription(groupData.name, groupData.image, groupData.cost),
+          
+          new Subscription(groupData.subscription.name,netflixImage, groupData.subscription.cost),
           groupData.members
         );
       }));
@@ -57,10 +58,7 @@ export default function GroupList() {
     })
 
   
-    setGroups([
-      new Group(new Subscription("Netflix", netflixImage, 20), []),
-      new Group(new Subscription("Spotify", spotify, 10), []),
-    ]);
+
 
 
   }, []);
@@ -75,7 +73,7 @@ export default function GroupList() {
       members: "3/6",
     },
   ];
-
+  console.log(groups)
   return (
     <Container maxW='3xl'>
       <Box
@@ -125,14 +123,15 @@ export default function GroupList() {
           <Button colorScheme="blue" onClick={onOpen}>New Group</Button>
         </Box>
       </Flex>
-
+      
       {groups.map((group) => (
+        
           <Link to={`/view-group/${group.subscription.name}`} key={group.subscription.name}>
             <SubscriptionComponent
-              image={group.subscription.image}
-              cost={group.subscription.cost.toString()}
-              name={group.subscription.name}
-              members={group.friends.length.toString()}
+              image={group?.subscription?.image}
+              cost={group?.subscription?.cost.toString()}
+              name={group?.subscription?.name}
+              members={group?.friends?.length?.toString()}
             />
           </Link>
         ))}
