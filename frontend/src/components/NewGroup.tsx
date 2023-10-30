@@ -108,6 +108,9 @@ function NewGroup(props: { onClose: () => void }) {
       .then((data) => {
         console.log("Response data:", data);
         // You can work with the response data here
+
+        // Close the modal after successful response
+        props.onClose();
       })
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
@@ -200,20 +203,24 @@ function NewGroup(props: { onClose: () => void }) {
           </Button>
           <Button
             onClick={() => {
-              if (selectedSubscription && selectedFriends.length > 0) {
-                const newGroup = new Group(
-                  selectedSubscription,
-                  selectedFriends
-                );
-                console.log(newGroup);
-                setSelectedSubscription(null);
-                setSelectedFriends([]);
-
-                // TODO(tommy): Send an API Request to the server to create a new group
-                sendPostRequestToServer(newGroup);
-              } else {
-                console.log("error");
+              if (!selectedSubscription) {
+                console.log("Error: Please select a subscription");
+                return;
               }
+
+              if (selectedFriends.length === 0) {
+                console.log("Error: Please select at least one friend");
+                return;
+              }
+
+              // If both conditions are met, proceed to create and send the API request
+              const newGroup = new Group(selectedSubscription, selectedFriends);
+              console.log(newGroup);
+              setSelectedSubscription(null);
+              setSelectedFriends([]);
+
+              // TODO(tommy): Send an API Request to the server to create a new group
+              sendPostRequestToServer(newGroup);
             }}
           >
             Create Group
