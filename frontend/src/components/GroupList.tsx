@@ -18,30 +18,55 @@ import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
 import NewGroup from './NewGroup'
-import React from "react";
+import React,{ useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Group } from "../models/Group";
+
 
 
 export default function GroupList() {
   const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [groups, setGroups] = React.useState<Group[]>([]);
-
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [loading, setLoading] = useState(true);
   const subscriptionCost = "$8.10";
   const savings = "$14.90";
   const profilePicture = "https://bit.ly/sage-adebayo";
   
-  React.useEffect(() => {
+  
+  useEffect(() => {
     // TODO(Nina) Fetch the list of groups from the backend.
+    //https://localhost:4000/api/groups
     
+    fetch("http://localhost:4000/api/groups")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      
+      setGroups(data.map((groupData: any) => {
+        return new Group(
+          new Subscription(groupData.name, groupData.image, groupData.cost),
+          groupData.members
+        );
+      }));
+      setLoading(false);
+    })
+
+  
     setGroups([
       new Group(new Subscription("Netflix", netflixImage, 20), []),
       new Group(new Subscription("Spotify", spotify, 10), []),
     ]);
 
-  }, []);
 
+  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   const friendSubscriptions = [
     {
       name: "Disney",
