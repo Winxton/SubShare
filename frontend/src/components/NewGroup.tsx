@@ -215,11 +215,10 @@ function NewGroup(props: { onClose: () => void }) {
 
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, selectedFriends);
-              console.log(newGroup);
+              // console.log(newGroup);
               setSelectedSubscription(null);
               setSelectedFriends([]);
 
-              // TODO(tommy): Send an API Request to the server to create a new group
               sendPostRequestToServer(newGroup);
             }}
           >
