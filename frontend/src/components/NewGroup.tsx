@@ -77,6 +77,43 @@ function NewGroup(props: { onClose: () => void }) {
     return friend.name.toLowerCase().includes(searchFriend.toLowerCase());
   });
 
+  function sendPostRequestToServer(group: Group) {
+    // Define the URL of the server where you want to send the POST request
+    const url = 'https://localhost:4000/api/groups';
+
+    // Create an object with the data you want to send in the request body
+    const data = {
+      key1: 'value1',
+      key2: 'value2'
+    };
+
+    // Create the request configuration object
+    const requestOptions = {
+      method: 'POST', // HTTP request method
+      headers: {
+        'Content-Type': 'application/json', // Set the content type to JSON
+        // You can also include additional headers here if needed
+      },
+      body: JSON.stringify(data) // Convert the data object to a JSON string
+    };
+
+    // Send the POST request using the fetch function
+    fetch(url, requestOptions)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse the response body as JSON
+      })
+      .then(data => {
+        console.log('Response data:', data);
+        // You can work with the response data here
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+      });
+  }
+
   function renderNewGroup() {
     return (
       <Box>
@@ -171,6 +208,9 @@ function NewGroup(props: { onClose: () => void }) {
                 console.log(newGroup);
                 setSelectedSubscription(null);
                 setSelectedFriends([]);
+
+                // TODO(tommy): Send an API Request to the server to create a new group
+
               } else {
                 console.log("error");
               }

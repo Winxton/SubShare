@@ -28,6 +28,7 @@ app.get('/api/groups', (req, res) => {
 // Create a new group
 app.post('/api/groups', (req, res) => {
     const { subscription, friends } = req.body;
+
     const newGroup = new Group(subscription, friends);
     groups.push(newGroup);
     res.status(201).json(newGroup);
