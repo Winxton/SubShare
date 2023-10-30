@@ -24,6 +24,44 @@ let groups: Group[] = [];
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
 let friends: Friend[] = []; 
 
+app.get('/api/friends', (req, res) => {
+    res.json(friends);
+});
+
+app.put('/api/friends/:currentName', (req, res) => {
+    const { currentName } = req.params;
+    const { newName } = req.body;
+  
+    const friend = friends.find((f) => f.name === currentName);
+  
+    if (!friend) {
+      return res.status(404).json({ message: 'Friend not found' });
+    }
+  
+    friend.name = newName;
+  
+    res.json(friend);
+});
+
+app.post('/api/friends', (req, res) => {
+    const { name, image } = req.body;
+    const newFriend = new Friend(name, image);
+    friends.push(newFriend);
+    res.status(201).json(newFriend);
+  });
+
+app.delete('/api/friends/:name', (req, res) => {
+    const { name } = req.params;
+    const index = friends.findIndex((f) => f.name === name);
+
+    if (index === -1) {
+        return res.status(404).json({ message: 'Friend not found' });
+    }
+
+    const deletedFriend = friends.splice(index, 1);
+    res.json({ message: 'Friend deleted', friend: deletedFriend[0] });
+});
+
 // List all groups
 app.get('/api/groups', (req, res) => {
     res.json(groups);
