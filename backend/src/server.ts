@@ -18,7 +18,11 @@ class Friend {
     constructor (public name: string, public image: string) {}
 }
 
-let groups: Group[] = [];  // This will serve as our in-memory database for now
+// This will serve as our in-memory database for now
+let groups: Group[] = []; 
+
+// TODO(young): Add the APIs to be able to create, update, and delete friends.
+let friends: Friend[] = []; 
 
 // List all groups
 app.get('/api/groups', (req, res) => {
