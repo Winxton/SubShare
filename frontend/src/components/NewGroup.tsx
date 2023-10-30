@@ -48,12 +48,28 @@ function NewGroup(props: { onClose: () => void }) {
     React.useState<Subscription | null>(null);
   const [selectedFriends, setSelectedFriends] = React.useState<Friend[]>([]);
 
-  const friends = [
-    new Friend("winston", "https://bit.ly/sage-adebayo"),
-    new Friend("nina", "https://bit.ly/dan-abramov"),
-    new Friend("tommy", "https://bit.ly/code-beast"),
-    new Friend("young", "https://bit.ly/sage-adebayo"),
-  ];
+  const [friends, setFriends] = React.useState<Friend[]>([]);
+
+  React.useEffect(() => {
+    fetch('http://localhost:4000/api/friends')
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((friends) => {
+      const friendObjects = friends.map((friendData: any) => {
+        return new Friend(
+          friendData.name,
+          friendData.image,
+        )
+      });
+      
+      setFriends(friendObjects);
+    })
+
+  }, []);
 
   const subscriptions = [
     new Subscription("Netflix", netflixImage, 20),

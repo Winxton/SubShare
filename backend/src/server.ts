@@ -26,7 +26,12 @@ class Friend {
 let groups: Group[] = []; 
 
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
-let friends: Friend[] = []; 
+let friends: Friend[] = [
+  new Friend("winston", "https://bit.ly/sage-adebayo"),
+  new Friend("nina", "https://bit.ly/dan-abramov"),
+  new Friend("tommy", "https://bit.ly/code-beast"),
+  new Friend("young", "https://bit.ly/sage-adebayo"),
+];
 
 app.get('/api/friends', (req, res) => {
     res.json(friends);
