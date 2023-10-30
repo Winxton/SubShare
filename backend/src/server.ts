@@ -1,10 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 const PORT = 4000;
 
 app.use(bodyParser.json());
+
+// Enable all CORS requests
+app.use(cors());
 
 class Subscription {
     constructor(public name: string, public image: string, public cost: number) {}
