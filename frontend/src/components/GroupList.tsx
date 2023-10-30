@@ -12,36 +12,35 @@ import {
   useDisclosure
 } from "@chakra-ui/react";
 
-import { Subscription } from "./Subscription";
+import { Subscription as SubscriptionComponent } from "./Subscription";
+import { Subscription } from "../models/Subscription";
 import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
 import NewGroup from './NewGroup'
 import React from "react";
 import { Link } from "react-router-dom";
+import { Group } from "../models/Group";
 
 
 export default function GroupList() {
   const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [groups, setGroups] = React.useState<Group[]>([]);
 
   const subscriptionCost = "$8.10";
   const savings = "$14.90";
   const profilePicture = "https://bit.ly/sage-adebayo";
-  const subscriptions = [
-    {
-      name: "Netflix",
-      image: netflixImage,
-      cost: "$3.75",
-      members: "3/5",
-    },
-    {
-      name: "Spotify",
-      image: spotify,
-      cost: "$4.33",
-      members: "2/6",
-    },
-  ];
+  
+  React.useEffect(() => {
+    // TODO(Nina) Fetch the list of groups from the backend.
+    
+    setGroups([
+      new Group(new Subscription("Netflix", netflixImage, 20), []),
+      new Group(new Subscription("Spotify", spotify, 10), []),
+    ]);
+
+  }, []);
 
   const friendSubscriptions = [
     {
@@ -102,20 +101,20 @@ export default function GroupList() {
         </Box>
       </Flex>
 
-      {subscriptions.map((subscription) => (
-          <Link to={`/view-group/${subscription.name}`} key={subscription.name}>
-            <Subscription
-              image={subscription.image}
-              cost={subscription.cost}
-              name={subscription.name}
-              members={subscription.members}
+      {groups.map((group) => (
+          <Link to={`/view-group/${group.subscription.name}`} key={group.subscription.name}>
+            <SubscriptionComponent
+              image={group.subscription.image}
+              cost={group.subscription.cost.toString()}
+              name={group.subscription.name}
+              members={group.friends.length.toString()}
             />
           </Link>
         ))}
         <Text fontWeight="bold">Friend Groups</Text>
         {friendSubscriptions.map((subscription) => (
           <Link to={`/view-group/${subscription.name}`} key={subscription.name}>
-            <Subscription
+            <SubscriptionComponent
               image={subscription.image}
               cost={subscription.cost}
               name={subscription.name}
