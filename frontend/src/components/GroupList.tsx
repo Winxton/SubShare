@@ -9,7 +9,7 @@ import {
   Stack,
   StackDivider,
   Button,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { Subscription as SubscriptionComponent } from "./Subscription";
@@ -17,15 +17,14 @@ import { Subscription } from "../models/Subscription";
 import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
-import NewGroup from './NewGroup'
-import React,{ useEffect, useState } from "react";
+import NewGroup from "./NewGroup";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Group } from "../models/Group";
 
-
 export default function GroupList() {
   const theme = useTheme();
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const subscriptionCost = "$8.10";
@@ -34,21 +33,27 @@ export default function GroupList() {
 
   useEffect(() => {
     fetch("http://localhost:4000/api/groups")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      setGroups(data.map((groupData: any) => {
-        return new Group(
-          new Subscription(groupData.subscription.name, groupData.subscription.image, groupData.subscription.cost),
-          groupData.members
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setGroups(
+          data.map((groupData: any) => {
+            return new Group(
+              new Subscription(
+                groupData.subscription.name,
+                groupData.subscription.image,
+                groupData.subscription.cost
+              ),
+              groupData.members
+            );
+          })
         );
-      }));
-      setLoading(false);
-    })
+        setLoading(false);
+      });
   }, [isOpen]);
 
   if (loading) {
@@ -64,15 +69,11 @@ export default function GroupList() {
     },
   ];
 
-  console.log("GROUPS")
-  console.log(groups)
+  // console.log("GROUPS");
+  // console.log(groups);
   return (
-    <Container maxW='3xl'>
-      <Box
-        className="Header"
-        w="100%"
-        p={4}
-      >
+    <Container maxW="3xl">
+      <Box className="Header" w="100%" p={4}>
         <Heading as="h1" size="md" textAlign="left">
           Groups
         </Heading>
@@ -104,20 +105,25 @@ export default function GroupList() {
         divider={<StackDivider borderColor="gray.200" />}
         spacing={4}
         align="stretch"
-        borderRadius={'md'}
+        borderRadius={"md"}
         padding="2"
       >
-      <Flex align="center" justify="space-between">
-        <Box>
-          <Text fontWeight="bold">My Groups</Text>
-        </Box>
-        <Box>
-          <Button colorScheme="blue" onClick={onOpen}>New Group</Button>
-        </Box>
-      </Flex>
-      
-      {groups.map((group) => (
-          <Link to={`/view-group/${group.subscription.name}`} key={group.subscription.name}>
+        <Flex align="center" justify="space-between">
+          <Box>
+            <Text fontWeight="bold">My Groups</Text>
+          </Box>
+          <Box>
+            <Button colorScheme="blue" onClick={onOpen}>
+              New Group
+            </Button>
+          </Box>
+        </Flex>
+
+        {groups.map((group) => (
+          <Link
+            to={`/view-group/${group.subscription.name}`}
+            key={group.subscription.name}
+          >
             <SubscriptionComponent
               image={group?.subscription?.image}
               cost={group?.subscription?.cost.toString()}
@@ -139,9 +145,7 @@ export default function GroupList() {
         ))}
       </Stack>
 
-
-      {isOpen && <NewGroup onClose={onClose}/>}
-
+      {isOpen && <NewGroup onClose={onClose} />}
     </Container>
   );
 }
