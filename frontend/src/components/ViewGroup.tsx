@@ -28,7 +28,7 @@ export default function ViewGroup() {
 
   useEffect(() => {
     console.log(groupName);
-    fetch(`http://localhost:4000/api/view-group/?groupName=${groupName}`)
+    fetch(`http://localhost:4000/api/groups/?groupName=${groupName}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
