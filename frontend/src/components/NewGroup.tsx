@@ -51,24 +51,20 @@ function NewGroup(props: { onClose: () => void }) {
   const [friends, setFriends] = React.useState<Friend[]>([]);
 
   React.useEffect(() => {
-    fetch('http://localhost:4000/api/friends')
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((friends) => {
-      const friendObjects = friends.map((friendData: any) => {
-        return new Friend(
-          friendData.name,
-          friendData.image,
-        )
-      });
-      
-      setFriends(friendObjects);
-    })
+    fetch("http://localhost:4000/api/friends")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((friends) => {
+        const friendObjects = friends.map((friendData: any) => {
+          return new Friend(friendData.name, friendData.image);
+        });
 
+        setFriends(friendObjects);
+      });
   }, []);
 
   const subscriptions = [

@@ -94,8 +94,6 @@ export default function GroupList() {
     },
   ];
 
-  // console.log("GROUPS");
-  // console.log(groups);
   return (
     <Container maxW="3xl">
       <Box className="Header" w="100%" p={4}>
