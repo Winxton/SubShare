@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
   Heading,
@@ -9,14 +9,10 @@ import {
   Text,
   useTheme,
   Divider,
-  Avatar,
+  IconButton,
   Center,
 } from "@chakra-ui/react";
-import spotify from "../images/spotify.png";
-import friend1 from "../images/friend1.jpg";
-import friend2 from "../images/friend2.jpg";
-import friend3 from "../images/friend3.jpg";
-import friend4 from "../images/friend4.jpg";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Friend } from "./Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
@@ -24,6 +20,7 @@ import { Group } from "../models/Group";
 export default function ViewGroup() {
   const theme = useTheme();
   const { groupName } = useParams();
+  const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
   const savedAmount = "10";
   const owedAmount = "5";
@@ -64,22 +61,31 @@ export default function ViewGroup() {
     return <div>No matching group found.</div>;
   }
   return (
-    <Container bg={theme.colors.secondary[600]}>
+    <Container border="1px" /*bg={theme.colors.secondary[600]}*/>
+      <IconButton
+        left="16px"
+        top="16px"
+        aria-label="Go back"
+        icon={<ArrowBackIcon />}
+        onClick={() => {
+          navigate(-1);
+        }}
+      />
       <Box
         className="Header"
-        bg={theme.colors.primary[500]}
+        //bg={theme.colors.primary[500]}
         w="100%"
         p={4}
-        color="white"
+        color="black"
       >
-        <Heading as="h1" size="1xl" textAlign="center">
+        <Heading as="h1" size="lg" textAlign="center">
           {selectGroup.subscription.name} Group
         </Heading>
       </Box>
 
       <Box p={4}>
         {/* Shaded section with background color */}
-        <Box bg="gray.200" p={4} borderRadius="md">
+        <Box /*bg="gray.200"*/ p={4} borderRadius="md">
           <Center mb={4}>
             <Image
               src={selectGroup.subscription.image}
