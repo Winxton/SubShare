@@ -61,7 +61,7 @@ export default function ViewGroup() {
     return <div>No matching group found.</div>;
   }
   return (
-    <Container border="1px" /*bg={theme.colors.secondary[600]}*/>
+    <Container maxW="3xl" /*bg={theme.colors.secondary[600]}*/>
       <IconButton
         left="16px"
         top="16px"
