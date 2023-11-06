@@ -27,7 +27,6 @@ export default function ViewGroup() {
   // Use the `groupName` as part of the group name
 
   useEffect(() => {
-    console.log(groupName);
     fetch(`http://localhost:4000/api/groups/?groupName=${groupName}`)
       .then((response) => {
         if (!response.ok) {
@@ -36,7 +35,6 @@ export default function ViewGroup() {
         return response.json();
       })
       .then((groupData) => {
-        console.log(`filteredGroup ${groupData}`);
         if (groupData.length > 0) {
           // Assuming the server returns an array, but you can modify the structure as needed
           const firstGroup = groupData[0];
