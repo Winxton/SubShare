@@ -71,9 +71,21 @@ app.delete('/api/friends/:name', (req, res) => {
     res.json({ message: 'Friend deleted', friend: deletedFriend[0] });
 });
 
-// List all groups
+//get selected groups
 app.get('/api/groups', (req, res) => {
-    res.json(groups);
+    const { groupName } = req.query;
+    if (groupName) {
+        const filteredGroup = groups.find(group => group.subscription.name === groupName);
+
+        if (filteredGroup) {
+            res.json([filteredGroup]); 
+            console.log(`filteredGroup ${filteredGroup}`)// Wrap the result in an array
+        } else {
+            res.status(404).json({ message: 'Group not found' });
+        }
+    } else {
+        res.json(groups);
+    }
 });
 
 // Create a new group
