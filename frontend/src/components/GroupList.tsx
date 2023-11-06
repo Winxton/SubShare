@@ -21,7 +21,9 @@ import NewGroup from './NewGroup'
 import React,{ useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Group } from "../models/Group";
-
+import { DeleteIcon } from "@chakra-ui/icons"
+import { IconButton } from '@chakra-ui/react'
+import { SearchIcon } from "@chakra-ui/icons";
 
 export default function GroupList() {
   const theme = useTheme();
@@ -32,6 +34,23 @@ export default function GroupList() {
   const savings = "$14.90";
   const profilePicture = "https://bit.ly/sage-adebayo";
 
+  const handleDeleteGroup = (groupToDelete) => {
+    // Send a DELETE request to your API to delete the group
+    fetch(`http://localhost:4000/api/groups/${groupToDelete.subscription.name}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        // Remove the deleted group from the state
+        setGroups((prevGroups) => prevGroups.filter((group) => group !== groupToDelete));
+      })
+      .catch((error) => {
+        console.error("Error deleting group:", error);
+      });
+  };
+  
   useEffect(() => {
     fetch("http://localhost:4000/api/groups")
     .then((response) => {
@@ -117,14 +136,25 @@ export default function GroupList() {
       </Flex>
       
       {groups.map((group) => (
+          <Flex align="center" justify="space-between">
           <Link to={`/view-group/${group.subscription.name}`} key={group.subscription.name}>
+       
             <SubscriptionComponent
-              image={group?.subscription?.image}
-              cost={group?.subscription?.cost.toString()}
-              name={group?.subscription?.name}
-              members={group?.friends?.length?.toString()}
-            />
+            image={group?.subscription?.image}
+            cost={group?.subscription?.cost.toString()}
+            name={group?.subscription?.name}
+            members={group?.friends?.length?.toString()}
+          />
+
           </Link>
+          <IconButton
+                aria-label='delete group'
+                icon={<DeleteIcon />}
+                colorScheme="red"
+                onClick={() => handleDeleteGroup(group)}
+              />
+           </Flex>
+
         ))}
         <Text fontWeight="bold">Invited Groups</Text>
         {invitedSubscriptions.map((subscription) => (
