@@ -4,7 +4,7 @@ import Login from './Login'
 import GroupList from './GroupList';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../constants';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function Main() {
     const [session, setSession] = useState<Session | null>(null)
@@ -20,7 +20,7 @@ export default function Main() {
       }, [])
     
     if (session) { 
-        return <GroupList/>
+        return <GroupList session={session}/>
     } else {
         return <Login/>
     }
