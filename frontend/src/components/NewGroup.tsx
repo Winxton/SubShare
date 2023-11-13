@@ -40,6 +40,7 @@ import { Friend as FriendComponent } from "./Friend";
 import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
+import { API_URL } from "../constants";
 
 function NewGroup(props: { onClose: () => void }) {
   const [searchText, setSearchText] = React.useState<string>("");
@@ -51,24 +52,20 @@ function NewGroup(props: { onClose: () => void }) {
   const [friends, setFriends] = React.useState<Friend[]>([]);
 
   React.useEffect(() => {
-    fetch('http://localhost:4000/api/friends')
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((friends) => {
-      const friendObjects = friends.map((friendData: any) => {
-        return new Friend(
-          friendData.name,
-          friendData.image,
-        )
-      });
-      
-      setFriends(friendObjects);
-    })
+    fetch("http://localhost:4000/api/friends")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((friends) => {
+        const friendObjects = friends.map((friendData: any) => {
+          return new Friend(friendData.name, friendData.image);
+        });
 
+        setFriends(friendObjects);
+      });
   }, []);
 
   const subscriptions = [
@@ -95,7 +92,7 @@ function NewGroup(props: { onClose: () => void }) {
 
   function sendPostRequestToServer(group: Group) {
     // Define the URL of the server where you want to send the POST request
-    const url = "http://localhost:4000/api/groups";
+    const url = `${API_URL}/groups`;
 
     // Create an object with the data you want to send in the request body
     const data = {
@@ -136,7 +133,6 @@ function NewGroup(props: { onClose: () => void }) {
   function renderNewGroup() {
     return (
       <Box>
-        <Heading size="lg">Create Group</Heading>
         <Heading size="md">Subscriptions</Heading>
 
         <Input
