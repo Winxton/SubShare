@@ -1,4 +1,5 @@
-import { Button, Container, Input } from "@chakra-ui/react";
+import { Button, Container, Input, Image, Box } from "@chakra-ui/react";
+import loginImageURL from "../images/SubscriptionAppLogo.png";
 import { useState } from "react";
 import { supabase } from "./Main";
 import { API_URL } from "../constants";
@@ -26,15 +27,27 @@ export default function Login() {
 
   // TODO:(nina) Add the logo here
   return (
-    <Container maxW="3xl">
+    <Box
+      height="100vh"
+      display="flex"
+      flexDirection={"column"}
+      alignItems="center"
+      justifyContent="center"
+    >
+      {/* Add your image using the Image component */}
+      <Image src={loginImageURL} alt="Login Image" boxSize="300px" mb={4} />
+
       <Input
         placeholder="Email"
-        value={email}
         onChange={(e) => setEmail(e.target.value)}
+        w="300px"
+        mb={4}
       />
-      <Button colorScheme="blue" onClick={loginWithOTP}>
-        Login
-      </Button>
-    </Container>
+      <Box width="300px">
+        <Button colorScheme="blue" onClick={loginWithOTP} w="100%">
+          Login
+        </Button>
+      </Box>
+    </Box>
   );
 }
