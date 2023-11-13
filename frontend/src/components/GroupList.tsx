@@ -17,6 +17,8 @@ import { Subscription } from "../models/Subscription";
 import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
+import {API_URL} from "../constants";
+
 import NewGroup from "./NewGroup";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -37,7 +39,7 @@ export default function GroupList() {
   const handleDeleteGroup = (groupToDelete) => {
     // Send a DELETE request to your API to delete the group
     fetch(
-      `http://localhost:4000/api/groups/${groupToDelete.subscription.name}`,
+      `${API_URL}/groups/${groupToDelete.subscription.name}`,
       {
         method: "DELETE",
       }
@@ -57,7 +59,7 @@ export default function GroupList() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/groups")
+    fetch(`${API_URL}/groups`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

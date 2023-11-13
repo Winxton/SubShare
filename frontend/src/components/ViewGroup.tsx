@@ -12,6 +12,7 @@ import {
   IconButton,
   Center,
 } from "@chakra-ui/react";
+import { API_URL } from "../constants";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Friend } from "./Friend";
 import { Subscription } from "../models/Subscription";
@@ -27,7 +28,7 @@ export default function ViewGroup() {
   // Use the `groupName` as part of the group name
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/groups/?groupName=${groupName}`)
+    fetch(`${API_URL}/groups/?groupName=${groupName}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
