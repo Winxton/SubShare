@@ -1,6 +1,8 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+import { getUser, createGroup, getGroups } from "./database";
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -18,7 +20,7 @@ class Subscription {
 }
 
 class Group {
-  constructor(public subscription: Subscription, public friends: Friend) {}
+  constructor(public subscription: Subscription, public friends: Friend[]) {}
 }
 
 class Friend {
@@ -79,7 +81,7 @@ app.delete("/api/friends/:name", (req, res) => {
 // API routes related to groups
 
 //get selected groups
-app.get("/api/groups", (req, res) => {
+app.get("/api/groups", async (req, res) => {
   const { groupName } = req.query;
   if (groupName) {
     const filteredGroup = groups.find(
@@ -93,16 +95,38 @@ app.get("/api/groups", (req, res) => {
       res.status(404).json({ message: "Group not found" });
     }
   } else {
-    res.json(groups);
+    // Get all groups from the database
+    const accessToken = req.headers.access_token;
+    const user = await getUser(accessToken);
+    const groups = await getGroups(user.id);
+
+    const jsonGroups = groups.map((group) => {
+      return new Group(
+        new Subscription(group.name, group.image, group.cost),
+        []
+      );
+    });
+
+    res.json(jsonGroups);
   }
 });
 
 // Create a new group
-app.post("/api/groups", (req, res) => {
+app.post("/api/groups", async (req, res) => {
   const { subscription, friends } = req.body;
 
   const newGroup = new Group(subscription, friends);
-  groups.push(newGroup);
+
+  const accessToken = req.headers.access_token;
+  const user = await getUser(accessToken);
+
+  const created = createGroup(
+    user.id,
+    subscription.name,
+    subscription.cost,
+    new Date(),
+    subscription.image
+  );
 
   res.status(201).json(newGroup);
 });

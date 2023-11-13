@@ -2,7 +2,7 @@ import { Button, Container, Input, Image, Box } from "@chakra-ui/react";
 import loginImageURL from "../images/SubscriptionAppLogo.png";
 import { useState } from "react";
 import { supabase } from "./Main";
-import { API_URL } from "../constants";
+import { APP_URL } from "../constants";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,7 +12,7 @@ export default function Login() {
       options: {
         // set this to false if you do not want the user to be automatically signed up
         shouldCreateUser: true,
-        emailRedirectTo: API_URL,
+        emailRedirectTo: APP_URL,
       },
     });
     console.log(data);

@@ -1,5 +1,6 @@
 import React from "react";
 import logo from "./logo.svg";
+import { Session } from "@supabase/supabase-js";
 
 import {
   Button,
@@ -42,7 +43,7 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 
-function NewGroup(props: { onClose: () => void }) {
+function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
   const [searchFriend, setSearchFriend] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] =
@@ -105,7 +106,7 @@ function NewGroup(props: { onClose: () => void }) {
       method: "POST", // HTTP request method
       headers: {
         "Content-Type": "application/json", // Set the content type to JSON
-        // You can also include additional headers here if needed
+        access_token: props.session!.access_token,
       },
       body: JSON.stringify(data), // Convert the data object to a JSON string
     };
