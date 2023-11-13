@@ -1,8 +1,8 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 
 const { createClient } = require("@supabase/supabase-js");
-const APP_URL = 'http://localhost:3000'
+const APP_URL = "http://localhost:3000";
 
 interface User {
   email: string;
@@ -34,5 +34,20 @@ async function selectUsers(supabase) {
   users.map((user) => console.log(user.email));
 }
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+async function getUser(supabase, accessToken) {
+  const userResp = await supabase.auth.getUser(accessToken);
+  const { user, error } = userResp;
+
+  if (user) {
+    console.log(user);
+  } else {
+    console.log("Error");
+  }
+}
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
+
 selectUsers(supabase);

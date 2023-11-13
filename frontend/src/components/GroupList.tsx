@@ -1,3 +1,6 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 import {
   Container,
   Box,
@@ -11,6 +14,11 @@ import {
   Button,
   useDisclosure,
 } from "@chakra-ui/react";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { IconButton } from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
+
+import { Session } from "@supabase/supabase-js";
 
 import { Subscription as SubscriptionComponent } from "./Subscription";
 import { Subscription } from "../models/Subscription";
@@ -20,14 +28,11 @@ import disney from "../images/disney.png";
 import {API_URL} from "../constants";
 
 import NewGroup from "./NewGroup";
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { Group } from "../models/Group";
-import { DeleteIcon } from "@chakra-ui/icons";
-import { IconButton } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
 
-export default function GroupList() {
+import { supabase } from "./Main";
+
+export default function GroupList(props: { session: Session | null}) {
   const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
@@ -98,10 +103,13 @@ export default function GroupList() {
 
   return (
     <Container maxW="3xl">
-      <Box className="Header" w="100%" p={4}>
+      <Box className="Header" w="100%" p={4} display="flex" justifyContent="space-between" alignItems="center">
         <Heading as="h1" size="md" textAlign="left">
           Groups
         </Heading>
+        <Button size="sm" variant={'ghost'} onClick={() => {
+          supabase.auth.signOut();
+        }}>Sign Out</Button>
       </Box>
       <Flex className="Profile" margin="10px">
         <Avatar src={profilePicture} marginRight="10px" />

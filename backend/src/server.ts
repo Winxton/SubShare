@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 
 const express = require("express");
@@ -35,6 +35,8 @@ let friends: Friend[] = [
   new Friend("tommy", "https://bit.ly/code-beast"),
   new Friend("young", "https://bit.ly/sage-adebayo"),
 ];
+
+// API routes related to friends
 
 app.get("/api/friends", (req, res) => {
   res.json(friends);
@@ -73,6 +75,8 @@ app.delete("/api/friends/:name", (req, res) => {
   const deletedFriend = friends.splice(index, 1);
   res.json({ message: "Friend deleted", friend: deletedFriend[0] });
 });
+
+// API routes related to groups
 
 //get selected groups
 app.get("/api/groups", (req, res) => {
