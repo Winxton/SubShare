@@ -8,6 +8,11 @@ interface User {
   email: string;
 }
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+);
+
 async function signInWithEmail(email: string) {
   const { data, error } = await supabase.auth.signInWithOtp({
     email: email,
@@ -34,20 +39,47 @@ async function selectUsers(supabase) {
   users.map((user) => console.log(user.email));
 }
 
-async function getUser(supabase, accessToken) {
+// Get User by Token
+export async function getUser(accessToken: string) {
   const userResp = await supabase.auth.getUser(accessToken);
-  const { user, error } = userResp;
 
-  if (user) {
-    console.log(user);
-  } else {
-    console.log("Error");
-  }
+  const { data, error } = userResp;
+
+  return data.user;
 }
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+// Get Groups
 
-selectUsers(supabase);
+export async function createGroup(userId, name, cost, createdDate, image) {
+  const resp = await supabase.from("groups").insert([
+    {
+      user_id: userId,
+      name: name,
+      cost: cost,
+      created_date: createdDate,
+      image: image,
+    },
+  ]);
+
+  if (resp.error) {
+    console.error("Error creating group:", resp.error);
+    return null;
+  }
+
+  return resp.data;
+}
+
+export async function getGroups(userId) {
+  const resp = await supabase
+    .from("groups")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_date", { ascending: false });
+
+  if (resp.error) {
+    console.error("Error getting groups:", resp.error);
+    return null;
+  }
+
+  return resp.data;
+}

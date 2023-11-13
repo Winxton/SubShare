@@ -25,14 +25,14 @@ import { Subscription } from "../models/Subscription";
 import netflixImage from "../images/netflix.png";
 import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
-import {API_URL} from "../constants";
+import { API_URL } from "../constants";
 
 import NewGroup from "./NewGroup";
 import { Group } from "../models/Group";
 
 import { supabase } from "./Main";
 
-export default function GroupList(props: { session: Session | null}) {
+export default function GroupList(props: { session: Session | null }) {
   const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
@@ -43,12 +43,9 @@ export default function GroupList(props: { session: Session | null}) {
 
   const handleDeleteGroup = (groupToDelete) => {
     // Send a DELETE request to your API to delete the group
-    fetch(
-      `${API_URL}/groups/${groupToDelete.subscription.name}`,
-      {
-        method: "DELETE",
-      }
-    )
+    fetch(`${API_URL}/groups/${groupToDelete.subscription.name}`, {
+      method: "DELETE",
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -64,7 +61,13 @@ export default function GroupList(props: { session: Session | null}) {
   };
 
   useEffect(() => {
-    fetch(`${API_URL}/groups`)
+    const requestOptions = {
+      headers: {
+        access_token: props.session!.access_token,
+      },
+    };
+
+    fetch(`${API_URL}/groups`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -103,13 +106,26 @@ export default function GroupList(props: { session: Session | null}) {
 
   return (
     <Container maxW="3xl">
-      <Box className="Header" w="100%" p={4} display="flex" justifyContent="space-between" alignItems="center">
+      <Box
+        className="Header"
+        w="100%"
+        p={4}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Heading as="h1" size="md" textAlign="left">
           Groups
         </Heading>
-        <Button size="sm" variant={'ghost'} onClick={() => {
-          supabase.auth.signOut();
-        }}>Sign Out</Button>
+        <Button
+          size="sm"
+          variant={"ghost"}
+          onClick={() => {
+            supabase.auth.signOut();
+          }}
+        >
+          Sign Out
+        </Button>
       </Box>
       <Flex className="Profile" margin="10px">
         <Avatar src={profilePicture} marginRight="10px" />
@@ -186,7 +202,7 @@ export default function GroupList(props: { session: Session | null}) {
         ))}
       </Stack>
 
-      {isOpen && <NewGroup onClose={onClose} />}
+      {isOpen && <NewGroup onClose={onClose} session={props.session} />}
     </Container>
   );
 }
