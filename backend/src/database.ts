@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+import { Group, Subscription } from "./models";
 const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
@@ -9,6 +10,7 @@ const supabase = createClient(
 );
 
 // Get User by Token
+
 export async function getUser(accessToken: string) {
   const userResp = await supabase.auth.getUser(accessToken);
 
@@ -38,7 +40,7 @@ export async function createGroup(userId, name, cost, createdDate, image) {
   return resp.data;
 }
 
-export async function getGroups(userId) {
+export async function getGroups(userId): Promise<Group[] | null> {
   const resp = await supabase
     .from("groups")
     .select("*")
@@ -50,5 +52,9 @@ export async function getGroups(userId) {
     return null;
   }
 
-  return resp.data;
+  const groups = resp.data;
+
+  return groups.map((group) => {
+    return new Group(new Subscription(group.name, group.image, group.cost), []);
+  });
 }

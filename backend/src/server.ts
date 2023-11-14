@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { getUser, createGroup, getGroups } from "./database";
+import { Group, Friend } from "./models";
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -14,18 +15,6 @@ app.use(bodyParser.json());
 
 // Enable all CORS requests
 app.use(cors());
-
-class Subscription {
-  constructor(public name: string, public image: string, public cost: number) {}
-}
-
-class Group {
-  constructor(public subscription: Subscription, public friends: Friend[]) {}
-}
-
-class Friend {
-  constructor(public name: string, public image: string) {}
-}
 
 // This will serve as our in-memory database for now
 let groups: Group[] = [];
@@ -83,31 +72,28 @@ app.delete("/api/friends/:name", (req, res) => {
 //get selected groups
 app.get("/api/groups", async (req, res) => {
   const { groupName } = req.query;
+  // Get all groups from the database
+  const accessToken = req.headers.access_token;
+  const user = await getUser(accessToken);
+  const groups = await getGroups(user.id);
+
+  if (!groups) {
+    return res.status(404).json({ message: "Error fetching groups" });
+  }
+
   if (groupName) {
     const filteredGroup = groups.find(
-      (group) => group.subscription.name === groupName
+      (group) =>
+        group.subscription.name.toLowerCase() === groupName.toLowerCase()
     );
 
     if (filteredGroup) {
       res.json([filteredGroup]);
-      console.log(`filteredGroup ${filteredGroup}`); // Wrap the result in an array
     } else {
       res.status(404).json({ message: "Group not found" });
     }
   } else {
-    // Get all groups from the database
-    const accessToken = req.headers.access_token;
-    const user = await getUser(accessToken);
-    const groups = await getGroups(user.id);
-
-    const jsonGroups = groups.map((group) => {
-      return new Group(
-        new Subscription(group.name, group.image, group.cost),
-        []
-      );
-    });
-
-    res.json(jsonGroups);
+    res.json(groups);
   }
 });
 
