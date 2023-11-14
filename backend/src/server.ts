@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // This will serve as our in-memory database for now
-let groups: Group[] = [];
+let temporaryGroups: Group[] = [];
 
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
 let friends: Friend[] = [
@@ -71,6 +71,8 @@ app.delete("/api/friends/:name", (req, res) => {
 
 //get selected groups
 app.get("/api/groups", async (req, res) => {
+  // TODO(tommy): get friends from the database as well.
+
   const { groupName } = req.query;
   // Get all groups from the database
   const accessToken = req.headers.access_token;
@@ -99,6 +101,7 @@ app.get("/api/groups", async (req, res) => {
 
 // Create a new group
 app.post("/api/groups", async (req, res) => {
+  // TODO(tommy): create friends in the database as well.
   const { subscription, friends } = req.body;
 
   const newGroup = new Group(subscription, friends);
@@ -119,12 +122,15 @@ app.post("/api/groups", async (req, res) => {
 
 // Delete a group
 app.delete("/api/groups/:name", (req, res) => {
+  // TODO(nina): allow users to delete groups.
+  // Make sure the database is updated as well.
+
   const groupName = req.params.name;
-  const index = groups.findIndex(
+  const index = temporaryGroups.findIndex(
     (group) => group.subscription.name === groupName
   );
   if (index !== -1) {
-    const deletedGroup = groups.splice(index, 1);
+    const deletedGroup = temporaryGroups.splice(index, 1);
     res.json(deletedGroup);
   } else {
     res.status(404).send("Group not found");
