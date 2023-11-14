@@ -30,7 +30,7 @@ import { API_URL } from "../constants";
 import NewGroup from "./NewGroup";
 import { Group } from "../models/Group";
 
-import { supabase } from "./Main";
+import { supabase } from "../App";
 
 export default function GroupList(props: { session: Session | null }) {
   const theme = useTheme();

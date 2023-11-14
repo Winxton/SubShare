@@ -1,7 +1,7 @@
 import { Button, Container, Input, Image, Box } from "@chakra-ui/react";
 import loginImageURL from "../images/SubscriptionAppLogo.png";
 import { useState } from "react";
-import { supabase } from "./Main";
+import { supabase } from "../App";
 import { APP_URL } from "../constants";
 
 export default function Login() {

@@ -17,8 +17,9 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Friend } from "./Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
+import { Session } from "@supabase/supabase-js";
 
-export default function ViewGroup() {
+export default function ViewGroup(props: { session: Session }) {
   const theme = useTheme();
   const { groupName } = useParams();
   const navigate = useNavigate();
@@ -28,7 +29,9 @@ export default function ViewGroup() {
   // Use the `groupName` as part of the group name
 
   useEffect(() => {
-    fetch(`${API_URL}/groups/?groupName=${groupName}`)
+    fetch(`${API_URL}/groups?groupName=${groupName}`, {
+      headers: { access_token: props.session.access_token },
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
