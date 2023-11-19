@@ -41,9 +41,10 @@ export async function createGroup(userId, name, cost, createdDate, image) {
 
   return resp.data;
 }
-export async function createMember(email, isOwner, accepted, accepted_date, balance) {
+export async function createMember(groupId, email, isOwner, accepted, accepted_date, balance) {
   const resp = await supabase.from("members").insert([
     {
+      groupId: groupId,
       email: email,
       isOwner: isOwner,
       accepted: accepted, 

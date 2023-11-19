@@ -109,16 +109,17 @@ app.post("/api/groups", async (req, res) => {
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
-  const createdGroup = createGroup(
+  const createdGroup = await createGroup(
     user.id,
     subscription.name,
     subscription.cost,
     new Date(),
     subscription.image
   );
+  newGroup.groupId = createdGroup.id;
   for (const memberData of friends) {
     const createdFriend = await createMember(
-    
+      newGroup.groupId,
       memberData.email,
       memberData.isOwner,
       memberData.accepted,
