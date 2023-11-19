@@ -34,22 +34,22 @@ export async function createGroup(userId, name, cost, createdDate, image) {
     },
   ]);
 }
-  export async function createMember(email, isOwner, accepted, accepted_date, balance) {
-    const resp = await supabase.from("members").insert([
-      {
-        email: email,
-        isOwner: isOwner,
-        accepted: accepted, 
-        accepted_date: accepted_date,
-        balance: balance
-      },
-    ]);
-  if (resp.error) {
-    console.error("Error creating member:", resp.error);
-    return null;
-  }
+export async function createMember(email, isOwner, accepted, accepted_date, balance) {
+  const resp = await supabase.from("members").insert([
+    {
+      email: email,
+      isOwner: isOwner,
+      accepted: accepted, 
+      accepted_date: accepted_date,
+      balance: balance
+    },
+  ]);
+if (resp.error) {
+  console.error("Error creating member:", resp.error);
+  return null;
+}
 
-  return resp.data;
+return resp.data;
 }
 
 export async function getGroups(userId): Promise<Group[] | null> {
