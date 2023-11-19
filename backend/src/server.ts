@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { getUser, createGroup, getGroups } from "./database";
+import { getUser, createGroup, getGroups, createMember } from "./database";
 import { Group, Friend } from "./models";
 
 const express = require("express");
@@ -109,14 +109,22 @@ app.post("/api/groups", async (req, res) => {
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
-  const created = createGroup(
+  const createdGroup = createGroup(
     user.id,
     subscription.name,
     subscription.cost,
     new Date(),
     subscription.image
   );
-
+  for (const memberData of friends) {
+    const createdFriend = await createMember(
+    
+      memberData.email,
+      memberData.isOwner,
+      memberData.accepted,
+      new Date(),
+      memberData.balance
+    )}
   res.status(201).json(newGroup);
 });
 

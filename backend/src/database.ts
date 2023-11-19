@@ -15,7 +15,9 @@ export async function getUser(accessToken: string) {
   const userResp = await supabase.auth.getUser(accessToken);
 
   const { data, error } = userResp;
-
+  if(error){
+    console.log(error)
+  }
   return data.user;
 }
 
@@ -31,9 +33,19 @@ export async function createGroup(userId, name, cost, createdDate, image) {
       image: image,
     },
   ]);
-
+}
+  export async function createMember(email, isOwner, accepted, accepted_date, balance) {
+    const resp = await supabase.from("members").insert([
+      {
+        email: email,
+        isOwner: isOwner,
+        accepted: accepted, 
+        accepted_date: accepted_date,
+        balance: balance
+      },
+    ]);
   if (resp.error) {
-    console.error("Error creating group:", resp.error);
+    console.error("Error creating member:", resp.error);
     return null;
   }
 
@@ -41,6 +53,7 @@ export async function createGroup(userId, name, cost, createdDate, image) {
 }
 
 export async function getGroups(userId): Promise<Group[] | null> {
+  
   const resp = await supabase
     .from("groups")
     .select("*")
