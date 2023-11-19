@@ -1,6 +1,3 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-
 import { getUser, createGroup, getGroups } from "./database";
 import { Group, Friend } from "./models";
 
