@@ -43,7 +43,7 @@ export default function GroupList(props: { session: Session | null }) {
 
   const handleDeleteGroup = (groupToDelete) => {
     // Send a DELETE request to your API to delete the group
-    fetch(`${API_URL}/groups/${groupToDelete.subscription.name}`, {
+    fetch(`${API_URL}/groups/${groupToDelete.subscription.id}`, {
       method: "DELETE",
     })
       .then((response) => {

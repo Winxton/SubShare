@@ -58,4 +58,23 @@ export async function getGroups(userId): Promise<Group[] | null> {
   return groups.map((group) => {
     return new Group(new Subscription(group.name, group.image, group.cost), []);
   });
+
+  
+}
+
+// database.ts
+export async function deleteGroup(groupId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("groups").delete().eq("id", groupId);
+
+    if (error) {
+      console.error("Error deleting group:", error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    return false;
+  }
 }

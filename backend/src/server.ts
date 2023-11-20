@@ -1,4 +1,4 @@
-import { getUser, createGroup, getGroups } from "./database";
+import { getUser, createGroup, getGroups, deleteGroup } from "./database";
 import { Group, Friend } from "./models";
 
 const express = require("express");
@@ -118,21 +118,25 @@ app.post("/api/groups", async (req, res) => {
 });
 
 // Delete a group
-app.delete("/api/groups/:name", (req, res) => {
-  // TODO(nina): allow users to delete groups.
-  // Make sure the database is updated as well.
+app.delete("/api/groups/:id", async (req, res) => {
+  try {
+    // Get the name of the group to delete from the request parameters
+    const groupID = req.params.id;
 
-  const groupName = req.params.name;
-  const index = temporaryGroups.findIndex(
-    (group) => group.subscription.name === groupName
-  );
-  if (index !== -1) {
-    const deletedGroup = temporaryGroups.splice(index, 1);
-    res.json(deletedGroup);
-  } else {
-    res.status(404).send("Group not found");
+    // Call the deleteGroup function from the database to delete the group
+    const success = await deleteGroup(groupID);
+
+    if (success) {
+      res.json({ message: "Group deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Group not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
