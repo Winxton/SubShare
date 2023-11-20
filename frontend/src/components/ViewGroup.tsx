@@ -49,7 +49,8 @@ export default function ViewGroup(props: { session: Session }) {
                 firstGroup.subscription.image,
                 firstGroup.subscription.cost
               ),
-              firstGroup.friends
+              firstGroup.friends,
+              firstGroup.id
             )
           );
         } else {
