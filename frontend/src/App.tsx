@@ -3,12 +3,21 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { createClient, Session } from "@supabase/supabase-js";
 
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./constants";
 import Login from "./components/Login";
 import GroupList from "./components/GroupList";
 import ViewGroup from "./components/ViewGroup";
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+
+if (!supabaseAnonKey) {
+  throw new Error("REACT_APP_SUPABASE_ANON_KEY is not set");
+}
+if (!supabaseUrl) {
+  throw new Error("REACT_APP_SUPABASE_URL is not set");
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
