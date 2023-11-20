@@ -1,4 +1,4 @@
-import { getUser, createGroup, getGroups } from "./database";
+import { getUser, createGroup, createMember,getGroups } from "./database";
 import { Group, Friend } from "./models";
 
 const express = require("express");
@@ -18,10 +18,10 @@ let temporaryGroups: Group[] = [];
 
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
 let friends: Friend[] = [
-  new Friend("winston", "https://bit.ly/sage-adebayo"),
-  new Friend("nina", "https://bit.ly/dan-abramov"),
-  new Friend("tommy", "https://bit.ly/code-beast"),
-  new Friend("young", "https://bit.ly/sage-adebayo"),
+  new Friend("winston", "https://bit.ly/sage-adebayo","sdkf@gmail.com"),
+  new Friend("nina", "https://bit.ly/dan-abramov","sjadknksa@hotmail.com"),
+  new Friend("tommy", "https://bit.ly/code-beast","yahoo.ca"),
+  new Friend("young", "https://bit.ly/sage-adebayo","sadsal@business.ca"),
 ];
 
 // API routes related to friends
@@ -99,21 +99,30 @@ app.get("/api/groups", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
-  const { subscription, friends } = req.body;
+  const { subscription, friends, id} = req.body;
 
-  const newGroup = new Group(subscription, friends);
+  const newGroup = new Group(subscription, friends, id);
 
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
-  const created = createGroup(
+  const createdGroup = await createGroup(
     user.id,
     subscription.name,
     subscription.cost,
     new Date(),
     subscription.image
   );
-
+ 
+  for (const memberData of friends) {
+    const createdFriend = await createMember(
+      newGroup.id,
+      memberData.email,
+      memberData.isOwner,
+      memberData.accepted,
+      new Date(),
+      memberData.balance
+    )}
   res.status(201).json(newGroup);
 });
 
