@@ -22,6 +22,7 @@
     "chakra": "^0.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "dotenv": "^16.3.1",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.287.0",
     "postcss": "^8.4.31",
@@ -36,8 +37,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "react-scripts start",
-    "start": "react-scripts start",
+    "dev": "node start.js",
+    "start": "node start.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

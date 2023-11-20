@@ -1,7 +1,4 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-
-import { getUser, createGroup, getGroups, createMember } from "./database";
+import { getUser, createGroup, createMember,getGroups } from "./database";
 import { Group, Friend } from "./models";
 
 const express = require("express");
