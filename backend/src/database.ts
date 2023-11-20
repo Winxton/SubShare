@@ -33,8 +33,8 @@ export async function createGroup(userId, name, cost, createdDate, image) {
       created_date: createdDate,
       image: image,
     },
-  ]);
-
+  ]).select();
+console.log(resp)
   if (resp.error) {
     console.error("Error creating group:", resp.error);
     return null;
@@ -45,7 +45,7 @@ export async function createGroup(userId, name, cost, createdDate, image) {
 export async function createMember(groupId, email, isOwner, accepted, accepted_date, balance) {
   const resp = await supabase.from("members").insert([
     {
-      groupId: groupId,
+      group_id: groupId,
       email: email,
       isOwner: isOwner,
       accepted: accepted, 
