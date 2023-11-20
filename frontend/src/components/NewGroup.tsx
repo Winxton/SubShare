@@ -227,7 +227,11 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
               }
 
               // If both conditions are met, proceed to create and send the API request
-              const newGroup = new Group(selectedSubscription, selectedFriends);
+              const newGroup = new Group(
+                selectedSubscription,
+                selectedFriends,
+                null
+              );
               // console.log(newGroup);
               setSelectedSubscription(null);
               setSelectedFriends([]);
