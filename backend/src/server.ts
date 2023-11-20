@@ -114,7 +114,6 @@ app.post("/api/groups", async (req, res) => {
     subscription.image
   );
  
-  newGroup.id = createdGroup.id;
   for (const memberData of friends) {
     const createdFriend = await createMember(
       newGroup.id,
