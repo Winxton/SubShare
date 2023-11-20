@@ -2,8 +2,11 @@ export class Subscription {
   constructor(public name: string, public image: string, public cost: number) {}
 }
 export class Group {
-  constructor(public subscription: Subscription, public friends: Friend[], public id:string ) {
-  }
+  constructor(
+    public subscription: Subscription,
+    public friends: Friend[],
+    public id: string
+  ) {}
 }
 export class Friend {
   constructor(
