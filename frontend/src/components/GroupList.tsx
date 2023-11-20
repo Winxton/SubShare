@@ -83,7 +83,8 @@ export default function GroupList(props: { session: Session | null }) {
                 groupData.subscription.image,
                 groupData.subscription.cost
               ),
-              groupData.members
+              groupData.members,
+              groupData.id
             );
           })
         );
