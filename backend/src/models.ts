@@ -2,10 +2,7 @@ export class Subscription {
   constructor(public name: string, public image: string, public cost: number) {}
 }
 export class Group {
-  public groupId: string | null; // Add this line
-
-  constructor(public subscription: Subscription, public friends: Friend[]) {
-    this.groupId = null; // Initialize groupId
+  constructor(public subscription: Subscription, public friends: Friend[], public id:string ) {
   }
 }
 export class Friend {
@@ -14,7 +11,7 @@ export class Friend {
     public image: string,
     public email?: string,
     public group_id?: string,
-    public isOwner?: boolean,
+    public isowner?: boolean,
     public accepted?: boolean,
     public accepted_date?: Date,
     public balance?: number

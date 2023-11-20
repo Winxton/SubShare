@@ -99,9 +99,9 @@ app.get("/api/groups", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
-  const { subscription, friends } = req.body;
+  const { subscription, friends, id} = req.body;
 
-  const newGroup = new Group(subscription, friends);
+  const newGroup = new Group(subscription, friends, id);
 
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
@@ -113,11 +113,11 @@ app.post("/api/groups", async (req, res) => {
     new Date(),
     subscription.image
   );
-  console.log(createdGroup)
-  newGroup.groupId = createdGroup.id;
+ 
+  newGroup.id = createdGroup.id;
   for (const memberData of friends) {
     const createdFriend = await createMember(
-      newGroup.groupId,
+      newGroup.id,
       memberData.email,
       memberData.isOwner,
       memberData.accepted,

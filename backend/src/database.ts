@@ -34,7 +34,7 @@ export async function createGroup(userId, name, cost, createdDate, image) {
       image: image,
     },
   ]).select();
-console.log(resp)
+
   if (resp.error) {
     console.error("Error creating group:", resp.error);
     return null;
@@ -47,7 +47,7 @@ export async function createMember(groupId, email, isOwner, accepted, accepted_d
     {
       group_id: groupId,
       email: email,
-      isOwner: isOwner,
+      isowner: isOwner,
       accepted: accepted, 
       accepted_date: accepted_date,
       balance: balance
@@ -77,6 +77,6 @@ export async function getGroups(userId): Promise<Group[] | null> {
   const groups = resp.data;
 
   return groups.map((group) => {
-    return new Group(new Subscription(group.name, group.image, group.cost), []);
+    return new Group(new Subscription(group.name, group.image, group.cost), [],group.id);
   });
 }
