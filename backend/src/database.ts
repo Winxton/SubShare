@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
-import { Group, Subscription } from "./models";
+import { Friend, Group, Subscription } from "./models";
 const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
@@ -64,7 +64,6 @@ return resp.data;
 }
 
 export async function getGroups(userId): Promise<Group[] | null> {
-  
   const resp = await supabase
     .from("groups")
     .select("*")
@@ -78,8 +77,40 @@ export async function getGroups(userId): Promise<Group[] | null> {
 
   const groups = resp.data;
 
-  return groups.map((group) => {
-   
-    return new Group(new Subscription(group.name, group.image, group.cost), [],group.id);
+  if (!groups) {
+    return null;
+  }
+
+  // Fetch members for each group
+  const groupsWithMembers = await Promise.all(
+    groups.map(async (group) => {
+      const members = await getMembers(group.id);
+      return new Group(
+        new Subscription(group.name, group.image, group.cost),
+        members || [],
+        group.id
+      );
+    })
+  );
+
+  return groupsWithMembers;
+}
+
+export async function getMembers(GroupId): Promise<Friend[] | null> {
+  
+  const resp = await supabase
+    .from("members")
+    .select("*")
+    .eq("group_id", GroupId)
+
+  if (resp.error) {
+    console.error("Error getting groups:", resp.error);
+    return null;
+  }
+
+  const members = resp.data;
+
+  return members.map((member) => {
+    return new Friend (member.name, member.image, member.email);
   });
 }

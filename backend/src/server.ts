@@ -1,4 +1,4 @@
-import { getUser, createGroup, createMember,getGroups } from "./database";
+import { getUser, createGroup, createMember,getGroups, getMembers } from "./database";
 import { Group, Friend } from "./models";
 
 const express = require("express");
@@ -87,7 +87,11 @@ app.get("/api/groups", async (req, res) => {
     );
 
     if (filteredGroup) {
-      res.json([filteredGroup]);
+     
+    
+    
+        // Include friends in the response
+        res.json({ group: filteredGroup });
     } else {
       res.status(404).json({ message: "Group not found" });
     }
