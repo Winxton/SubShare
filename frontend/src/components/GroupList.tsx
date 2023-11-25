@@ -43,14 +43,24 @@ export default function GroupList(props: { session: Session | null }) {
 
   const handleDeleteGroup = (groupToDelete) => {
     // Send a DELETE request to your API to delete the group
-    fetch(`${API_URL}/groups/${groupToDelete.subscription.id}`, {
+    const groupId = groupToDelete.id;
+
+    if (!groupId) {
+      console.error("Invalid groupId:", groupId);
+      return;
+    }
+
+    // Send a DELETE request to your API to delete the group
+    fetch(`${API_URL}/groups/${groupId}`, {
       method: "DELETE",
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        // Remove the deleted group from the state
+        // Remove the deleted group from the state or UI
+        // (You might need to adjust this based on your application's state management)
+        // For example, if using React state:
         setGroups((prevGroups) =>
           prevGroups.filter((group) => group !== groupToDelete)
         );
