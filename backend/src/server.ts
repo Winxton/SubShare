@@ -48,8 +48,8 @@ app.put("/api/friends/:currentName", (req, res) => {
 });
 
 app.post("/api/friends", (req, res) => {
-  const { name, image } = req.body;
-  const newFriend = new Friend(name, image);
+  const { name, image, email } = req.body;
+  const newFriend = new Friend(name, image, email);
   friends.push(newFriend);
   res.status(201).json(newFriend);
 });
@@ -101,9 +101,9 @@ app.get("/api/groups", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
-  const { subscription, friends, id} = req.body;
-
-  const newGroup = new Group(subscription, friends, id);
+  const { subscription, friends, id} = req.body; //getting subscription and friends from the front end
+  
+  const newGroup = new Group(subscription, friends, id); // id is undefined 
 
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
@@ -115,10 +115,10 @@ app.post("/api/groups", async (req, res) => {
     new Date(),
     subscription.image
   );
- 
+
   for (const memberData of friends) {
     const createdFriend = await createMember(
-      newGroup.id,
+      createdGroup.id, // the return data (id) when you create a group table in supabase
       memberData.email,
       memberData.isOwner,
       memberData.accepted,

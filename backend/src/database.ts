@@ -40,7 +40,9 @@ export async function createGroup(userId, name, cost, createdDate, image) {
     return null;
   }
 
-  return resp.data;
+  const createdGroupId = resp.data[0];
+
+  return createdGroupId;
 }
 export async function createMember(groupId, email, isOwner, accepted, accepted_date, balance) {
   const resp = await supabase.from("members").insert([
@@ -77,6 +79,7 @@ export async function getGroups(userId): Promise<Group[] | null> {
   const groups = resp.data;
 
   return groups.map((group) => {
+   
     return new Group(new Subscription(group.name, group.image, group.cost), [],group.id);
   });
 

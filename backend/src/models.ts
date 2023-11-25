@@ -12,7 +12,7 @@ export class Friend {
   constructor(
     public name: string,
     public image: string,
-    public email?: string,
+    public email: string,
     public group_id?: string,
     public isowner?: boolean,
     public accepted?: boolean,
