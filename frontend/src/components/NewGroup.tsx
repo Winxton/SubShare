@@ -44,20 +44,21 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 
+const subscriptions = [
+  new Subscription("Netflix", netflixImage, 20),
+  new Subscription("HBO", hboImage, 20),
+  new Subscription("Disney", disney, 20),
+  new Subscription("Spotify", spotify, 20),
+  new Subscription("Youtube", youtubeImage, 20),
+  new Subscription("Crunchy", crunchyrollImage, 20),
+];
+
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
   const [friends, setFriends] = React.useState<Friend[]>([]);
-
-  const subscriptions = [
-    new Subscription("Netflix", netflixImage, 20),
-    new Subscription("HBO", hboImage, 20),
-    new Subscription("Disney", disney, 20),
-    new Subscription("Spotify", spotify, 20),
-    new Subscription("Youtube", youtubeImage, 20),
-    new Subscription("Crunchy", crunchyrollImage, 20),
-  ];
+  const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
@@ -110,8 +111,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   function renderNewGroup() {
     return (
       <Box>
-        <Heading size="md" mb="1">
-          Subscriptions
+        <Heading size="sm" mb="1">
+          Select a Subscription
         </Heading>
 
         <Input
@@ -145,8 +146,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
           })}
         </Wrap>
 
-        <Heading size="md" mt="2" mb="1">
-          Friends
+        <Heading size="sm" mt="2" mb="1">
+          Select Members
         </Heading>
 
         <AddFriend
@@ -200,6 +201,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 return;
               }
 
+              setIsCreatingGroup(true); // set isCreatingGroup to true
+
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
               // console.log(newGroup);
@@ -208,8 +211,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
               sendPostRequestToServer(newGroup);
             }}
+            isLoading={isCreatingGroup} // set isLoading to isCreatingGroup
           >
-            Create Group
+            {isCreatingGroup ? "Creating Group..." : "Create Group"}
           </Button>
         </ModalFooter>
       </ModalContent>
