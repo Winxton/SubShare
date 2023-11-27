@@ -113,4 +113,23 @@ export async function getMembers(GroupId): Promise<Friend[] | null> {
   return members.map((member) => {
     return new Friend (member.name, member.image, member.email);
   });
+
+  
+}
+
+// database.ts
+export async function deleteGroup(groupId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("groups").delete().eq("id", groupId);
+
+    if (error) {
+      console.error("Error deleting group:", error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    return false;
+  }
 }
