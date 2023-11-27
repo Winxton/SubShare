@@ -4,15 +4,15 @@ import { Session } from "@supabase/supabase-js";
 
 import {
   Button,
-  Text,
   Box,
-  Flex,
   Square,
   Input,
   Wrap,
   WrapItem,
-  HStack,
   VStack,
+  Tabs,
+  TabList,
+  Tab,
 } from "@chakra-ui/react";
 
 import {
@@ -59,6 +59,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     React.useState<Subscription | null>(null);
   const [friends, setFriends] = React.useState<Friend[]>([]);
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
+  const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
@@ -172,6 +173,19 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             );
           })}
         </VStack>
+
+        <Tabs
+          mt="2"
+          variant="soft-rounded"
+          size="sm"
+          index={selectedTab}
+          onChange={setSelectedTab}
+        >
+          <TabList>
+            <Tab>Split Equally</Tab>
+            <Tab>By Amounts</Tab>
+          </TabList>
+        </Tabs>
       </Box>
     );
   }
