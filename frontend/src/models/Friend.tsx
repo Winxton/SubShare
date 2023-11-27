@@ -1,7 +1,7 @@
 export class Friend {
   constructor(
-    public name: string,
-    public image: string,
+    public name: string | null,
+    public image: string | null,
     public email: string,
     public group_id?: string,
     public isowner?: boolean,

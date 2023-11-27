@@ -119,7 +119,7 @@ export default function ViewGroup(props: { session: Session }) {
           </Heading>
 
           {selectGroup.friends.map((member) => (
-            <Friend name={member.name} image={member.image} />
+            <Friend email={member.email} />
           ))}
         </VStack>
       </Box>

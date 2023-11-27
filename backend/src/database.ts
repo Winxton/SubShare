@@ -16,8 +16,8 @@ export async function getUser(accessToken: string) {
   const userResp = await supabase.auth.getUser(accessToken);
 
   const { data, error } = userResp;
-  if(error){
-    console.log(error)
+  if (error) {
+    console.log(error);
   }
   return data.user;
 }
@@ -25,15 +25,18 @@ export async function getUser(accessToken: string) {
 // Get Groups
 
 export async function createGroup(userId, name, cost, createdDate, image) {
-  const resp = await supabase.from("groups").insert([
-    {
-      user_id: userId,
-      name: name,
-      cost: cost,
-      created_date: createdDate,
-      image: image,
-    },
-  ]).select();
+  const resp = await supabase
+    .from("groups")
+    .insert([
+      {
+        user_id: userId,
+        name: name,
+        cost: cost,
+        created_date: createdDate,
+        image: image,
+      },
+    ])
+    .select();
 
   if (resp.error) {
     console.error("Error creating group:", resp.error);
@@ -44,23 +47,30 @@ export async function createGroup(userId, name, cost, createdDate, image) {
 
   return createdGroupId;
 }
-export async function createMember(groupId, email, isOwner, accepted, accepted_date, balance) {
+export async function createMember(
+  groupId,
+  email,
+  isOwner,
+  accepted,
+  accepted_date,
+  balance
+) {
   const resp = await supabase.from("members").insert([
     {
       group_id: groupId,
       email: email,
       isowner: isOwner,
-      accepted: accepted, 
+      accepted: accepted,
       accepted_date: accepted_date,
-      balance: balance
+      balance: balance,
     },
   ]);
-if (resp.error) {
-  console.error("Error creating member:", resp.error);
-  return null;
-}
+  if (resp.error) {
+    console.error("Error creating member:", resp.error);
+    return null;
+  }
 
-return resp.data;
+  return resp.data;
 }
 
 export async function getGroups(userId): Promise<Group[] | null> {
@@ -97,11 +107,10 @@ export async function getGroups(userId): Promise<Group[] | null> {
 }
 
 export async function getMembers(GroupId): Promise<Friend[] | null> {
-  
   const resp = await supabase
     .from("members")
     .select("*")
-    .eq("group_id", GroupId)
+    .eq("group_id", GroupId);
 
   if (resp.error) {
     console.error("Error getting groups:", resp.error);
@@ -111,10 +120,8 @@ export async function getMembers(GroupId): Promise<Friend[] | null> {
   const members = resp.data;
 
   return members.map((member) => {
-    return new Friend (member.name, member.image, member.email);
+    return new Friend(member.name, member.image, member.email);
   });
-
-  
 }
 
 // database.ts

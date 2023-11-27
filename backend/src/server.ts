@@ -1,5 +1,11 @@
-
-import { getUser, createGroup, createMember,getGroups, getMembers, deleteGroup } from "./database";
+import {
+  getUser,
+  createGroup,
+  createMember,
+  getGroups,
+  getMembers,
+  deleteGroup,
+} from "./database";
 
 import { Group, Friend } from "./models";
 
@@ -20,10 +26,10 @@ let temporaryGroups: Group[] = [];
 
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
 let friends: Friend[] = [
-  new Friend("winston", "https://bit.ly/sage-adebayo","sdkf@gmail.com"),
-  new Friend("nina", "https://bit.ly/dan-abramov","sjadknksa@hotmail.com"),
-  new Friend("tommy", "https://bit.ly/code-beast","yahoo.ca"),
-  new Friend("young", "https://bit.ly/sage-adebayo","sadsal@business.ca"),
+  new Friend("winston", "https://bit.ly/sage-adebayo", "sdkf@gmail.com"),
+  new Friend("nina", "https://bit.ly/dan-abramov", "sjadknksa@hotmail.com"),
+  new Friend("tommy", "https://bit.ly/code-beast", "yahoo.ca"),
+  new Friend("young", "https://bit.ly/sage-adebayo", "sadsal@business.ca"),
 ];
 
 // API routes related to friends
@@ -89,8 +95,8 @@ app.get("/api/groups", async (req, res) => {
     );
 
     if (filteredGroup) {
-        // Include friends in the response
-        res.json({ group: filteredGroup });
+      // Include friends in the response
+      res.json({ group: filteredGroup });
     } else {
       res.status(404).json({ message: "Group not found" });
     }
@@ -102,9 +108,9 @@ app.get("/api/groups", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
-  const { subscription, friends, id} = req.body; //getting subscription and friends from the front end
-  
-  const newGroup = new Group(subscription, friends, id); // id is undefined 
+  const { subscription, friends, id } = req.body; //getting subscription and friends from the front end
+
+  const newGroup = new Group(subscription, friends, id); // id is undefined
 
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
@@ -125,7 +131,8 @@ app.post("/api/groups", async (req, res) => {
       memberData.accepted,
       new Date(),
       memberData.balance
-    )}
+    );
+  }
   res.status(201).json(newGroup);
 });
 
@@ -148,7 +155,6 @@ app.delete("/api/groups/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
