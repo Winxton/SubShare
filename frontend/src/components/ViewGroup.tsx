@@ -38,18 +38,19 @@ export default function ViewGroup(props: { session: Session }) {
         }
         return response.json();
       })
-      .then((groupData) => {
-        if (groupData.length > 0) {
-          // Assuming the server returns an array, but you can modify the structure as needed
-          const firstGroup = groupData[0];
+      .then((response) => {
+        console.log("Server Response:", response); // used to see the response from server (inspect webpage)
+        const { group } = response;
+        if (group) {
           setSelectGroup(
             new Group(
               new Subscription(
-                firstGroup.subscription.name,
-                firstGroup.subscription.image,
-                firstGroup.subscription.cost
+                group.subscription.name,
+                group.subscription.image,
+                group.subscription.cost
               ),
-              firstGroup.friends
+              group.friends,
+              group.id
             )
           );
         } else {

@@ -1,4 +1,6 @@
-import { getUser, createGroup, getGroups } from "./database";
+
+import { getUser, createGroup, createMember,getGroups, getMembers, deleteGroup } from "./database";
+
 import { Group, Friend } from "./models";
 
 const express = require("express");
@@ -18,10 +20,10 @@ let temporaryGroups: Group[] = [];
 
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
 let friends: Friend[] = [
-  new Friend("winston", "https://bit.ly/sage-adebayo"),
-  new Friend("nina", "https://bit.ly/dan-abramov"),
-  new Friend("tommy", "https://bit.ly/code-beast"),
-  new Friend("young", "https://bit.ly/sage-adebayo"),
+  new Friend("winston", "https://bit.ly/sage-adebayo","sdkf@gmail.com"),
+  new Friend("nina", "https://bit.ly/dan-abramov","sjadknksa@hotmail.com"),
+  new Friend("tommy", "https://bit.ly/code-beast","yahoo.ca"),
+  new Friend("young", "https://bit.ly/sage-adebayo","sadsal@business.ca"),
 ];
 
 // API routes related to friends
@@ -46,8 +48,8 @@ app.put("/api/friends/:currentName", (req, res) => {
 });
 
 app.post("/api/friends", (req, res) => {
-  const { name, image } = req.body;
-  const newFriend = new Friend(name, image);
+  const { name, image, email } = req.body;
+  const newFriend = new Friend(name, image, email);
   friends.push(newFriend);
   res.status(201).json(newFriend);
 });
@@ -87,7 +89,8 @@ app.get("/api/groups", async (req, res) => {
     );
 
     if (filteredGroup) {
-      res.json([filteredGroup]);
+        // Include friends in the response
+        res.json({ group: filteredGroup });
     } else {
       res.status(404).json({ message: "Group not found" });
     }
@@ -99,14 +102,14 @@ app.get("/api/groups", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
-  const { subscription, friends } = req.body;
-
-  const newGroup = new Group(subscription, friends);
+  const { subscription, friends, id} = req.body; //getting subscription and friends from the front end
+  
+  const newGroup = new Group(subscription, friends, id); // id is undefined 
 
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
-  const created = createGroup(
+  const createdGroup = await createGroup(
     user.id,
     subscription.name,
     subscription.cost,
@@ -114,25 +117,38 @@ app.post("/api/groups", async (req, res) => {
     subscription.image
   );
 
+  for (const memberData of friends) {
+    const createdFriend = await createMember(
+      createdGroup.id, // the return data (id) when you create a group table in supabase
+      memberData.email,
+      memberData.isOwner,
+      memberData.accepted,
+      new Date(),
+      memberData.balance
+    )}
   res.status(201).json(newGroup);
 });
 
 // Delete a group
-app.delete("/api/groups/:name", (req, res) => {
-  // TODO(nina): allow users to delete groups.
-  // Make sure the database is updated as well.
+app.delete("/api/groups/:id", async (req, res) => {
+  try {
+    // Get the name of the group to delete from the request parameters
+    const groupID = req.params.id;
 
-  const groupName = req.params.name;
-  const index = temporaryGroups.findIndex(
-    (group) => group.subscription.name === groupName
-  );
-  if (index !== -1) {
-    const deletedGroup = temporaryGroups.splice(index, 1);
-    res.json(deletedGroup);
-  } else {
-    res.status(404).send("Group not found");
+    // Call the deleteGroup function from the database to delete the group
+    const success = await deleteGroup(groupID);
+
+    if (success) {
+      res.json({ message: "Group deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Group not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
