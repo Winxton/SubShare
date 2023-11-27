@@ -33,7 +33,18 @@ export default function Login() {
   const handleGoBack = () => {
     setEmail("");
     setIsEmailSent(false);
+    resetError(); // Reset the error state
+  };
+
+  // Function to reset the error state
+  const resetError = () => {
     setError("");
+  };  
+
+  const handleEmailChange = (e) => {
+    // Reset the error state when the email input changes
+    resetError();
+    setEmail(e.target.value);
   };
 
   // TODO:(nina) Add the logo here
@@ -63,7 +74,8 @@ export default function Login() {
     ) : (
       <Input
         placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={handleEmailChange} 
+        value={email}
         w="300px"
         mb={4}
       />
