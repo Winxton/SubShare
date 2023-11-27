@@ -1,12 +1,13 @@
-import { Flex, Text, Square, Image } from "@chakra-ui/react";
-import { CheckCircleIcon } from "@chakra-ui/icons";
+import { Flex, Text, Square, Image, IconButton } from "@chakra-ui/react";
+import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/react";
 import md5 from "md5";
 
 export function Friend(props: {
   email: string;
-  isMe?: boolean; // Make isMe an optional property
-  isSelected?: boolean; // Make isSelected an optional property
+  isMe?: boolean;
+  isSelected?: boolean;
+  onRemove?: (email: string) => void;
 }) {
   // Gravatar URL construction
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
@@ -34,6 +35,16 @@ export function Friend(props: {
         <Square bg="green.500" borderRadius="full" p="2" ml="2">
           <CheckCircleIcon color="white" boxSize={4} />
         </Square>
+      )}
+      {props.onRemove && (
+        <IconButton
+          aria-label="Remove"
+          icon={<CloseIcon />}
+          size={"sm"}
+          variant={"ghost"}
+          color="lightgray"
+          onClick={() => props.onRemove!(props.email)}
+        />
       )}
     </Flex>
   );

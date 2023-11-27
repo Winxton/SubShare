@@ -48,7 +48,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
-  const [selectedFriends, setSelectedFriends] = React.useState<Friend[]>([]);
   const [friends, setFriends] = React.useState<Friend[]>([]);
 
   const subscriptions = [
@@ -158,28 +157,17 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         />
         <VStack>
           {friends.map((friend) => {
-            const isSelected = selectedFriends.some(
-              (selectedFriend) => selectedFriend.name === friend.name
-            );
-
             return (
-              <Flex
-                width="100%"
-                onClick={() => {
-                  const newSelectedFriends = isSelected
-                    ? selectedFriends.filter(
-                        (selectedFriend) => selectedFriend.name !== friend.name
-                      )
-                    : [...selectedFriends, friend];
-                  setSelectedFriends(newSelectedFriends);
+              <FriendComponent
+                email={friend.email}
+                isMe={false}
+                onRemove={(email) => {
+                  const newFriends = friends.filter(
+                    (friend) => friend.email !== email
+                  );
+                  setFriends(newFriends);
                 }}
-              >
-                <FriendComponent
-                  email={friend.email}
-                  isSelected={isSelected}
-                  isMe={false}
-                ></FriendComponent>
-              </Flex>
+              ></FriendComponent>
             );
           })}
         </VStack>
@@ -207,20 +195,16 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 return;
               }
 
-              if (selectedFriends.length === 0) {
+              if (friends.length === 0) {
                 console.log("Error: Please select at least one friend");
                 return;
               }
 
               // If both conditions are met, proceed to create and send the API request
-              const newGroup = new Group(
-                selectedSubscription,
-                selectedFriends,
-                null
-              );
+              const newGroup = new Group(selectedSubscription, friends, null);
               // console.log(newGroup);
               setSelectedSubscription(null);
-              setSelectedFriends([]);
+              setFriends([]);
 
               sendPostRequestToServer(newGroup);
             }}
