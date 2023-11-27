@@ -53,7 +53,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [friends, setFriends] = React.useState<Friend[]>([]);
 
   React.useEffect(() => {
-    fetch("http://localhost:4000/api/friends")
+    fetch("http://localhost:4000/api/friends") // fetching Friend array from backend server
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -62,7 +62,11 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
       })
       .then((friends) => {
         const friendObjects = friends.map((friendData: any) => {
-          return new Friend(friendData.name, friendData.image);
+          return new Friend(
+            friendData.name,
+            friendData.image,
+            friendData.email
+          );
         });
 
         setFriends(friendObjects);
