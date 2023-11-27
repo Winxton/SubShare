@@ -27,6 +27,7 @@ import {
 
 import { Heading } from "@chakra-ui/react";
 import { Image } from "@chakra-ui/react";
+import AddFriend from "./AddFriend";
 
 import netflixImage from "../images/netflix.png";
 import hboImage from "../images/hbo.png";
@@ -45,33 +46,10 @@ import { API_URL } from "../constants";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
-  const [searchFriend, setSearchFriend] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
   const [selectedFriends, setSelectedFriends] = React.useState<Friend[]>([]);
-
   const [friends, setFriends] = React.useState<Friend[]>([]);
-
-  React.useEffect(() => {
-    fetch("http://localhost:4000/api/friends") // fetching Friend array from backend server
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((friends) => {
-        const friendObjects = friends.map((friendData: any) => {
-          return new Friend(
-            friendData.name,
-            friendData.image,
-            friendData.email
-          );
-        });
-
-        setFriends(friendObjects);
-      });
-  }, []);
 
   const subscriptions = [
     new Subscription("Netflix", netflixImage, 20),
@@ -85,14 +63,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
   }
-  function handleInputChangefriend(event: React.ChangeEvent<HTMLInputElement>) {
-    setSearchFriend(event.target.value);
-  }
+
   const filteredSubscriptions = subscriptions.filter((subscription) => {
     return subscription.name.toLowerCase().includes(searchText.toLowerCase());
-  });
-  const filteredFriends = friends.filter((friend) => {
-    return friend.name.toLowerCase().includes(searchFriend.toLowerCase());
   });
 
   function sendPostRequestToServer(group: Group) {
@@ -138,7 +111,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   function renderNewGroup() {
     return (
       <Box>
-        <Heading size="md">Subscriptions</Heading>
+        <Heading size="md" mb="1">
+          Subscriptions
+        </Heading>
 
         <Input
           placeholder="Search Subscriptions"
@@ -156,10 +131,14 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 onClick={() => {
                   setSelectedSubscription(subscription);
                 }}
-                border={isSelected ? "1px solid blue" : "none"}
+                border={isSelected ? "1px solid #08a4a7" : "none"}
                 borderRadius={"md"}
               >
-                <Square size="150px" border="1px solid grey">
+                <Square
+                  size="100px"
+                  border="1px solid lightgray"
+                  borderRadius={"md"}
+                >
                   <Image src={subscription.image} alt={subscription.name} />
                 </Square>
               </WrapItem>
@@ -167,15 +146,18 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
           })}
         </Wrap>
 
-        <Heading size="md">Friends</Heading>
-        <Input
-          placeholder="Search Friends"
-          size="sm"
-          value={searchFriend}
-          onChange={handleInputChangefriend}
+        <Heading size="md" mt="2" mb="1">
+          Friends
+        </Heading>
+
+        <AddFriend
+          onAddFriend={(email) => {
+            const newFriend = new Friend(null, null, email);
+            setFriends([...friends, newFriend]);
+          }}
         />
         <VStack>
-          {filteredFriends.map((friend) => {
+          {friends.map((friend) => {
             const isSelected = selectedFriends.some(
               (selectedFriend) => selectedFriend.name === friend.name
             );
@@ -193,9 +175,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 }}
               >
                 <FriendComponent
-                  name={friend.name}
+                  email={friend.email}
                   isSelected={isSelected}
-                  image={friend.image}
                   isMe={false}
                 ></FriendComponent>
               </Flex>
@@ -219,6 +200,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             Close
           </Button>
           <Button
+            colorScheme="blue"
             onClick={() => {
               if (!selectedSubscription) {
                 console.log("Error: Please select a subscription");
