@@ -87,9 +87,6 @@ app.get("/api/groups", async (req, res) => {
     );
 
     if (filteredGroup) {
-     
-    
-    
         // Include friends in the response
         res.json({ group: filteredGroup });
     } else {
