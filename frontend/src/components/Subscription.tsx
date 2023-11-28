@@ -20,11 +20,7 @@ export function Subscription(props: {
             <Box>
               {" "}
               {props.members.map((member) => (
-                <Avatar
-                  size="sm"
-                  padding="4px"
-                  src={getGravatarUrl(member.email)}
-                />
+                <Avatar padding="4px" src={getGravatarUrl(member.email, 75)} />
               ))}
             </Box>
           </Text>

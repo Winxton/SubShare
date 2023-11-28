@@ -86,7 +86,6 @@ export default function GroupList(props: { session: Session | null }) {
         return response.json();
       })
       .then((data) => {
-        console.log("Response data:", data);
         setGroups(
           data.map((groupData: any) => {
             return new Group(

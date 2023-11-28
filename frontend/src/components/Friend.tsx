@@ -49,6 +49,6 @@ export function Friend(props: {
     </Flex>
   );
 }
-export const getGravatarUrl = (email: string) => {
-  return `https://www.gravatar.com/avatar/${md5(email)}?s=200&d=identicon`;
+export const getGravatarUrl = (email: string, size: number = 50) => {
+  return `https://www.gravatar.com/avatar/${md5(email)}?s=${size}&d=identicon`;
 };
