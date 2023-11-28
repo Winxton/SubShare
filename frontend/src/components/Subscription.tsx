@@ -8,6 +8,10 @@ export function Subscription(props: {
   name: string;
   members: Friend[];
 }) {
+  const numberOfMembers = props.members.length;
+  const costPerMember = parseFloat(
+    (parseFloat(props.cost) / numberOfMembers).toFixed(2)
+  );
   return (
     <Box>
       <Flex className="profile" margin="10px">
@@ -15,8 +19,8 @@ export function Subscription(props: {
         <Box>
           <Text>{props.name} </Text>
           <Text>
-            ${props.cost}/month *{" "}
-            <Text as="span">{props.members.length} members</Text>
+            ${costPerMember}/month *{" "}
+            <Text as="span">{numberOfMembers} members</Text>
             <Box>
               {" "}
               {props.members.map((member) => (
