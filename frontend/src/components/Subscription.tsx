@@ -1,12 +1,13 @@
-import { Box, Image, Flex, Text } from "@chakra-ui/react";
+import { Box, Image, Flex, Text, Avatar } from "@chakra-ui/react";
 import { Friend } from "../models/Friend";
+import { Friend as FriendComponent } from "./Friend";
+import { getGravatarUrl } from "./Friend";
 export function Subscription(props: {
   cost: string;
   image: string;
   name: string;
   members: Friend[];
 }) {
-  console.log("Members prop:", props.members);
   return (
     <Box>
       <Flex className="profile" margin="10px">
@@ -16,11 +17,16 @@ export function Subscription(props: {
           <Text>
             {props.cost}/month{" "}
             <Text as="span">{props.members.length} members</Text>
-            {props.members.map((member, index) => (
-              <Box key={index} marginTop="2">
-                <Text>Email: {member.email}</Text>
-              </Box>
-            ))}
+            <Box>
+              {" "}
+              {props.members.map((member) => (
+                <Avatar
+                  size="sm"
+                  padding="4px"
+                  src={getGravatarUrl(member.email)}
+                />
+              ))}
+            </Box>
           </Text>
         </Box>
       </Flex>
