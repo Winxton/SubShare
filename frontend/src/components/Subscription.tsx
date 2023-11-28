@@ -15,12 +15,12 @@ export function Subscription(props: {
         <Box>
           <Text>{props.name} </Text>
           <Text>
-            {props.cost}/month{" "}
+            ${props.cost}/month *{" "}
             <Text as="span">{props.members.length} members</Text>
             <Box>
               {" "}
               {props.members.map((member) => (
-                <Avatar padding="4px" src={getGravatarUrl(member.email, 75)} />
+                <Avatar padding="6px" src={getGravatarUrl(member.email, 75)} />
               ))}
             </Box>
           </Text>
