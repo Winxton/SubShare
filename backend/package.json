@@ -4,7 +4,6 @@
     "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts"
   },
   "dependencies": {
-    "@sendgrid/mail": "^7.7.0",
     "@supabase/supabase-js": "^2.38.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
