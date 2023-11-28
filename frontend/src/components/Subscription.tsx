@@ -16,6 +16,11 @@ export function Subscription(props: {
           <Text>
             {props.cost}/month{" "}
             <Text as="span">{props.members.length} members</Text>
+            {props.members.map((member, index) => (
+              <Box key={index} marginTop="2">
+                <Text>Email: {member.email}</Text>
+              </Box>
+            ))}
           </Text>
         </Box>
       </Flex>
