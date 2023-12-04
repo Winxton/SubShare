@@ -81,6 +81,7 @@ export default function GroupList(props: { session: Session | null }) {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
+
         return response.json();
       })
       .then((data) => {
@@ -92,7 +93,7 @@ export default function GroupList(props: { session: Session | null }) {
                 groupData.subscription.image,
                 groupData.subscription.cost
               ),
-              groupData.members,
+              groupData.friends,
               groupData.id
             );
           })
@@ -112,7 +113,7 @@ export default function GroupList(props: { session: Session | null }) {
       name: "Disney",
       image: disney,
       cost: "3.75",
-      members: "3/6",
+      members: [],
     },
   ];
 
@@ -190,7 +191,7 @@ export default function GroupList(props: { session: Session | null }) {
                 image={group?.subscription?.image}
                 cost={group?.subscription?.cost.toString()}
                 name={group?.subscription?.name}
-                members={group?.friends?.length?.toString()}
+                members={group?.friends}
               />
             </Link>
             <IconButton

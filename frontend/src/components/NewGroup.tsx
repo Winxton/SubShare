@@ -98,9 +98,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         return response.json(); // Parse the response body as JSON
       })
       .then((data) => {
-        console.log("Response data:", data);
-        // You can work with the response data here
-
         // Close the modal after successful response
         props.onClose();
       })
