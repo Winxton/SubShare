@@ -29,12 +29,15 @@ export default function Login() {
         },
       });
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setIsEmailSent(true);
-      }
-    } catch (error) {}
+    if (error) {
+      setError(error.message);
+    } else {
+      setIsEmailSent(true);
+      resetError(); // Reset the error state when there is no error
+    }
+   } catch (error) {
+    
+   }
   };
 
   const handleGoBack = () => {
