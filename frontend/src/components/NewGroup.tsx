@@ -3,15 +3,15 @@ import { Session } from "@supabase/supabase-js";
 
 import {
   Button,
-  Text,
   Box,
-  Flex,
   Square,
   Input,
   Wrap,
   WrapItem,
-  ButtonGroup,
-  VStack,
+  Tabs,
+  TabList,
+  Tab,
+  Flex,
 } from "@chakra-ui/react";
 
 import {
@@ -43,6 +43,15 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 
+const subscriptions = [
+  new Subscription("Netflix", netflixImage, 20),
+  new Subscription("HBO", hboImage, 20),
+  new Subscription("Disney", disney, 20),
+  new Subscription("Spotify", spotify, 20),
+  new Subscription("Youtube", youtubeImage, 20),
+  new Subscription("Crunchy", crunchyrollImage, 20),
+];
+
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] =
@@ -59,6 +68,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     new Subscription("Youtube", youtubeImage, 12),
     new Subscription("Crunchy", crunchyrollImage, 7),
   ];
+  const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
+  const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
@@ -108,8 +119,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   function renderNewGroup() {
     return (
       <Box>
-        <Heading size="md" mb="1">
-          Subscriptions
+        <Heading size="sm" mb="1">
+          Select a Subscription
         </Heading>
 
         <Input
@@ -142,17 +153,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             );
           })}
         </Wrap>
-        <Heading size="md" mt="2" mb="1">
-          Distribution
-        </Heading>
-        <ButtonGroup variant="outline" spacing="6">
-          <Button onClick={() => setSplitMode("equally")}>split Equally</Button>
-          <Button onClick={() => setSplitMode("byAmount")}>
-            split by amount
-          </Button>
-        </ButtonGroup>
-        <Heading size="md" mt="2" mb="1">
-          Friends
+
+        <Heading size="sm" mt="2" mb="1">
+          Select Members
         </Heading>
 
         <AddFriend
@@ -182,6 +185,19 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             </Flex>
           );
         })}
+
+        <Tabs
+          mt="2"
+          variant="soft-rounded"
+          size="sm"
+          index={selectedTab}
+          onChange={setSelectedTab}
+        >
+          <TabList>
+            <Tab onClick={() => setSplitMode("equally")}>Split Equally</Tab>
+            <Tab onClick={() => setSplitMode("byAmount")}>By Amounts</Tab>
+          </TabList>
+        </Tabs>
       </Box>
     );
   }
@@ -211,6 +227,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 return;
               }
 
+              setIsCreatingGroup(true); // set isCreatingGroup to true
+
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
               // console.log(newGroup);
@@ -219,8 +237,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
               sendPostRequestToServer(newGroup);
             }}
+            isLoading={isCreatingGroup} // set isLoading to isCreatingGroup
           >
-            Create Group
+            {isCreatingGroup ? "Creating Group..." : "Create Group"}
           </Button>
         </ModalFooter>
       </ModalContent>

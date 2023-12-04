@@ -1,4 +1,4 @@
-import { Box, Image, Flex, Text, Avatar } from "@chakra-ui/react";
+import { Box, Image, Flex, Text, Avatar, Square } from "@chakra-ui/react";
 import { Friend } from "../models/Friend";
 import { Friend as FriendComponent } from "./Friend";
 import { getGravatarUrl } from "./Friend";
@@ -14,9 +14,12 @@ export function Subscription(props: {
   );
   return (
     <Box>
-      <Flex className="profile" margin="10px">
-        <Image src={props.image} marginRight="10px" />
-        <Box>
+      <Flex className="profile" marginRight="10px" alignItems="center">
+        <Square size="100px" border="1px solid lightgray" borderRadius={"md"}>
+          <Image src={props.image} />
+        </Square>
+
+        <Box marginLeft={"10px"}>
           <Text>{props.name} </Text>
           <Text>
             ${costPerMember}/month *{" "}
