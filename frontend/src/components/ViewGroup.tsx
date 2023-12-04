@@ -11,6 +11,7 @@ import {
   Divider,
   IconButton,
   Center,
+  Spinner, // Import Spinner component from Chakra UI
 } from "@chakra-ui/react";
 import { API_URL } from "../constants";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -61,8 +62,13 @@ export default function ViewGroup(props: { session: Session }) {
   }, [groupName]);
 
   if (selectGroup === null) {
-    return <div>No matching group found.</div>;
+    return (
+      <Center height="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
   }
+
   return (
     <Container maxW="3xl" /*bg={theme.colors.secondary[600]}*/>
       <IconButton

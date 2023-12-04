@@ -13,17 +13,16 @@ import {
   StackDivider,
   Button,
   useDisclosure,
+  Center,
+  Spinner,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { IconButton } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
 
 import { Session } from "@supabase/supabase-js";
 
 import { Subscription as SubscriptionComponent } from "./Subscription";
 import { Subscription } from "../models/Subscription";
-import netflixImage from "../images/netflix.png";
-import spotify from "../images/spotify.png";
 import disney from "../images/disney.png";
 import { API_URL } from "../constants";
 
@@ -82,6 +81,7 @@ export default function GroupList(props: { session: Session | null }) {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
+
         return response.json();
       })
       .then((data) => {
@@ -93,7 +93,7 @@ export default function GroupList(props: { session: Session | null }) {
                 groupData.subscription.image,
                 groupData.subscription.cost
               ),
-              groupData.members,
+              groupData.friends,
               groupData.id
             );
           })
@@ -103,7 +103,9 @@ export default function GroupList(props: { session: Session | null }) {
   }, [isOpen]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    <Center height="100vh">
+      <Spinner size="xl" />
+    </Center>;
   }
 
   const invitedSubscriptions = [
@@ -111,7 +113,7 @@ export default function GroupList(props: { session: Session | null }) {
       name: "Disney",
       image: disney,
       cost: "3.75",
-      members: "3/6",
+      members: [],
     },
   ];
 
@@ -189,7 +191,7 @@ export default function GroupList(props: { session: Session | null }) {
                 image={group?.subscription?.image}
                 cost={group?.subscription?.cost.toString()}
                 name={group?.subscription?.name}
-                members={group?.friends?.length?.toString()}
+                members={group?.friends}
               />
             </Link>
             <IconButton
