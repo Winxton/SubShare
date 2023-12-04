@@ -1,5 +1,4 @@
-import React from "react";
-import logo from "./logo.svg";
+import React, { useState } from "react";
 import { Session } from "@supabase/supabase-js";
 
 import {
@@ -11,7 +10,7 @@ import {
   Input,
   Wrap,
   WrapItem,
-  HStack,
+  ButtonGroup,
   VStack,
 } from "@chakra-ui/react";
 
@@ -49,14 +48,16 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
   const [friends, setFriends] = React.useState<Friend[]>([]);
+  const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
+  const [splitAmount, setSplitAmount] = useState<number | null>(null);
 
   const subscriptions = [
     new Subscription("Netflix", netflixImage, 20),
-    new Subscription("HBO", hboImage, 20),
-    new Subscription("Disney", disney, 20),
-    new Subscription("Spotify", spotify, 20),
-    new Subscription("Youtube", youtubeImage, 20),
-    new Subscription("Crunchy", crunchyrollImage, 20),
+    new Subscription("HBO", hboImage, 30),
+    new Subscription("Disney", disney, 25),
+    new Subscription("Spotify", spotify, 10),
+    new Subscription("Youtube", youtubeImage, 12),
+    new Subscription("Crunchy", crunchyrollImage, 7),
   ];
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -141,7 +142,15 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             );
           })}
         </Wrap>
-
+        <Heading size="md" mt="2" mb="1">
+          Distribution
+        </Heading>
+        <ButtonGroup variant="outline" spacing="6">
+          <Button onClick={() => setSplitMode("equally")}>split Equally</Button>
+          <Button onClick={() => setSplitMode("byAmount")}>
+            split by amount
+          </Button>
+        </ButtonGroup>
         <Heading size="md" mt="2" mb="1">
           Friends
         </Heading>
@@ -152,9 +161,10 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             setFriends([...friends, newFriend]);
           }}
         />
-        <VStack>
-          {friends.map((friend) => {
-            return (
+
+        {friends.map((friend) => {
+          return (
+            <Flex>
               <FriendComponent
                 email={friend.email}
                 isMe={false}
@@ -164,10 +174,14 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                   );
                   setFriends(newFriends);
                 }}
+                splitMode={splitMode}
+                subscriptionCost={selectedSubscription?.cost}
+                friendCount={friends.length}
               ></FriendComponent>
-            );
-          })}
-        </VStack>
+              {/* <Box>{renderSubscriptionSplit()}</Box> */}
+            </Flex>
+          );
+        })}
       </Box>
     );
   }
