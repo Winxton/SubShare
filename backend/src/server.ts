@@ -86,7 +86,7 @@ app.get("/api/member-groups", async (req, res) => {
 
     // Get groups the user is a member of
     const memberGroups = await getMemberGroups(user.email);
-    console.log("this is memergroups api",memberGroups);
+   
     if (!memberGroups) {
       return res.status(404).json({ message: "Error fetching member groups" });
     }
