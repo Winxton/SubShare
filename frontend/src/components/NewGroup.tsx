@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 
 import {
@@ -12,6 +12,7 @@ import {
   TabList,
   Tab,
   Flex,
+  Text,
 } from "@chakra-ui/react";
 
 import {
@@ -42,15 +43,7 @@ import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
-
-const subscriptions = [
-  new Subscription("Netflix", netflixImage, 20),
-  new Subscription("HBO", hboImage, 20),
-  new Subscription("Disney", disney, 20),
-  new Subscription("Spotify", spotify, 20),
-  new Subscription("Youtube", youtubeImage, 20),
-  new Subscription("Crunchy", crunchyrollImage, 20),
-];
+import { Console } from "console";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
@@ -58,7 +51,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     React.useState<Subscription | null>(null);
   const [friends, setFriends] = React.useState<Friend[]>([]);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
-  const [splitAmount, setSplitAmount] = useState<number | null>(null);
 
   const subscriptions = [
     new Subscription("Netflix", netflixImage, 20),
@@ -70,6 +62,35 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
+  const [user, setUser] = useState(null); // new state
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Fetch user data from the server using the API
+        const response = await fetch(`${API_URL}/user`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            access_token: props.session!.access_token,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const userData = await response.json();
+        console.log(userData);
+        setUser(userData.user.email);
+      } catch (error) {
+        console.error("There was a problem fetching user data:", error);
+      }
+    };
+
+    // Call the fetchUserData function when the component mounts
+    fetchUserData();
+  }, [props.session]); // Run this effect when the session prop changes
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
@@ -164,7 +185,13 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             setFriends([...friends, newFriend]);
           }}
         />
-
+        {user ? (
+          <Heading size="sm" mb="1">
+            Welcome, {user.email}!
+          </Heading>
+        ) : (
+          <p>Loading user data...</p>
+        )}
         {friends.map((friend) => {
           return (
             <Flex>
@@ -181,7 +208,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 subscriptionCost={selectedSubscription?.cost}
                 friendCount={friends.length}
               ></FriendComponent>
-              {/* <Box>{renderSubscriptionSplit()}</Box> */}
             </Flex>
           );
         })}

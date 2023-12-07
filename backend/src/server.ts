@@ -71,6 +71,25 @@ app.delete("/api/friends/:name", (req, res) => {
   const deletedFriend = friends.splice(index, 1);
   res.json({ message: "Friend deleted", friend: deletedFriend[0] });
 });
+ //created a api route to get the user from supabase
+app.get("/api/user", async (req, res) => {
+  try {
+    // Get the access token from the request headers
+    const accessToken = req.headers.access_token;
+
+    // Call the getUser function from the database to get user data
+    const user = await getUser(accessToken);
+
+    if (user) {
+      res.json({ user });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error getting user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // API routes related to groups
 
