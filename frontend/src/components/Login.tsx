@@ -29,18 +29,32 @@ export default function Login() {
         },
       });
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setIsEmailSent(true);
-      }
-    } catch (error) {}
+    if (error) {
+      setError(error.message);
+    } else {
+      setIsEmailSent(true);
+      resetError(); // Reset the error state when there is no error
+    }
+   } catch (error) {
+    
+   }
   };
 
   const handleGoBack = () => {
     setEmail("");
     setIsEmailSent(false);
+    resetError(); // Reset the error state
+  };
+
+  // Function to reset the error state
+  const resetError = () => {
     setError("");
+  };  
+
+  const handleEmailChange = (e) => {
+    // Reset the error state when the email input changes
+    resetError();
+    setEmail(e.target.value);
   };
 
   return (
@@ -77,15 +91,16 @@ export default function Login() {
         <Text mb={4}>
           Sent email to {email}. Check your email for the login link!
         </Text>
-      ) : (
-        <Input
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          w="300px"
-          mb={4}
-        />
-      )}
-
+    ) : (
+      <Input
+        placeholder="Email"
+        onChange={handleEmailChange} 
+        value={email}
+        w="300px"
+        mb={4}
+      />
+    )}
+    
       <Box width="300px">
         {isEmailSent ? (
           <Button colorScheme="blue" onClick={handleGoBack} w="100%">
