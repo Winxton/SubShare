@@ -5,10 +5,8 @@ import {
   getGroups,
   getMembers,
   deleteGroup,
-  
 } from "./database";
 import { getMemberGroups } from "./database";
-
 
 import { Group, Friend } from "./models";
 
@@ -75,52 +73,20 @@ app.delete("/api/friends/:name", (req, res) => {
   res.json({ message: "Friend deleted", friend: deletedFriend[0] });
 });
 
-// API routes related to groups
-app.get("/api/member-groups", async (req, res) => {
-  const { groupName } = req.query;
-  const accessToken = req.headers.access_token;
-  
-  try {
-    // Get user information
-    const user = await getUser(accessToken);
-
-    // Get groups the user is a member of
-    const memberGroups = await getMemberGroups(user.email);
-   
-    if (!memberGroups) {
-      return res.status(404).json({ message: "Error fetching member groups" });
-    }
-
-    if (groupName) {
-      const filteredGroup = memberGroups.find(
-        (group) =>
-          group.subscription.name.toLowerCase() === groupName.toLowerCase()
-      );
-
-      if (filteredGroup) {
-        // Include friends in the response
-        res.json({ group: filteredGroup });
-      } else {
-        res.status(404).json({ message: "Member group not found" });
-      }
-    } else {
-      res.json(memberGroups);
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
 //get selected groups
 app.get("/api/groups", async (req, res) => {
-  // TODO(tommy): get friends from the database as well.
+  const { groupName, accepted } = req.query;
 
-  const { groupName } = req.query;
   // Get all groups from the database
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
-  const groups = await getGroups(user.id);
-  //const otherGroups = await getMemberGroups(user.email);
+
+  let groups;
+  if (accepted) {
+    groups = await getMemberGroups(user.email);
+  } else {
+    groups = await getGroups(user.id);
+  }
 
   if (!groups) {
     return res.status(404).json({ message: "Error fetching groups" });

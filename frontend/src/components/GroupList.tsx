@@ -110,7 +110,7 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-    fetch(`${API_URL}/member-groups`, requestOptions)
+    fetch(`${API_URL}/groups?accepted=true`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
