@@ -5,6 +5,7 @@ import {
   getGroups,
   getMembers,
   deleteGroup,
+  acceptInvitedGroup,
 } from "./database";
 import { getMemberGroups } from "./database";
 
@@ -162,4 +163,28 @@ app.delete("/api/groups/:id", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+app.put("/api/groups/:id", async (req, res) => {
+  
+  try {
+    // Get the ID of the group to update from the request parameters
+    const groupID = req.params.id;
+    
+    const accessToken = req.headers.access_token;
+    
+    const user = await getUser(accessToken);
+
+    // Update the group status in the database
+    const success = await acceptInvitedGroup(user.email,groupID);
+    
+    if (success) {
+      res.json({ message: "Group updated successfully" });
+    } else {
+      res.status(404).json({ message: "Group not found or update failed" });
+    }
+  } catch (error) {
+    console.error("Error updating group:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });

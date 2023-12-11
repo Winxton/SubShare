@@ -72,7 +72,7 @@ export async function createMember(
 
   return resp.data;
 }
-
+//add comment
 export async function getMemberGroups(userEmail): Promise<Group[] | null> {
   try {
     // Fetch groups based on the user's email in the members table
@@ -187,3 +187,30 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
     return false;
   }
 }
+
+//Function to update the accepted status of a group in the database
+export async function acceptInvitedGroup(email, groupID) {
+ 
+  try {
+
+    // Update the 'accepted' field of the member with the specified email and group ID
+    const resp = await supabase
+      .from('members')
+      .update({ accepted: true })
+      .eq('email', email)
+      .eq('group_id', groupID);
+    console.log("data is ",resp)
+    if (resp.error) {
+      console.error('Error updating group:');
+      return false;
+    }
+    // Check if the update was successful
+   
+    return resp;
+  } catch (error) {
+    console.error('Error updating group:', error);
+    return false;
+  }
+}
+
+//Function to update the decline status of a group in the database

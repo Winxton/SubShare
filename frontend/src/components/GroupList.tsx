@@ -69,6 +69,40 @@ export default function GroupList(props: { session: Session | null }) {
         console.error("Error deleting group:", error);
       });
   };
+  const handleDeclineInvitation (groupToDecline) => {
+    const groupId = groupToAccept.id;
+  }
+  const handleAcceptInvitation = (groupToAccept) => {
+    // Send a PUT request to API to update the group status
+    const groupId = groupToAccept.id;
+    
+    if (!groupId) {
+      console.error("Invalid groupId:", groupId);
+      return;
+    }
+
+    fetch(`${API_URL}/groups/${groupId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json", // Set the content type to JSON
+        access_token: props.session!.access_token,
+      },
+      // Convert the data object to a JSON string
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        // Update the status of the accepted group in the state or UI
+
+        setInvitedSubscriptions((prevInvitedGroups) =>
+          prevInvitedGroups.filter((group) => group !== groupToAccept)
+        );
+      })
+      .catch((error) => {
+        console.error("Error accepting group invitation:", error);
+      });
+  };
 
   useEffect(() => {
     const requestOptions = {
@@ -229,17 +263,28 @@ export default function GroupList(props: { session: Session | null }) {
         <Text fontWeight="bold">Invited Groups</Text>
 
         {invitedSubscriptions.map((invitedGroup) => (
-          <Link
-            to={`/view-group/${invitedGroup.subscription.name}`}
-            key={invitedGroup.subscription.name}
-          >
-            <SubscriptionComponent
-              image={invitedGroup?.subscription?.image}
-              cost={invitedGroup?.subscription?.cost.toString()}
-              name={invitedGroup?.subscription?.name}
-              members={invitedGroup?.friends}
-            />
-          </Link>
+          <Flex key={invitedGroup.subscription.name} justify="space-between">
+            <Link to={`/view-group/${invitedGroup.subscription.name}`}>
+              <SubscriptionComponent
+                image={invitedGroup?.subscription?.image}
+                cost={invitedGroup?.subscription?.cost.toString()}
+                name={invitedGroup?.subscription?.name}
+                members={invitedGroup?.friends}
+              />
+            </Link>
+            <Button
+              colorScheme="green"
+              onClick={() => handleAcceptInvitation(invitedGroup)}
+            >
+              Accept
+            </Button>
+            <Button
+      colorScheme="red"
+      onClick={() => handleDeclineInvitation(invitedGroup)}
+    >
+      Decline
+    </Button>
+          </Flex>
         ))}
       </Stack>
 
