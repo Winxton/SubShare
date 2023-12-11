@@ -71,7 +71,7 @@ export default function GroupList(props: { session: Session | null }) {
   };
 
   //to do nina
-
+  const handleDeclineInvitation = (groupToDecline) => {};
   const handleAcceptInvitation = (groupToAccept) => {
     // Send a PUT request to API to update the group status
     const groupId = groupToAccept.id;
