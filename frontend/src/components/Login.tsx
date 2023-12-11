@@ -11,7 +11,8 @@ import {
 import loginImageURL from "../images/subshare-logo.webp";
 import { useState } from "react";
 import { supabase } from "../App";
-import { APP_URL } from "../constants";
+
+const APP_URL = process.env.REACT_APP_URL;
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -29,15 +30,13 @@ export default function Login() {
         },
       });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setIsEmailSent(true);
-      resetError(); // Reset the error state when there is no error
-    }
-   } catch (error) {
-    
-   }
+      if (error) {
+        setError(error.message);
+      } else {
+        setIsEmailSent(true);
+        resetError(); // Reset the error state when there is no error
+      }
+    } catch (error) {}
   };
 
   const handleGoBack = () => {
@@ -49,7 +48,7 @@ export default function Login() {
   // Function to reset the error state
   const resetError = () => {
     setError("");
-  };  
+  };
 
   const handleEmailChange = (e) => {
     // Reset the error state when the email input changes
@@ -91,16 +90,16 @@ export default function Login() {
         <Text mb={4}>
           Sent email to {email}. Check your email for the login link!
         </Text>
-    ) : (
-      <Input
-        placeholder="Email"
-        onChange={handleEmailChange} 
-        value={email}
-        w="300px"
-        mb={4}
-      />
-    )}
-    
+      ) : (
+        <Input
+          placeholder="Email"
+          onChange={handleEmailChange}
+          value={email}
+          w="300px"
+          mb={4}
+        />
+      )}
+
       <Box width="300px">
         {isEmailSent ? (
           <Button colorScheme="blue" onClick={handleGoBack} w="100%">
