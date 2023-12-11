@@ -11,6 +11,7 @@ import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/react";
 import md5 from "md5";
 import { useState } from "react";
+
 export function Friend(props: {
   email: string;
   isMe?: boolean;

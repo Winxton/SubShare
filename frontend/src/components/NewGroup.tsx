@@ -82,8 +82,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
         const userData = await response.json();
         //using the auth user email we create a new Friend(group member) then add the new friend into the friend state
-        const newFriend = new Friend(null, null, userData.user.email);
-        setFriends([newFriend]);
+        const myself = new Friend(null, null, userData.user.email, true);
+        setFriends([myself]);
         setUser(userData.user.email);
       } catch (error) {
         console.error("There was a problem fetching user data:", error);
@@ -183,7 +183,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email);
+            const newFriend = new Friend(null, null, email, false);
             setFriends([...friends, newFriend]);
           }}
         />
