@@ -240,7 +240,7 @@ export default function GroupList(props: { session: Session | null }) {
         </Flex>
 
         {groups.map((group) => (
-          <Flex align="center" justify="space-between">
+          <Flex align="center" justify="space-between" key={group.id}>
             <Link
               to={`/view-group/${group.subscription.name}`}
               key={group.subscription.name}
@@ -255,7 +255,6 @@ export default function GroupList(props: { session: Session | null }) {
             <IconButton
               aria-label="delete group"
               icon={<DeleteIcon />}
-              colorScheme="red"
               onClick={() => handleDeleteGroup(group)}
             />
           </Flex>
