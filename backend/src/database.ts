@@ -73,6 +73,52 @@ export async function createMember(
   return resp.data;
 }
 
+export async function getMemberGroups(userEmail): Promise<Group[] | null> {
+  try {
+    // Fetch groups based on the user's email in the members table
+    const { data: memberData, error: memberError } = await supabase
+      .from('members')
+      .select('group_id')
+      .eq('email', userEmail);
+
+    if (memberError) {
+      throw new Error(`Error getting groups for user: ${memberError.message}`);
+    }
+
+    const groupIds = memberData?.map((member) => member.group_id) || [];
+
+    // Fetch the actual groups based on the retrieved group ids
+    const { data: groupData, error: groupError } = await supabase
+      .from('groups')
+      .select('*')
+      .in('id', groupIds)
+      .order('created_date', { ascending: false });
+
+    if (groupError) {
+      throw new Error(`Error getting group data: ${groupError.message}`);
+    }
+
+    const groups = groupData || [];
+
+    // Fetch members for each group
+    const groupsWithMembers = await Promise.all(
+      groups.map(async (group) => {
+        const members = await getMembers(group.id);
+        return new Group(
+          new Subscription(group.name, group.image, group.cost),
+          members || [],
+          group.id
+        );
+      })
+    );
+
+    return groupsWithMembers;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 export async function getGroups(userId): Promise<Group[] | null> {
   const resp = await supabase
     .from("groups")
@@ -105,6 +151,7 @@ export async function getGroups(userId): Promise<Group[] | null> {
 
   return groupsWithMembers;
 }
+
 
 export async function getMembers(GroupId): Promise<Friend[] | null> {
   const resp = await supabase
