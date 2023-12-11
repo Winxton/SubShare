@@ -6,8 +6,7 @@ import { createClient, Session } from "@supabase/supabase-js";
 import Login from "./components/Login";
 import GroupList from "./components/GroupList";
 import ViewGroup from "./components/ViewGroup";
-import { Provider } from "react-redux";
-import store from "../src/reduxStore/store";
+
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 
@@ -35,17 +34,15 @@ function App() {
 
   if (session) {
     return (
-      <Provider store={store}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<GroupList session={session} />} />
-            <Route
-              path="/view-group/:groupName"
-              element={<ViewGroup session={session} />}
-            />
-          </Routes>
-        </Router>
-      </Provider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<GroupList session={session} />} />
+          <Route
+            path="/view-group/:groupName"
+            element={<ViewGroup session={session} />}
+          />
+        </Routes>
+      </Router>
     );
   } else {
     return <Login />;
