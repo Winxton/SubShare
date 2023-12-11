@@ -207,7 +207,7 @@ export default function GroupList(props: { session: Session | null }) {
         </Flex>
 
         {groups.length === 0 && (
-          <Flex ml="2" align="center">
+          <Flex align="center">
             <Mug size={60} mood="sad" color="#E0E4E8" />
             <Text ml="2" fontSize="sm" color="gray.500">
               You have no groups yet
