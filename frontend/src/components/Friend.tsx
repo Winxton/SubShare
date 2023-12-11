@@ -25,7 +25,7 @@ export function Friend(props: {
     props.email
   )}?s=200&d=identicon`;
   const subscriptionCost = props.subscriptionCost ?? 0;
-  const numberOfGroupMembers = 1 + (props.friendCount || 1);
+  const numberOfGroupMembers = props.friendCount || 1;
   const subscriptionCostPerMember = subscriptionCost
     ? (subscriptionCost / numberOfGroupMembers).toFixed(2)
     : null;

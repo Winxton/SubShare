@@ -81,7 +81,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         }
 
         const userData = await response.json();
-        console.log(userData);
+        //using the auth user email we create a new Friend(group member) then add the new friend into the friend state
+        const newFriend = new Friend(null, null, userData.user.email);
+        setFriends([newFriend]);
         setUser(userData.user.email);
       } catch (error) {
         console.error("There was a problem fetching user data:", error);
@@ -185,24 +187,22 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             setFriends([...friends, newFriend]);
           }}
         />
-        {user ? (
-          <Heading size="sm" mb="1">
-            Welcome, {user.email}!
-          </Heading>
-        ) : (
-          <p>Loading user data...</p>
-        )}
+
         {friends.map((friend) => {
+          const isUser = friend.email === user;
           return (
-            <Flex>
+            <Flex key={friend.email}>
               <FriendComponent
                 email={friend.email}
-                isMe={false}
+                isMe={isUser}
                 onRemove={(email) => {
-                  const newFriends = friends.filter(
-                    (friend) => friend.email !== email
-                  );
-                  setFriends(newFriends);
+                  // Check if it's the ser before removing
+                  if (!isUser) {
+                    const newFriends = friends.filter(
+                      (friend) => friend.email !== email
+                    );
+                    setFriends(newFriends);
+                  }
                 }}
                 splitMode={splitMode}
                 subscriptionCost={selectedSubscription?.cost}
@@ -211,7 +211,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             </Flex>
           );
         })}
-
         <Tabs
           mt="2"
           variant="soft-rounded"
@@ -257,7 +256,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
-              // console.log(newGroup);
               setSelectedSubscription(null);
               setFriends([]);
 
