@@ -102,11 +102,11 @@ app.get("/api/groups", async (req, res) => {
 
   let groups;
   if (accepted) {
-    // Groups that I'm invited to.
-    groups = await getMemberGroups(user.email, null);
-  } else {
     // Groups that I have accepted.
     groups = await getMemberGroups(user.email, true);
+  } else {
+    // Groups that I'm invited to.
+    groups = await getMemberGroups(user.email, null);
   }
 
   if (!groups) {
