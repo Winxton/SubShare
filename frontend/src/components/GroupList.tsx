@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Mug } from "react-kawaii";
 
 import {
   Container,
@@ -35,6 +36,7 @@ export default function GroupList(props: { session: Session | null }) {
   const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
+  const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const subscriptionCost = "$8.10";
   const savings = "$14.90";
@@ -102,20 +104,43 @@ export default function GroupList(props: { session: Session | null }) {
       });
   }, [isOpen]);
 
+  useEffect(() => {
+    const requestOptions = {
+      headers: {
+        access_token: props.session!.access_token,
+      },
+    };
+
+    fetch(`${API_URL}/groups?accepted=true`, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setInvitedSubscriptions(
+          data.map((groupData: any) => {
+            return new Group(
+              new Subscription(
+                groupData.subscription.name,
+                groupData.subscription.image,
+                groupData.subscription.cost
+              ),
+              groupData.friends,
+              groupData.id
+            );
+          })
+        );
+        setLoading(false);
+      });
+  }, [isOpen]);
+
   if (loading) {
     <Center height="100vh">
       <Spinner size="xl" />
     </Center>;
   }
-
-  const invitedSubscriptions = [
-    {
-      name: "Disney",
-      image: disney,
-      cost: "3.75",
-      members: [],
-    },
-  ];
 
   return (
     <Container maxW="3xl">
@@ -181,8 +206,16 @@ export default function GroupList(props: { session: Session | null }) {
           </Box>
         </Flex>
 
+        {groups.length === 0 && (
+          <Flex align="center">
+            <Mug size={60} mood="sad" color="#E0E4E8" />
+            <Text ml="2" fontSize="sm" color="gray.500">
+              You have no groups yet
+            </Text>
+          </Flex>
+        )}
         {groups.map((group) => (
-          <Flex align="center" justify="space-between">
+          <Flex align="center" justify="space-between" key={group.id}>
             <Link
               to={`/view-group/${group.subscription.name}`}
               key={group.subscription.name}
@@ -197,19 +230,22 @@ export default function GroupList(props: { session: Session | null }) {
             <IconButton
               aria-label="delete group"
               icon={<DeleteIcon />}
-              colorScheme="red"
               onClick={() => handleDeleteGroup(group)}
             />
           </Flex>
         ))}
         <Text fontWeight="bold">Invited Groups</Text>
-        {invitedSubscriptions.map((subscription) => (
-          <Link to={`/view-group/${subscription.name}`} key={subscription.name}>
+
+        {invitedSubscriptions.map((invitedGroup) => (
+          <Link
+            to={`/view-group/${invitedGroup.subscription.name}`}
+            key={invitedGroup.subscription.name}
+          >
             <SubscriptionComponent
-              image={subscription.image}
-              cost={subscription.cost}
-              name={subscription.name}
-              members={subscription.members}
+              image={invitedGroup?.subscription?.image}
+              cost={invitedGroup?.subscription?.cost.toString()}
+              name={invitedGroup?.subscription?.name}
+              members={invitedGroup?.friends}
             />
           </Link>
         ))}

@@ -6,6 +6,7 @@ import {
   getMembers,
   deleteGroup,
 } from "./database";
+import { getMemberGroups } from "./database";
 
 import { Group, Friend } from "./models";
 
@@ -91,17 +92,20 @@ app.get("/api/user", async (req, res) => {
   }
 });
 
-// API routes related to groups
-
 //get selected groups
 app.get("/api/groups", async (req, res) => {
-  // TODO(tommy): get friends from the database as well.
+  const { groupName, accepted } = req.query;
 
-  const { groupName } = req.query;
   // Get all groups from the database
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
-  const groups = await getGroups(user.id);
+
+  let groups;
+  if (accepted) {
+    groups = await getMemberGroups(user.email);
+  } else {
+    groups = await getGroups(user.id);
+  }
 
   if (!groups) {
     return res.status(404).json({ message: "Error fetching groups" });
