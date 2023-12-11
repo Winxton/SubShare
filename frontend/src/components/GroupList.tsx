@@ -69,13 +69,13 @@ export default function GroupList(props: { session: Session | null }) {
         console.error("Error deleting group:", error);
       });
   };
-  const handleDeclineInvitation (groupToDecline) => {
-    const groupId = groupToAccept.id;
-  }
+
+  //to do nina
+
   const handleAcceptInvitation = (groupToAccept) => {
     // Send a PUT request to API to update the group status
     const groupId = groupToAccept.id;
-    
+
     if (!groupId) {
       console.error("Invalid groupId:", groupId);
       return;
@@ -278,11 +278,11 @@ export default function GroupList(props: { session: Session | null }) {
               Accept
             </Button>
             <Button
-      colorScheme="red"
-      onClick={() => handleDeclineInvitation(invitedGroup)}
-    >
-      Decline
-    </Button>
+              colorScheme="red"
+              onClick={() => handleDeclineInvitation(invitedGroup)}
+            >
+              Decline
+            </Button>
           </Flex>
         ))}
       </Stack>
