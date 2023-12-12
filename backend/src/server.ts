@@ -82,10 +82,13 @@ app.get("/api/groups", async (req, res) => {
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
+  console.log(accepted)
+
   let groups;
   if (accepted) {
     groups = await getMemberGroups(user.email);
   } else {
+    console.log("INVITED TO GROUPS")
     groups = await getGroups(user.id);
   }
 
@@ -165,7 +168,7 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-app.put("/api/groups/:id", async (req, res) => {
+app.put("api/accept_invite/:groupId", async (req, res) => {
   
   try {
     // Get the ID of the group to update from the request parameters
