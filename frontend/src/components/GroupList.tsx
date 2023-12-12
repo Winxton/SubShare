@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Mug } from "react-kawaii";
 
 import {
   Container,
@@ -111,7 +112,7 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-    fetch(`${API_URL}/groups`, requestOptions)
+    fetch(`${API_URL}/groups?accepted=true`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -144,7 +145,11 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
+<<<<<<< HEAD
     fetch(`${API_URL}/groups?accepted=null`, requestOptions)
+=======
+    fetch(`${API_URL}/groups`, requestOptions)
+>>>>>>> cec83afbf32b7cda8b253e9c2786fc20c0da5346
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -239,6 +244,14 @@ export default function GroupList(props: { session: Session | null }) {
           </Box>
         </Flex>
 
+        {groups.length === 0 && (
+          <Flex align="center">
+            <Mug size={60} mood="sad" color="#E0E4E8" />
+            <Text ml="2" fontSize="sm" color="gray.500">
+              You have no groups yet
+            </Text>
+          </Flex>
+        )}
         {groups.map((group) => (
           <Flex align="center" justify="space-between" key={group.id}>
             <Link

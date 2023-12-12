@@ -1,5 +1,4 @@
-import React from "react";
-import logo from "./logo.svg";
+import React, { useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 
 import {
@@ -9,10 +8,11 @@ import {
   Input,
   Wrap,
   WrapItem,
-  VStack,
   Tabs,
   TabList,
   Tab,
+  Flex,
+  Text,
 } from "@chakra-ui/react";
 
 import {
@@ -43,23 +43,56 @@ import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
-
-const subscriptions = [
-  new Subscription("Netflix", netflixImage, 20),
-  new Subscription("HBO", hboImage, 20),
-  new Subscription("Disney", disney, 20),
-  new Subscription("Spotify", spotify, 20),
-  new Subscription("Youtube", youtubeImage, 20),
-  new Subscription("Crunchy", crunchyrollImage, 20),
-];
+import { Console } from "console";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
   const [friends, setFriends] = React.useState<Friend[]>([]);
+  const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
+
+  const subscriptions = [
+    new Subscription("Netflix", netflixImage, 20),
+    new Subscription("HBO", hboImage, 30),
+    new Subscription("Disney", disney, 25),
+    new Subscription("Spotify", spotify, 10),
+    new Subscription("Youtube", youtubeImage, 12),
+    new Subscription("Crunchy", crunchyrollImage, 7),
+  ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
+  const [user, setUser] = useState(null); // new state
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Fetch user data from the server using the API
+        const response = await fetch(`${API_URL}/user`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            access_token: props.session!.access_token,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const userData = await response.json();
+        //using the auth user email we create a new Friend(group member) then add the new friend into the friend state
+        const myself = new Friend(null, null, userData.user.email, true);
+        setFriends([myself]);
+        setUser(userData.user.email);
+      } catch (error) {
+        console.error("There was a problem fetching user data:", error);
+      }
+    };
+
+    // Call the fetchUserData function when the component mounts
+    fetchUserData();
+  }, [props.session]); // Run this effect when the session prop changes
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
@@ -150,27 +183,34 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email);
+            const newFriend = new Friend(null, null, email, false);
             setFriends([...friends, newFriend]);
           }}
         />
-        <VStack>
-          {friends.map((friend) => {
-            return (
+
+        {friends.map((friend) => {
+          const isUser = friend.email === user;
+          return (
+            <Flex key={friend.email}>
               <FriendComponent
                 email={friend.email}
-                isMe={false}
+                isMe={isUser}
                 onRemove={(email) => {
-                  const newFriends = friends.filter(
-                    (friend) => friend.email !== email
-                  );
-                  setFriends(newFriends);
+                  // Check if it's the ser before removing
+                  if (!isUser) {
+                    const newFriends = friends.filter(
+                      (friend) => friend.email !== email
+                    );
+                    setFriends(newFriends);
+                  }
                 }}
+                splitMode={splitMode}
+                subscriptionCost={selectedSubscription?.cost}
+                friendCount={friends.length}
               ></FriendComponent>
-            );
-          })}
-        </VStack>
-
+            </Flex>
+          );
+        })}
         <Tabs
           mt="2"
           variant="soft-rounded"
@@ -179,8 +219,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
           onChange={setSelectedTab}
         >
           <TabList>
-            <Tab>Split Equally</Tab>
-            <Tab>By Amounts</Tab>
+            <Tab onClick={() => setSplitMode("equally")}>Split Equally</Tab>
+            <Tab onClick={() => setSplitMode("byAmount")}>By Amounts</Tab>
           </TabList>
         </Tabs>
       </Box>
@@ -216,7 +256,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
-              // console.log(newGroup);
               setSelectedSubscription(null);
               setFriends([]);
 

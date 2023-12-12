@@ -72,13 +72,22 @@ export async function createMember(
 
   return resp.data;
 }
+<<<<<<< HEAD
 export async function getMemberGroups(userEmail): Promise<Group[] | null> {
+=======
+//add comment
+export async function getMemberGroups(
+  userEmail: string,
+  accepted: boolean | null
+): Promise<Group[] | null> {
+>>>>>>> cec83afbf32b7cda8b253e9c2786fc20c0da5346
   try {
     // Fetch groups based on the user's email in the members table
     const { data: memberData, error: memberError } = await supabase
-      .from('members')
-      .select('group_id')
-      .eq('email', userEmail);
+      .from("members")
+      .select("group_id")
+      .eq("email", userEmail)
+      .is("accepted", accepted);
 
     if (memberError) {
       throw new Error(`Error getting groups for user: ${memberError.message}`);
@@ -88,10 +97,10 @@ export async function getMemberGroups(userEmail): Promise<Group[] | null> {
 
     // Fetch the actual groups based on the retrieved group ids
     const { data: groupData, error: groupError } = await supabase
-      .from('groups')
-      .select('*')
-      .in('id', groupIds)
-      .order('created_date', { ascending: false });
+      .from("groups")
+      .select("*")
+      .in("id", groupIds)
+      .order("created_date", { ascending: false });
 
     if (groupError) {
       throw new Error(`Error getting group data: ${groupError.message}`);
@@ -117,40 +126,6 @@ export async function getMemberGroups(userEmail): Promise<Group[] | null> {
     return null;
   }
 }
-
-export async function getGroups(userId): Promise<Group[] | null> {
-  const resp = await supabase
-    .from("groups")
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_date", { ascending: false });
-
-  if (resp.error) {
-    console.error("Error getting groups:", resp.error);
-    return null;
-  }
-
-  const groups = resp.data;
-
-  if (!groups) {
-    return null;
-  }
-
-  // Fetch members for each group
-  const groupsWithMembers = await Promise.all(
-    groups.map(async (group) => {
-      const members = await getMembers(group.id);
-      return new Group(
-        new Subscription(group.name, group.image, group.cost),
-        members || [],
-        group.id
-      );
-    })
-  );
-
-  return groupsWithMembers;
-}
-
 
 export async function getMembers(GroupId): Promise<Friend[] | null> {
   const resp = await supabase
@@ -188,26 +163,35 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
 }
 
 //Function to update the accepted status of a group in the database
+<<<<<<< HEAD
 export async function acceptInvitedGroup(email:string, groupID:string) {
  
+=======
+export async function acceptInvitedGroup(email, groupID) {
+>>>>>>> cec83afbf32b7cda8b253e9c2786fc20c0da5346
   try {
-
     // Update the 'accepted' field of the member with the specified email and group ID
     const resp = await supabase
-      .from('members')
+      .from("members")
       .update({ accepted: true })
+<<<<<<< HEAD
       .eq('email', email)
       .eq('group_id', groupID);
     
+=======
+      .eq("email", email)
+      .eq("group_id", groupID);
+    console.log("data is ", resp);
+>>>>>>> cec83afbf32b7cda8b253e9c2786fc20c0da5346
     if (resp.error) {
-      console.error('Error updating group:');
+      console.error("Error updating group:");
       return false;
     }
     // Check if the update was successful
-   
+
     return resp;
   } catch (error) {
-    console.error('Error updating group:', error);
+    console.error("Error updating group:", error);
     return false;
   }
 }
