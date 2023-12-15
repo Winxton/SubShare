@@ -2,9 +2,9 @@ import {
   getUser,
   createGroup,
   createMember,
-  getGroups,
   getMembers,
   deleteGroup,
+  acceptInvitedGroup,
 } from "./database";
 import { getMemberGroups } from "./database";
 
@@ -72,7 +72,7 @@ app.delete("/api/friends/:name", (req, res) => {
   const deletedFriend = friends.splice(index, 1);
   res.json({ message: "Friend deleted", friend: deletedFriend[0] });
 });
- //created a api route to get the user from supabase
+//created a api route to get the user from supabase
 app.get("/api/user", async (req, res) => {
   try {
     // Get the access token from the request headers
@@ -100,11 +100,15 @@ app.get("/api/groups", async (req, res) => {
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
+  
+
   let groups;
   if (accepted) {
-    groups = await getMemberGroups(user.email);
+    // Groups that I have accepted.
+    groups = await getMemberGroups(user.email, true);
   } else {
-    groups = await getGroups(user.id);
+    // Groups that I'm invited to.
+    groups = await getMemberGroups(user.email, null);
   }
 
   if (!groups) {
@@ -178,7 +182,33 @@ app.delete("/api/groups/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+app.put("/api/accept_invite/:groupId", async (req, res) => {
+  
+  try {
+    // Get the ID of the group to update from the request parameters
+    const groupID = req.params.groupId;
+
+    const accessToken = req.headers.access_token;
+
+    const user = await getUser(accessToken);
+
+    // Update the group status in the database
+   
+    const success = await acceptInvitedGroup(user.email, groupID);
+
+    if (success) {
+      res.json({ message: "Group updated successfully" });
+    } else {
+      res.status(404).json({ message: "Group not found or update failed" });
+    }
+  } catch (error) {
+    console.error("Error updating group:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
