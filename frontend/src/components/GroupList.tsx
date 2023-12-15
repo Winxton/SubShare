@@ -82,7 +82,7 @@ export default function GroupList(props: { session: Session | null }) {
       return;
     }
 
-    fetch(`${API_URL}/groups/${groupId}`, {
+    fetch(`${API_URL}/accept_invite/${groupId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json", // Set the content type to JSON
@@ -145,11 +145,7 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-<<<<<<< HEAD
-    fetch(`${API_URL}/groups?accepted=null`, requestOptions)
-=======
     fetch(`${API_URL}/groups`, requestOptions)
->>>>>>> cec83afbf32b7cda8b253e9c2786fc20c0da5346
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

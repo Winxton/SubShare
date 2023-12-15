@@ -100,20 +100,15 @@ app.get("/api/groups", async (req, res) => {
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
-  console.log(accepted)
+  
 
   let groups;
   if (accepted) {
     // Groups that I have accepted.
     groups = await getMemberGroups(user.email, true);
   } else {
-<<<<<<< HEAD
-    console.log("INVITED TO GROUPS")
-    groups = await getGroups(user.id);
-=======
     // Groups that I'm invited to.
     groups = await getMemberGroups(user.email, null);
->>>>>>> cec83afbf32b7cda8b253e9c2786fc20c0da5346
   }
 
   if (!groups) {
@@ -187,26 +182,18 @@ app.delete("/api/groups/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-<<<<<<< HEAD
-app.put("api/accept_invite/:groupId", async (req, res) => {
+app.put("/api/accept_invite/:groupId", async (req, res) => {
   
-=======
-app.put("/api/groups/:id", async (req, res) => {
->>>>>>> cec83afbf32b7cda8b253e9c2786fc20c0da5346
   try {
     // Get the ID of the group to update from the request parameters
-    const groupID = req.params.id;
+    const groupID = req.params.groupId;
 
     const accessToken = req.headers.access_token;
 
     const user = await getUser(accessToken);
 
     // Update the group status in the database
+   
     const success = await acceptInvitedGroup(user.email, groupID);
 
     if (success) {
@@ -219,3 +206,9 @@ app.put("/api/groups/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+
