@@ -10,7 +10,6 @@ import {
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/react";
 import md5 from "md5";
-import { useState } from "react";
 
 export function Friend(props: {
   email: string;
@@ -18,8 +17,10 @@ export function Friend(props: {
   isSelected?: boolean;
   onRemove?: (email: string) => void;
   splitMode?: string;
+  splitCustomAmount: number | null;
   subscriptionCost?: number;
   friendCount?: number;
+  handleCustomAmountChange?: (email: string, value: number) => void;
 }) {
   // Gravatar URL construction
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
@@ -30,28 +31,7 @@ export function Friend(props: {
   const subscriptionCostPerMember = subscriptionCost
     ? (subscriptionCost / numberOfGroupMembers).toFixed(2)
     : null;
-  const [customAmount, setCustomAmount] = useState<number | null>(null);
-  const handleCustomAmountChange = (value: string) => {
-    const parsedValue = parseFloat(value) || null;
 
-    // Validate that the custom amount does not exceed the subscription amount
-    if (parsedValue !== null) {
-      if (parsedValue <= subscriptionCost) {
-        setCustomAmount(parsedValue);
-      } else {
-        // If the entered amount exceeds the subscription amount,
-        // set customAmount to the remaining balance
-        const remainingBalance =
-          subscriptionCost -
-          (subscriptionCostPerMember !== null
-            ? parseFloat(subscriptionCostPerMember)
-            : 0);
-        setCustomAmount(remainingBalance);
-      }
-    } else {
-      setCustomAmount(null);
-    }
-  };
   return (
     <Flex
       align="center"
@@ -80,13 +60,20 @@ export function Friend(props: {
 
       {props.splitMode === "byAmount" && (
         <Box>
-          <Text>$</Text>
-          <Input
-            type="number"
-            placeholder="Enter custom amount"
-            value={customAmount !== null ? customAmount : ""}
-            onChange={(e) => handleCustomAmountChange(e.target.value)}
-          />
+          <Flex>
+            <Text>$</Text>
+            <Input
+              type="number"
+              placeholder="Enter custom amount"
+              value={props.splitCustomAmount || 0}
+              onChange={(e) => {
+                const parsedValue = parseFloat(e.target.value) || null;
+                if (parsedValue) {
+                  props.handleCustomAmountChange!(props.email, parsedValue);
+                }
+              }}
+            />
+          </Flex>
         </Box>
       )}
       {props.onRemove && (

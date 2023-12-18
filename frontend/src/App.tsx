@@ -2,7 +2,6 @@ import "./App.css";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { createClient, Session } from "@supabase/supabase-js";
-
 import Login from "./components/Login";
 import GroupList from "./components/GroupList";
 import ViewGroup from "./components/ViewGroup";

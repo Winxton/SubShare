@@ -63,6 +63,19 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
   const [user, setUser] = useState(null); // new state
 
+  const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
+    {}
+  );
+
+  const subscriptionBalance =
+    selectedSubscription && splitMode === "byAmount"
+      ? selectedSubscription.cost -
+        Object.values(customAmounts).reduce(
+          (acc, amount) => acc + (amount || 0),
+          0
+        )
+      : 0;
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -175,7 +188,18 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             );
           })}
         </Wrap>
-
+        <Tabs
+          mt="2"
+          variant="soft-rounded"
+          size="sm"
+          index={selectedTab}
+          onChange={setSelectedTab}
+        >
+          <TabList>
+            <Tab onClick={() => setSplitMode("equally")}>Split Equally</Tab>
+            <Tab onClick={() => setSplitMode("byAmount")}>By Amounts</Tab>
+          </TabList>
+        </Tabs>
         <Heading size="sm" mt="2" mb="1">
           Select Members
         </Heading>
@@ -204,24 +228,24 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                   }
                 }}
                 splitMode={splitMode}
+                splitCustomAmount={customAmounts[friend.email] || null}
                 subscriptionCost={selectedSubscription?.cost}
                 friendCount={friends.length}
+                handleCustomAmountChange={(email: string, amount: number) => {
+                  setCustomAmounts({
+                    ...customAmounts,
+                    [email]: amount,
+                  });
+                }}
               ></FriendComponent>
             </Flex>
           );
         })}
-        <Tabs
-          mt="2"
-          variant="soft-rounded"
-          size="sm"
-          index={selectedTab}
-          onChange={setSelectedTab}
-        >
-          <TabList>
-            <Tab onClick={() => setSplitMode("equally")}>Split Equally</Tab>
-            <Tab onClick={() => setSplitMode("byAmount")}>By Amounts</Tab>
-          </TabList>
-        </Tabs>
+        <Flex margin="50px">
+          {" "}
+          <Text>Balance Remaining</Text>
+          <Text>{subscriptionBalance}</Text>
+        </Flex>
       </Box>
     );
   }

@@ -23,7 +23,7 @@ export async function getUser(accessToken: string) {
 }
 
 // Get Groups
-  
+
 export async function createGroup(userId, name, cost, createdDate, image) {
   const resp = await supabase
     .from("groups")
@@ -159,19 +159,18 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
 }
 
 //Function to update the accepted status of a group in the database
-export async function acceptInvitedGroup(email:string, groupID:string) {
-
+export async function acceptInvitedGroup(email: string, groupID: string) {
   try {
     // Update the 'accepted' field of the member with the specified email and group ID
     const resp = await supabase
       .from("members")
       .update({ accepted: true })
-      .eq('email', email)
-      .eq('group_id', groupID);
-    
+      .eq("email", email)
+      .eq("group_id", groupID);
+
     if (resp.error) {
       console.error("Error updating group:");
-      
+
       return false;
     }
     // Check if the update was successful
