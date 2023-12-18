@@ -33,6 +33,10 @@ let friends: Friend[] = [
   new Friend("young", "https://bit.ly/sage-adebayo", "sadsal@business.ca"),
 ];
 
+app.get("/", (req, res) => {
+  res.send({ message: "Knock on wood" });
+});
+
 // API routes related to friends
 
 app.get("/api/friends", (req, res) => {
@@ -92,7 +96,8 @@ app.get("/api/user", async (req, res) => {
   }
 });
 
-//get selected groups
+// API For Groups
+
 app.get("/api/groups", async (req, res) => {
   const { groupName, accepted } = req.query;
 
