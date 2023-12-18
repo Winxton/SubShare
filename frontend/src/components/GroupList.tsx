@@ -73,20 +73,8 @@ export default function GroupList(props: { session: Session | null }) {
       return;
     }
 
-    fetch(`${API_URL}/accept_invite/${groupId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json", // Set the content type to JSON
-        access_token: props.session!.access_token,
-      },
-      // Convert the data object to a JSON string
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        // Update the status of the accepted group in the state or UI
-
+    API.acceptInvite(groupId, props.session!.access_token)
+      .then(() => {
         setInvitedSubscriptions((prevInvitedGroups) =>
           prevInvitedGroups.filter((group) => group !== groupToAccept)
         );
