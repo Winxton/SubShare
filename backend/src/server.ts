@@ -100,8 +100,6 @@ app.get("/api/groups", async (req, res) => {
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
-  
-
   let groups;
   if (accepted) {
     // Groups that I have accepted.
@@ -183,7 +181,6 @@ app.delete("/api/groups/:id", async (req, res) => {
   }
 });
 app.put("/api/accept_invite/:groupId", async (req, res) => {
-  
   try {
     // Get the ID of the group to update from the request parameters
     const groupID = req.params.groupId;
@@ -193,7 +190,7 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
     const user = await getUser(accessToken);
 
     // Update the group status in the database
-   
+
     const success = await acceptInvitedGroup(user.email, groupID);
 
     if (success) {
@@ -210,5 +207,3 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-

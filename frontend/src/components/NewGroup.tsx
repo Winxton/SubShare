@@ -183,7 +183,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email, false);
+            const newFriend = new Friend(null, null, email, null);
             setFriends([...friends, newFriend]);
           }}
         />

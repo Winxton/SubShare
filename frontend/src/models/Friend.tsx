@@ -3,7 +3,7 @@ export class Friend {
     public name: string | null,
     public image: string | null,
     public email: string,
-    public accepted: boolean,
+    public accepted: boolean | null,
     public group_id?: string,
     public isowner?: boolean,
     public accepted_date?: Date,
