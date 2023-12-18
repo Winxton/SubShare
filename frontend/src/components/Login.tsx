@@ -18,8 +18,10 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [error, setError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const loginWithOTP = async () => {
+    setIsLoggingIn(true);
     try {
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
@@ -36,7 +38,10 @@ export default function Login() {
         setIsEmailSent(true);
         resetError(); // Reset the error state when there is no error
       }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   const handleGoBack = () => {
@@ -106,7 +111,12 @@ export default function Login() {
             Go Back
           </Button>
         ) : (
-          <Button colorScheme="blue" onClick={loginWithOTP} w="100%">
+          <Button
+            colorScheme="blue"
+            onClick={loginWithOTP}
+            w="100%"
+            isLoading={isLoggingIn}
+          >
             Login
           </Button>
         )}
