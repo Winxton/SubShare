@@ -65,19 +65,16 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
   const [user, setUser] = useState(null); // new state
+
   const dispatch: AppDispatch = useDispatch();
 
-  ///// get the SubscriptionCost and CustomAmounts to calculate the balance of the subscription
-  const subscriptionCost = useSelector(
-    (state: RootState) => state.subscription.cost
-  );
-  const customAmounts = useSelector(
-    (state: RootState) => state.subscription.customAmounts
+  const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
+    {}
   );
 
   const subscriptionBalance =
     selectedSubscription && splitMode === "byAmount"
-      ? subscriptionCost -
+      ? selectedSubscription.cost -
         Object.values(customAmounts).reduce(
           (acc, amount) => acc + (amount || 0),
           0
@@ -237,8 +234,15 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                   }
                 }}
                 splitMode={splitMode}
+                splitCustomAmount={customAmounts[friend.email] || null}
                 subscriptionCost={selectedSubscription?.cost}
                 friendCount={friends.length}
+                handleCustomAmountChange={(email: string, amount: number) => {
+                  setCustomAmounts({
+                    ...customAmounts,
+                    [email]: amount,
+                  });
+                }}
               ></FriendComponent>
             </Flex>
           );

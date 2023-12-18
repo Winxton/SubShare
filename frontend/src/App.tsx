@@ -2,8 +2,6 @@ import "./App.css";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { createClient, Session } from "@supabase/supabase-js";
-import { Provider } from "react-redux";
-import store from "./store/store";
 import Login from "./components/Login";
 import GroupList from "./components/GroupList";
 import ViewGroup from "./components/ViewGroup";
@@ -35,17 +33,15 @@ function App() {
 
   if (session) {
     return (
-      <Provider store={store}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<GroupList session={session} />} />
-            <Route
-              path="/view-group/:groupName"
-              element={<ViewGroup session={session} />}
-            />
-          </Routes>
-        </Router>
-      </Provider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<GroupList session={session} />} />
+          <Route
+            path="/view-group/:groupName"
+            element={<ViewGroup session={session} />}
+          />
+        </Routes>
+      </Router>
     );
   } else {
     return <Login />;

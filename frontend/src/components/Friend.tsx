@@ -21,8 +21,10 @@ export function Friend(props: {
   isSelected?: boolean;
   onRemove?: (email: string) => void;
   splitMode?: string;
+  splitCustomAmount: number | null;
   subscriptionCost?: number;
   friendCount?: number;
+  handleCustomAmountChange?: (email: string, value: number) => void;
 }) {
   // Gravatar URL construction
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
@@ -34,19 +36,10 @@ export function Friend(props: {
     ? (subscriptionCost / numberOfGroupMembers).toFixed(2)
     : null;
 
-  const dispatch = useDispatch();
   const customAmounts = useSelector(
     (state: RootState) => state.subscription.customAmounts
   );
 
-  const handleCustomAmountChange = (value: string) => {
-    const parsedValue = parseFloat(value) || null;
-
-    if (parsedValue !== null) {
-      // Dispatch setCustomAmount action with email and amount
-      dispatch(setCustomAmount({ email: props.email, amount: parsedValue }));
-    }
-  };
   return (
     <Flex
       align="center"
@@ -80,8 +73,13 @@ export function Friend(props: {
             <Input
               type="number"
               placeholder="Enter custom amount"
-              value={customAmounts[props.email] || ""}
-              onChange={(e) => handleCustomAmountChange(e.target.value)}
+              value={props.splitCustomAmount || 0}
+              onChange={(e) => {
+                const parsedValue = parseFloat(e.target.value) || null;
+                if (parsedValue) {
+                  props.handleCustomAmountChange!(props.email, parsedValue);
+                }
+              }}
             />
           </Flex>
         </Box>

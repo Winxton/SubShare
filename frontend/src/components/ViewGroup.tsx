@@ -125,7 +125,7 @@ export default function ViewGroup(props: { session: Session }) {
           </Heading>
 
           {selectGroup.friends.map((member) => (
-            <Friend email={member.email} />
+            <Friend email={member.email} splitCustomAmount={0} />
           ))}
         </VStack>
       </Box>
