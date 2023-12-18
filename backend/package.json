@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "start": "PORT=80 ts-node src/index.ts",
-    "dev": "PORT=4000 nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts"
+    "dev": "PORT=4000 nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts",
+    "build": "tsc -p . --outDir build/",
+    "start": "PORT=80 node build/index.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
