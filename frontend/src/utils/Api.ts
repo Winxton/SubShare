@@ -65,7 +65,7 @@ export function getAcceptedGroups(requestOptions: any) {
       });
     });
 }
-export function getAllGroups(requestOptions: any) {
+export function getInvitedGroups(requestOptions: any) {
   return fetch(`${API_URL}/groups`, requestOptions)
     .then((response) => {
       if (!response.ok) {
