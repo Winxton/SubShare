@@ -78,6 +78,7 @@ export default function GroupList(props: { session: Session | null }) {
         setInvitedSubscriptions((prevInvitedGroups) =>
           prevInvitedGroups.filter((group) => group !== groupToAccept)
         );
+        refreshGroups();
       })
       .catch((error) => {
         console.error("Error accepting group invitation:", error);
@@ -85,6 +86,10 @@ export default function GroupList(props: { session: Session | null }) {
   };
 
   useEffect(() => {
+    refreshGroups();
+  }, [isOpen]);
+
+  function refreshGroups() {
     const requestOptions = {
       headers: {
         access_token: props.session!.access_token,
@@ -99,16 +104,8 @@ export default function GroupList(props: { session: Session | null }) {
       .catch((error) => {
         console.error("Error fetching accepted groups:", error);
       });
-  }, [isOpen]);
 
-  useEffect(() => {
-    const requestOptions = {
-      headers: {
-        access_token: props.session!.access_token,
-      },
-    };
-
-    API.getAllGroups(requestOptions)
+    API.getInvitedGroups(requestOptions)
       .then((data) => {
         setInvitedSubscriptions(data);
         setLoading(false);
@@ -116,7 +113,7 @@ export default function GroupList(props: { session: Session | null }) {
       .catch((error) => {
         console.error("Error fetching all groups:", error);
       });
-  }, [isOpen]);
+  }
 
   if (loading) {
     <Center height="100vh">
