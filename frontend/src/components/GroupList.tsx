@@ -31,6 +31,7 @@ import NewGroup from "./NewGroup";
 import { Group } from "../models/Group";
 
 import { supabase } from "../App";
+import * as API from "../utils/Api";
 
 export default function GroupList(props: { session: Session | null }) {
   const theme = useTheme();
@@ -51,24 +52,14 @@ export default function GroupList(props: { session: Session | null }) {
       return;
     }
 
-    // Send a DELETE request to your API to delete the group
-    fetch(`${API_URL}/groups/${groupId}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        // Remove the deleted group from the state or UI
-        // (You might need to adjust this based on your application's state management)
-        // For example, if using React state:
-        setGroups((prevGroups) =>
-          prevGroups.filter((group) => group !== groupToDelete)
-        );
-      })
-      .catch((error) => {
-        console.error("Error deleting group:", error);
-      });
+    API.deleteGroup(groupId).then(() => {
+      // Remove the deleted group from the state or UI
+      // (You might need to adjust this based on your application's state management)
+      // For example, if using React state:
+      setGroups((prevGroups) =>
+        prevGroups.filter((group) => group !== groupToDelete)
+      );
+    });
   };
 
   //to do nina

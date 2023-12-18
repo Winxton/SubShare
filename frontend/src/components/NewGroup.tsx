@@ -43,7 +43,6 @@ import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
-import { Console } from "console";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
