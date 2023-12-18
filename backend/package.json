@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "start": "ts-node src/server.ts",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts"
+    "start": "PORT=80 ts-node src/server.ts",
+    "dev": "PORT=4000 nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
