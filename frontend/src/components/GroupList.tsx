@@ -91,29 +91,13 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-    fetch(`${API_URL}/groups?accepted=true`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        return response.json();
-      })
+    API.getAcceptedGroups(requestOptions)
       .then((data) => {
-        setGroups(
-          data.map((groupData: any) => {
-            return new Group(
-              new Subscription(
-                groupData.subscription.name,
-                groupData.subscription.image,
-                groupData.subscription.cost
-              ),
-              groupData.friends,
-              groupData.id
-            );
-          })
-        );
+        setGroups(data);
         setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching accepted groups:", error);
       });
   }, [isOpen]);
 
@@ -124,28 +108,13 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-    fetch(`${API_URL}/groups`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+    API.getAllGroups(requestOptions)
       .then((data) => {
-        setInvitedSubscriptions(
-          data.map((groupData: any) => {
-            return new Group(
-              new Subscription(
-                groupData.subscription.name,
-                groupData.subscription.image,
-                groupData.subscription.cost
-              ),
-              groupData.friends,
-              groupData.id
-            );
-          })
-        );
+        setInvitedSubscriptions(data);
         setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching all groups:", error);
       });
   }, [isOpen]);
 

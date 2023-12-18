@@ -1,4 +1,6 @@
 import { API_URL } from "../constants";
+import { Group } from "../models/Group";
+import { Subscription } from "../models/Subscription";
 
 export function deleteGroup(groupId: number) {
   // Send a DELETE request to your API to delete the group
@@ -38,4 +40,51 @@ export function acceptInvite(groupId: number, accessToken: string) {
       console.error("Error deleting group:", error);
     });
   
+}
+
+export function getAcceptedGroups(requestOptions: any) {
+  return fetch(`${API_URL}/groups?accepted=true`, requestOptions)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      return data.map((groupData: any) => {
+        return new Group(
+          new Subscription(
+            groupData.subscription.name,
+            groupData.subscription.image,
+            groupData.subscription.cost
+          ),
+          groupData.friends,
+          groupData.id
+        );
+      });
+    });
+}
+export function getAllGroups(requestOptions: any) {
+  return fetch(`${API_URL}/groups`, requestOptions)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      return data.map((groupData: any) => {
+        return new Group(
+          new Subscription(
+            groupData.subscription.name,
+            groupData.subscription.image,
+            groupData.subscription.cost
+          ),
+          groupData.friends,
+          groupData.id
+        );
+      });
+    });
 }
