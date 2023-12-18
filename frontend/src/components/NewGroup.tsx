@@ -43,7 +43,9 @@ import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
-import { Console } from "console";
+import { useDispatch, useSelector } from "react-redux";
+import { setCost } from "../store/subscriptionSlice";
+import { RootState, AppDispatch } from "../store/store";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
@@ -63,6 +65,24 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
   const [user, setUser] = useState(null); // new state
+  const dispatch: AppDispatch = useDispatch();
+
+  ///// get the SubscriptionCost and CustomAmounts to calculate the balance of the subscription
+  const subscriptionCost = useSelector(
+    (state: RootState) => state.subscription.cost
+  );
+  const customAmounts = useSelector(
+    (state: RootState) => state.subscription.customAmounts
+  );
+
+  const subscriptionBalance =
+    selectedSubscription && splitMode === "byAmount"
+      ? subscriptionCost -
+        Object.values(customAmounts).reduce(
+          (acc, amount) => acc + (amount || 0),
+          0
+        )
+      : 0;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -161,6 +181,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 margin="5px"
                 onClick={() => {
                   setSelectedSubscription(subscription);
+                  dispatch(setCost(subscription.cost));
                 }}
                 border={isSelected ? "1px solid #08a4a7" : "none"}
                 borderRadius={"md"}
@@ -176,7 +197,18 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             );
           })}
         </Wrap>
-
+        <Tabs
+          mt="2"
+          variant="soft-rounded"
+          size="sm"
+          index={selectedTab}
+          onChange={setSelectedTab}
+        >
+          <TabList>
+            <Tab onClick={() => setSplitMode("equally")}>Split Equally</Tab>
+            <Tab onClick={() => setSplitMode("byAmount")}>By Amounts</Tab>
+          </TabList>
+        </Tabs>
         <Heading size="sm" mt="2" mb="1">
           Select Members
         </Heading>
@@ -211,18 +243,11 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             </Flex>
           );
         })}
-        <Tabs
-          mt="2"
-          variant="soft-rounded"
-          size="sm"
-          index={selectedTab}
-          onChange={setSelectedTab}
-        >
-          <TabList>
-            <Tab onClick={() => setSplitMode("equally")}>Split Equally</Tab>
-            <Tab onClick={() => setSplitMode("byAmount")}>By Amounts</Tab>
-          </TabList>
-        </Tabs>
+        <Flex margin="50px">
+          {" "}
+          <Text>Balance Remaining</Text>
+          <Text>{subscriptionBalance}</Text>
+        </Flex>
       </Box>
     );
   }

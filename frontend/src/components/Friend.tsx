@@ -11,6 +11,9 @@ import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/react";
 import md5 from "md5";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setCustomAmount } from "../store/subscriptionSlice";
+import { RootState } from "../store/store";
 
 export function Friend(props: {
   email: string;
@@ -30,26 +33,18 @@ export function Friend(props: {
   const subscriptionCostPerMember = subscriptionCost
     ? (subscriptionCost / numberOfGroupMembers).toFixed(2)
     : null;
-  const [customAmount, setCustomAmount] = useState<number | null>(null);
+
+  const dispatch = useDispatch();
+  const customAmounts = useSelector(
+    (state: RootState) => state.subscription.customAmounts
+  );
+
   const handleCustomAmountChange = (value: string) => {
     const parsedValue = parseFloat(value) || null;
 
-    // Validate that the custom amount does not exceed the subscription amount
     if (parsedValue !== null) {
-      if (parsedValue <= subscriptionCost) {
-        setCustomAmount(parsedValue);
-      } else {
-        // If the entered amount exceeds the subscription amount,
-        // set customAmount to the remaining balance
-        const remainingBalance =
-          subscriptionCost -
-          (subscriptionCostPerMember !== null
-            ? parseFloat(subscriptionCostPerMember)
-            : 0);
-        setCustomAmount(remainingBalance);
-      }
-    } else {
-      setCustomAmount(null);
+      // Dispatch setCustomAmount action with email and amount
+      dispatch(setCustomAmount({ email: props.email, amount: parsedValue }));
     }
   };
   return (
@@ -80,13 +75,15 @@ export function Friend(props: {
 
       {props.splitMode === "byAmount" && (
         <Box>
-          <Text>$</Text>
-          <Input
-            type="number"
-            placeholder="Enter custom amount"
-            value={customAmount !== null ? customAmount : ""}
-            onChange={(e) => handleCustomAmountChange(e.target.value)}
-          />
+          <Flex>
+            <Text>$</Text>
+            <Input
+              type="number"
+              placeholder="Enter custom amount"
+              value={customAmounts[props.email] || ""}
+              onChange={(e) => handleCustomAmountChange(e.target.value)}
+            />
+          </Flex>
         </Box>
       )}
       {props.onRemove && (
