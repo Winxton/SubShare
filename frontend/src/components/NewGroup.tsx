@@ -46,6 +46,7 @@ import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
+import ImageUpload from "./ImageUpload";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [selectedSubscription, setSelectedSubscription] =
@@ -140,14 +141,29 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     return (
       <Flex mb="4" alignItems={"center"}>
         <Square size="100px" borderRadius={"md"}>
-          {selectedSubscription.image ? (
-            <Image
-              src={selectedSubscription.image}
-              alt={selectedSubscription.name}
-            />
-          ) : (
-            <Icon as={GearIcon} width="50px" height="50px" color="gray.400" />
-          )}
+          <ImageUpload
+            onImageUpload={(image) => {
+              setSelectedSubscription({
+                ...selectedSubscription,
+                image: image as string,
+              } as Subscription);
+            }}
+          >
+            {selectedSubscription.image ? (
+              <Image
+                src={selectedSubscription.image}
+                alt={selectedSubscription.name}
+              />
+            ) : (
+              <Icon
+                as={GearIcon}
+                width="50px"
+                height="50px"
+                color="gray.400"
+                cursor="pointer"
+              />
+            )}
+          </ImageUpload>
         </Square>
         <Flex ml="2" direction={"column"}>
           <Input
