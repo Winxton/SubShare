@@ -271,18 +271,22 @@ export default function GroupList(props: { session: Session | null }) {
                 members={invitedGroup?.friends}
               />
             </Link>
-            <Button
-              colorScheme="green"
-              onClick={() => handleAcceptInvitation(invitedGroup)}
-            >
-              Accept
-            </Button>
-            <Button
-              colorScheme="red"
-              onClick={() => handleDeclineInvitation(invitedGroup)}
-            >
-              Decline
-            </Button>
+            <Flex>
+              <Button
+                colorScheme="green"
+                onClick={() => handleAcceptInvitation(invitedGroup)}
+                variant="ghost"
+              >
+                Accept
+              </Button>
+              <Button
+                variant="ghost"
+                colorScheme="red"
+                onClick={() => handleDeclineInvitation(invitedGroup)}
+              >
+                Decline
+              </Button>
+            </Flex>
           </Flex>
         ))}
       </Stack>
