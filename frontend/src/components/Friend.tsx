@@ -10,10 +10,6 @@ import {
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/react";
 import md5 from "md5";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setCustomAmount } from "../store/subscriptionSlice";
-import { RootState } from "../store/store";
 
 export function Friend(props: {
   email: string;
@@ -35,10 +31,6 @@ export function Friend(props: {
   const subscriptionCostPerMember = subscriptionCost
     ? (subscriptionCost / numberOfGroupMembers).toFixed(2)
     : null;
-
-  const customAmounts = useSelector(
-    (state: RootState) => state.subscription.customAmounts
-  );
 
   return (
     <Flex

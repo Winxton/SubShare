@@ -43,9 +43,6 @@ import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
-import { useDispatch, useSelector } from "react-redux";
-import { setCost } from "../store/subscriptionSlice";
-import { RootState, AppDispatch } from "../store/store";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [searchText, setSearchText] = React.useState<string>("");
@@ -65,8 +62,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
   const [user, setUser] = useState(null); // new state
-
-  const dispatch: AppDispatch = useDispatch();
 
   const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
     {}
@@ -178,7 +173,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 margin="5px"
                 onClick={() => {
                   setSelectedSubscription(subscription);
-                  dispatch(setCost(subscription.cost));
                 }}
                 border={isSelected ? "1px solid #08a4a7" : "none"}
                 borderRadius={"md"}
