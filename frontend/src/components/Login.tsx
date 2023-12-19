@@ -22,6 +22,8 @@ export default function Login() {
 
   const loginWithOTP = async () => {
     setIsLoggingIn(true);
+    console.log(APP_URL);
+
     try {
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
