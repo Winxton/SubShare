@@ -5,6 +5,7 @@ import {
   getMembers,
   deleteGroup,
   acceptInvitedGroup,
+  getGroup,
 } from "./database";
 import { getMemberGroups } from "./database";
 
@@ -130,6 +131,20 @@ app.get("/api/groups", async (req, res) => {
     }
   } else {
     res.json(groups);
+  }
+});
+
+app.get("/api/groups/:groupId", async (req, res) => {
+  const { groupId } = req.params;
+  const accessToken = req.headers.access_token;
+
+  const user = await getUser(accessToken);
+  const group = await getGroup(user.email, groupId);
+
+  if (!group) {
+    return res.status(404).json({ message: "Group not found" });
+  } else {
+    return res.json(group);
   }
 });
 

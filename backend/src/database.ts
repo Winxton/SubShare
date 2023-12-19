@@ -23,7 +23,37 @@ export async function getUser(accessToken: string) {
 }
 
 // Get Groups
-  
+
+export async function getGroup(userEmail: string, groupId: string) {
+  // Get group from the database
+  const { data: groups, error } = await supabase
+    .from("groups")
+    .select("*")
+    .limit(1)
+    .eq("id", groupId);
+
+  if (error || groups.length === 0) {
+    console.error("Error getting group:", error);
+    return null;
+  }
+
+  const group = groups[0];
+  const members = await getMembers(group.id);
+
+  // Make sure I am in the group
+  const myself = members.find((member) => member.email === userEmail);
+  if (!myself) {
+    console.error("User is not in group. Cannot get group.");
+    return null;
+  }
+
+  return new Group(
+    new Subscription(group.name, group.image, group.cost),
+    members || [],
+    group.id
+  );
+}
+
 export async function createGroup(userId, name, cost, createdDate, image) {
   const resp = await supabase
     .from("groups")
@@ -123,7 +153,7 @@ export async function getMemberGroups(
   }
 }
 
-export async function getMembers(GroupId): Promise<Friend[] | null> {
+export async function getMembers(GroupId): Promise<Friend[]> {
   const resp = await supabase
     .from("members")
     .select("*")
@@ -131,7 +161,7 @@ export async function getMembers(GroupId): Promise<Friend[] | null> {
 
   if (resp.error) {
     console.error("Error getting groups:", resp.error);
-    return null;
+    return [];
   }
 
   const members = resp.data;
@@ -159,19 +189,18 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
 }
 
 //Function to update the accepted status of a group in the database
-export async function acceptInvitedGroup(email:string, groupID:string) {
-
+export async function acceptInvitedGroup(email: string, groupID: string) {
   try {
     // Update the 'accepted' field of the member with the specified email and group ID
     const resp = await supabase
       .from("members")
       .update({ accepted: true })
-      .eq('email', email)
-      .eq('group_id', groupID);
-    
+      .eq("email", email)
+      .eq("group_id", groupID);
+
     if (resp.error) {
       console.error("Error updating group:");
-      
+
       return false;
     }
     // Check if the update was successful

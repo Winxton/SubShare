@@ -195,10 +195,7 @@ export default function GroupList(props: { session: Session | null }) {
         )}
         {groups.map((group) => (
           <Flex align="center" justify="space-between" key={group.id}>
-            <Link
-              to={`/view-group/${group.subscription.name}`}
-              key={group.subscription.name}
-            >
+            <Link to={`/view-group/${group.id}`} key={group.subscription.name}>
               <SubscriptionComponent
                 image={group?.subscription?.image}
                 cost={group?.subscription?.cost.toString()}
@@ -217,7 +214,7 @@ export default function GroupList(props: { session: Session | null }) {
 
         {invitedSubscriptions.map((invitedGroup) => (
           <Flex key={invitedGroup.subscription.name} justify="space-between">
-            <Link to={`/view-group/${invitedGroup.subscription.name}`}>
+            <Link to={`/view-group/${invitedGroup.id}`}>
               <SubscriptionComponent
                 image={invitedGroup?.subscription?.image}
                 cost={invitedGroup?.subscription?.cost.toString()}
