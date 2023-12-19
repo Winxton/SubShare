@@ -212,3 +212,6 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// Export the Express API
+module.exports = app;
