@@ -22,9 +22,6 @@ app.use(bodyParser.json());
 // Enable all CORS requests
 app.use(cors());
 
-// This will serve as our in-memory database for now
-let temporaryGroups: Group[] = [];
-
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
 let friends: Friend[] = [
   new Friend("winston", "https://bit.ly/sage-adebayo", "sdkf@gmail.com"),
@@ -76,6 +73,7 @@ app.delete("/api/friends/:name", (req, res) => {
   const deletedFriend = friends.splice(index, 1);
   res.json({ message: "Friend deleted", friend: deletedFriend[0] });
 });
+
 //created a api route to get the user from supabase
 app.get("/api/user", async (req, res) => {
   try {
@@ -185,6 +183,7 @@ app.delete("/api/groups/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 app.put("/api/accept_invite/:groupId", async (req, res) => {
   try {
     // Get the ID of the group to update from the request parameters
