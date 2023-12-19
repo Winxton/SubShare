@@ -96,29 +96,33 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-    API.getAcceptedGroups(requestOptions)
+    const p1 = API.getAcceptedGroups(requestOptions)
       .then((data) => {
         setGroups(data);
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching accepted groups:", error);
       });
 
-    API.getInvitedGroups(requestOptions)
+    const p2 = API.getInvitedGroups(requestOptions)
       .then((data) => {
         setInvitedSubscriptions(data);
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching all groups:", error);
       });
+
+    Promise.all([p1, p2]).then(() => {
+      setLoading(false);
+    });
   }
 
   if (loading) {
-    <Center height="100vh">
-      <Spinner size="xl" />
-    </Center>;
+    return (
+      <Center height="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
   }
 
   return (
