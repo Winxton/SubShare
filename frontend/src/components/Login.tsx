@@ -12,8 +12,6 @@ import loginImageURL from "../images/subshare-logo.webp";
 import { useState } from "react";
 import { supabase } from "../App";
 
-const APP_URL = process.env.REACT_APP_URL;
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -22,15 +20,15 @@ export default function Login() {
 
   const loginWithOTP = async () => {
     setIsLoggingIn(true);
-    console.log(APP_URL);
 
     try {
+      const appUrl = window.location.origin;
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
           // set this to false if you do not want the user to be automatically signed up
           shouldCreateUser: true,
-          emailRedirectTo: APP_URL,
+          emailRedirectTo: appUrl,
         },
       });
 
