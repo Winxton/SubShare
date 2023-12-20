@@ -38,7 +38,7 @@ function App() {
         <Routes>
           <Route path="/" element={<GroupList session={session} />} />
           <Route
-            path="/view-group/:groupName"
+            path="/view-group/:groupId"
             element={<ViewGroup session={session} />}
           />
         </Routes>

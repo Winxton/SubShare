@@ -61,6 +61,11 @@ export default function Login() {
     setEmail(e.target.value);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    loginWithOTP();
+  };
+
   return (
     <Box
       height="100vh"
@@ -96,28 +101,29 @@ export default function Login() {
           Sent email to {email}. Check your email for the login link!
         </Text>
       ) : (
-        <Input
-          placeholder="Email"
-          onChange={handleEmailChange}
-          value={email}
-          w="300px"
-          mb={4}
-        />
-      )}
-
-      <Box width="300px">
-        {isEmailSent ? (
-          <Button colorScheme="blue" onClick={handleGoBack} w="100%">
-            Go Back
-          </Button>
-        ) : (
+        <form onSubmit={handleSubmit} style={{ width: "300px" }}>
+          <Input
+            placeholder="Email"
+            onChange={handleEmailChange}
+            value={email}
+            w="100%"
+            mb={4}
+          />
           <Button
+            type="submit"
             colorScheme="blue"
-            onClick={loginWithOTP}
             w="100%"
             isLoading={isLoggingIn}
           >
             Login
+          </Button>
+        </form>
+      )}
+
+      <Box width="300px">
+        {isEmailSent && (
+          <Button colorScheme="blue" onClick={handleGoBack} w="100%">
+            Go Back
           </Button>
         )}
       </Box>

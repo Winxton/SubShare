@@ -18,18 +18,40 @@ export function deleteGroup(groupId: number) {
     });
 }
 
-// api.ts
+export function getGroup(groupId: string, accessToken: string) {
+  return fetch(`${API_URL}/groups/${groupId}`, {
+    headers: {
+      access_token: accessToken,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
+      return response.json();
+    })
+    .then((data) => {
+      return new Group(
+        new Subscription(
+          data.subscription.name,
+          data.subscription.image,
+          data.subscription.cost
+        ),
+        data.friends,
+        data.id
+      );
+    });
+}
 
 export function acceptInvite(groupId: number, accessToken: string) {
-  
-     return fetch(`${API_URL}/accept_invite/${groupId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        access_token: accessToken,
-      },
-    })
+  return fetch(`${API_URL}/accept_invite/${groupId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      access_token: accessToken,
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -39,7 +61,6 @@ export function acceptInvite(groupId: number, accessToken: string) {
     .catch((error) => {
       console.error("Error deleting group:", error);
     });
-  
 }
 
 export function getAcceptedGroups(requestOptions: any) {
@@ -65,6 +86,7 @@ export function getAcceptedGroups(requestOptions: any) {
       });
     });
 }
+
 export function getInvitedGroups(requestOptions: any) {
   return fetch(`${API_URL}/groups`, requestOptions)
     .then((response) => {

@@ -96,29 +96,33 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-    API.getAcceptedGroups(requestOptions)
+    const p1 = API.getAcceptedGroups(requestOptions)
       .then((data) => {
         setGroups(data);
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching accepted groups:", error);
       });
 
-    API.getInvitedGroups(requestOptions)
+    const p2 = API.getInvitedGroups(requestOptions)
       .then((data) => {
         setInvitedSubscriptions(data);
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching all groups:", error);
       });
+
+    Promise.all([p1, p2]).then(() => {
+      setLoading(false);
+    });
   }
 
   if (loading) {
-    <Center height="100vh">
-      <Spinner size="xl" />
-    </Center>;
+    return (
+      <Center height="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
   }
 
   return (
@@ -195,10 +199,7 @@ export default function GroupList(props: { session: Session | null }) {
         )}
         {groups.map((group) => (
           <Flex align="center" justify="space-between" key={group.id}>
-            <Link
-              to={`/view-group/${group.subscription.name}`}
-              key={group.subscription.name}
-            >
+            <Link to={`/view-group/${group.id}`} key={group.subscription.name}>
               <SubscriptionComponent
                 image={group?.subscription?.image}
                 cost={group?.subscription?.cost.toString()}
@@ -217,7 +218,7 @@ export default function GroupList(props: { session: Session | null }) {
 
         {invitedSubscriptions.map((invitedGroup) => (
           <Flex key={invitedGroup.subscription.name} justify="space-between">
-            <Link to={`/view-group/${invitedGroup.subscription.name}`}>
+            <Link to={`/view-group/${invitedGroup.id}`}>
               <SubscriptionComponent
                 image={invitedGroup?.subscription?.image}
                 cost={invitedGroup?.subscription?.cost.toString()}
