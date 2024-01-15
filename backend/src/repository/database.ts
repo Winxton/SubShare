@@ -23,7 +23,35 @@ export async function getUser(accessToken: string) {
 }
 
 // Get Groups
+export async function getGroup(userEmail: string, groupId: string) {
+  // Get group from the database
+  const { data: groups, error } = await supabase
+    .from("groups")
+    .select("*")
+    .limit(1)
+    .eq("id", groupId);
 
+  if (error || groups.length === 0) {
+    console.error("Error getting group:", error);
+    return null;
+  }
+
+  const group = groups[0];
+  const members = await getMembers(group.id);
+
+  // Make sure I am in the group
+  const myself = members.find((member) => member.email === userEmail);
+  if (!myself) {
+    console.error("User is not in group. Cannot get group.");
+    return null;
+  }
+
+  return new Group(
+    new Subscription(group.name, group.image, group.cost),
+    members || [],
+    group.id
+  );
+}
 export async function createGroup(userId, name, cost, createdDate, image) {
   const resp = await supabase
     .from("groups")

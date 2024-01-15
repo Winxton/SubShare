@@ -61,10 +61,10 @@ export function Friend(props: {
               placeholder="Enter custom amount"
               value={props.splitCustomAmount || undefined}
               onChange={(e) => {
-                const parsedValue = parseFloat(e.target.value);
-                if (parsedValue) {
-                  props.handleCustomAmountChange!(props.email, parsedValue);
-                }
+                props.handleCustomAmountChange!(
+                  props.email,
+                  parseFloat(e.target.value)
+                );
               }}
             />
           </Flex>
