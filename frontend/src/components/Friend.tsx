@@ -18,19 +18,13 @@ export function Friend(props: {
   onRemove?: (email: string) => void;
   splitMode?: string;
   splitCustomAmount: number | null;
-  subscriptionCost?: number;
-  friendCount?: number;
+  subscriptionCostPerMember?: number;
   handleCustomAmountChange?: (email: string, value: number) => void;
 }) {
   // Gravatar URL construction
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
     props.email
   )}?s=200&d=identicon`;
-  const subscriptionCost = props.subscriptionCost ?? 0;
-  const numberOfGroupMembers = props.friendCount || 1;
-  const subscriptionCostPerMember = subscriptionCost
-    ? (subscriptionCost / numberOfGroupMembers).toFixed(2)
-    : null;
 
   return (
     <Flex
@@ -55,7 +49,7 @@ export function Friend(props: {
         </Square>
       )}
       {props.splitMode === "equally" && (
-        <Text>{subscriptionCostPerMember}</Text>
+        <Text>{props.subscriptionCostPerMember}</Text>
       )}
 
       {props.splitMode === "byAmount" && (

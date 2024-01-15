@@ -4,6 +4,7 @@ export class Friend {
     public image: string | null,
     public email: string,
     public accepted: boolean,
+    public subscription_cost: number,
     public group_id?: string,
     public isowner?: boolean,
     public accepted_date?: Date,
