@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
-import { Friend, Group, Subscription } from "./models";
+import { Friend, Group, Subscription } from "../models/models";
 const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
