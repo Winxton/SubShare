@@ -163,7 +163,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     friends: Friend[],
     email: string,
     splitMode: "equally" | "byAmount",
-    amount: number | null,
+    amount: number | Record<string, number> | null,
     pricePerMember: number
   ): Friend[] {
     return friends.map((friend) => {
@@ -171,7 +171,11 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         return {
           ...friend,
           subscription_cost:
-            splitMode === "equally" ? pricePerMember : amount || 0,
+            splitMode === "equally"
+              ? pricePerMember
+              : typeof amount === "number"
+              ? amount
+              : amount?.[email] || 0,
         };
       }
       return friend;
@@ -252,6 +256,11 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                       (friend) => friend.email !== email
                     );
                     setFriends(newFriends);
+
+                    // Remove the corresponding custom amount
+                    const { [email]: removedAmount, ...restAmounts } =
+                      customAmounts;
+                    setCustomAmounts(restAmounts);
                   }
                 }}
                 splitMode={splitMode}
