@@ -6,10 +6,10 @@ import {
   deleteGroup,
   acceptInvitedGroup,
   getGroup,
-} from "./database";
-import { getMemberGroups } from "./database";
+} from "./repository/database";
+import { getMemberGroups } from "./repository/database";
 
-import { Group, Friend } from "./models";
+import { Group, Friend } from "./models/models";
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -19,6 +19,8 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(bodyParser.json());
+
+// TODO seperate this into multiple files and put in api folder
 
 // Enable all CORS requests
 app.use(cors());
