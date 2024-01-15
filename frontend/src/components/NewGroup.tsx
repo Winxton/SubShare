@@ -237,7 +237,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email, false, 0);
+            const newFriend = new Friend(null, null, email, false, 0 || null);
             setFriends([...friends, newFriend]);
           }}
         />
@@ -268,7 +268,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 subscriptionCostPerMember={pricePerMember}
                 handleCustomAmountChange={(email: string, amount: number) => {
                   setCustomAmounts({
-                    ...customAmounts,
                     [email]: amount,
                   });
 

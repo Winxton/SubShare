@@ -59,9 +59,9 @@ export function Friend(props: {
             <Input
               type="number"
               placeholder="Enter custom amount"
-              value={props.splitCustomAmount || 0}
+              value={props.splitCustomAmount || undefined}
               onChange={(e) => {
-                const parsedValue = parseFloat(e.target.value) || null;
+                const parsedValue = parseFloat(e.target.value);
                 if (parsedValue) {
                   props.handleCustomAmountChange!(props.email, parsedValue);
                 }
