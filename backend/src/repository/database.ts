@@ -1,8 +1,8 @@
 import * as dotenv from "dotenv";
 const path = require("path");
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
-import { Friend, Group, Subscription } from "./models";
+import { Friend, Group, Subscription } from "../models/models";
 const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
@@ -123,7 +123,7 @@ export async function getMemberGroups(
   }
 }
 
-export async function getMembers(GroupId): Promise<Friend[] | null> {
+export async function getMembers(GroupId): Promise<Friend[]> {
   const resp = await supabase
     .from("members")
     .select("*")
@@ -131,7 +131,7 @@ export async function getMembers(GroupId): Promise<Friend[] | null> {
 
   if (resp.error) {
     console.error("Error getting groups:", resp.error);
-    return null;
+    return [];
   }
 
   const members = resp.data;

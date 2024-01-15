@@ -5,25 +5,25 @@ import {
   getMembers,
   deleteGroup,
   acceptInvitedGroup,
-} from "./database";
-import { getMemberGroups } from "./database";
+  getGroup,
+} from "./repository/database";
+import { getMemberGroups } from "./repository/database";
 
-import { Group, Friend } from "./models";
+import { Group, Friend } from "./models/models";
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 app.use(bodyParser.json());
 
+// TODO seperate this into multiple files and put in api folder
+
 // Enable all CORS requests
 app.use(cors());
-
-// This will serve as our in-memory database for now
-let temporaryGroups: Group[] = [];
 
 // TODO(young): Add the APIs to be able to create, update, and delete friends.
 let friends: Friend[] = [
@@ -32,6 +32,10 @@ let friends: Friend[] = [
   new Friend("tommy", "https://bit.ly/code-beast", "yahoo.ca"),
   new Friend("young", "https://bit.ly/sage-adebayo", "sadsal@business.ca"),
 ];
+
+app.get("/", (req, res) => {
+  res.send({ message: "Knock on wood" });
+});
 
 // API routes related to friends
 
@@ -72,6 +76,7 @@ app.delete("/api/friends/:name", (req, res) => {
   const deletedFriend = friends.splice(index, 1);
   res.json({ message: "Friend deleted", friend: deletedFriend[0] });
 });
+
 //created a api route to get the user from supabase
 app.get("/api/user", async (req, res) => {
   try {
@@ -92,15 +97,14 @@ app.get("/api/user", async (req, res) => {
   }
 });
 
-//get selected groups
+// API For Groups
+
 app.get("/api/groups", async (req, res) => {
   const { groupName, accepted } = req.query;
 
   // Get all groups from the database
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
-
-  
 
   let groups;
   if (accepted) {
@@ -129,6 +133,20 @@ app.get("/api/groups", async (req, res) => {
     }
   } else {
     res.json(groups);
+  }
+});
+
+app.get("/api/groups/:groupId", async (req, res) => {
+  const { groupId } = req.params;
+  const accessToken = req.headers.access_token;
+
+  const user = await getUser(accessToken);
+  const group = await getGroup(user.email, groupId);
+
+  if (!group) {
+    return res.status(404).json({ message: "Group not found" });
+  } else {
+    return res.json(group);
   }
 });
 
@@ -182,8 +200,8 @@ app.delete("/api/groups/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 app.put("/api/accept_invite/:groupId", async (req, res) => {
-  
   try {
     // Get the ID of the group to update from the request parameters
     const groupID = req.params.groupId;
@@ -193,7 +211,7 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
     const user = await getUser(accessToken);
 
     // Update the group status in the database
-   
+
     const success = await acceptInvitedGroup(user.email, groupID);
 
     if (success) {
@@ -211,4 +229,5 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-
+// Export the Express API
+module.exports = app;

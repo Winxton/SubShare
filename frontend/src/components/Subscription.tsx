@@ -22,8 +22,8 @@ export function Subscription(props: {
 
         <Box marginLeft={"10px"}>
           <Text fontWeight={"medium"}>{props.name} </Text>
-          <Text>
-            ${costPerMember}/month ·{" "}
+          <Box>
+            <Text>${costPerMember}/month · </Text>
             <Text as="span">{numberOfMembers} members</Text>
             <Box>
               {" "}
@@ -35,7 +35,7 @@ export function Subscription(props: {
                 />
               ))}
             </Box>
-          </Text>
+          </Box>
         </Box>
       </Flex>
     </Box>

@@ -13,53 +13,28 @@ import {
   Center,
   Spinner, // Import Spinner component from Chakra UI
 } from "@chakra-ui/react";
-import { API_URL } from "../constants";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Friend } from "./Friend";
-import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { Session } from "@supabase/supabase-js";
 
+import * as API from "../utils/Api";
+
 export default function ViewGroup(props: { session: Session }) {
   const theme = useTheme();
-  const { groupName } = useParams();
+  const { groupId } = useParams();
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
   const savedAmount = "10";
   const owedAmount = "5";
-  // Use the `groupName` as part of the group name
 
   useEffect(() => {
-    fetch(`${API_URL}/groups?groupName=${groupName}`, {
-      headers: { access_token: props.session.access_token },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((response) => {
-        console.log("Server Response:", response); // used to see the response from server (inspect webpage)
-        const { group } = response;
-        if (group) {
-          setSelectGroup(
-            new Group(
-              new Subscription(
-                group.subscription.name,
-                group.subscription.image,
-                group.subscription.cost
-              ),
-              group.friends,
-              group.id
-            )
-          );
-        } else {
-          // Handle the case where no matching group is found
-          setSelectGroup(null);
-        }
+    if (groupId) {
+      API.getGroup(groupId, props.session.access_token).then((group) => {
+        setSelectGroup(group);
       });
-  }, [groupName]);
+    }
+  }, [groupId]);
 
   if (selectGroup === null) {
     return (

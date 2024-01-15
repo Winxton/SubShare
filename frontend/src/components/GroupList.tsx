@@ -31,6 +31,7 @@ import NewGroup from "./NewGroup";
 import { Group } from "../models/Group";
 
 import { supabase } from "../App";
+import * as API from "../utils/Api";
 
 export default function GroupList(props: { session: Session | null }) {
   const theme = useTheme();
@@ -51,24 +52,14 @@ export default function GroupList(props: { session: Session | null }) {
       return;
     }
 
-    // Send a DELETE request to your API to delete the group
-    fetch(`${API_URL}/groups/${groupId}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        // Remove the deleted group from the state or UI
-        // (You might need to adjust this based on your application's state management)
-        // For example, if using React state:
-        setGroups((prevGroups) =>
-          prevGroups.filter((group) => group !== groupToDelete)
-        );
-      })
-      .catch((error) => {
-        console.error("Error deleting group:", error);
-      });
+    API.deleteGroup(groupId).then(() => {
+      // Remove the deleted group from the state or UI
+      // (You might need to adjust this based on your application's state management)
+      // For example, if using React state:
+      setGroups((prevGroups) =>
+        prevGroups.filter((group) => group !== groupToDelete)
+      );
+    });
   };
 
   //to do nina
@@ -82,23 +73,12 @@ export default function GroupList(props: { session: Session | null }) {
       return;
     }
 
-    fetch(`${API_URL}/accept_invite/${groupId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json", // Set the content type to JSON
-        access_token: props.session!.access_token,
-      },
-      // Convert the data object to a JSON string
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        // Update the status of the accepted group in the state or UI
-
+    API.acceptInvite(groupId, props.session!.access_token)
+      .then(() => {
         setInvitedSubscriptions((prevInvitedGroups) =>
           prevInvitedGroups.filter((group) => group !== groupToAccept)
         );
+        refreshGroups();
       })
       .catch((error) => {
         console.error("Error accepting group invitation:", error);
@@ -106,74 +86,43 @@ export default function GroupList(props: { session: Session | null }) {
   };
 
   useEffect(() => {
+    refreshGroups();
+  }, [isOpen]);
+
+  function refreshGroups() {
     const requestOptions = {
       headers: {
         access_token: props.session!.access_token,
       },
     };
 
-    fetch(`${API_URL}/groups?accepted=true`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        return response.json();
-      })
+    const p1 = API.getAcceptedGroups(requestOptions)
       .then((data) => {
-        setGroups(
-          data.map((groupData: any) => {
-            return new Group(
-              new Subscription(
-                groupData.subscription.name,
-                groupData.subscription.image,
-                groupData.subscription.cost
-              ),
-              groupData.friends,
-              groupData.id
-            );
-          })
-        );
-        setLoading(false);
-      });
-  }, [isOpen]);
-
-  useEffect(() => {
-    const requestOptions = {
-      headers: {
-        access_token: props.session!.access_token,
-      },
-    };
-
-    fetch(`${API_URL}/groups`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
+        setGroups(data);
       })
-      .then((data) => {
-        setInvitedSubscriptions(
-          data.map((groupData: any) => {
-            return new Group(
-              new Subscription(
-                groupData.subscription.name,
-                groupData.subscription.image,
-                groupData.subscription.cost
-              ),
-              groupData.friends,
-              groupData.id
-            );
-          })
-        );
-        setLoading(false);
+      .catch((error) => {
+        console.error("Error fetching accepted groups:", error);
       });
-  }, [isOpen]);
+
+    const p2 = API.getInvitedGroups(requestOptions)
+      .then((data) => {
+        setInvitedSubscriptions(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching all groups:", error);
+      });
+
+    Promise.all([p1, p2]).then(() => {
+      setLoading(false);
+    });
+  }
 
   if (loading) {
-    <Center height="100vh">
-      <Spinner size="xl" />
-    </Center>;
+    return (
+      <Center height="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
   }
 
   return (
@@ -250,10 +199,7 @@ export default function GroupList(props: { session: Session | null }) {
         )}
         {groups.map((group) => (
           <Flex align="center" justify="space-between" key={group.id}>
-            <Link
-              to={`/view-group/${group.subscription.name}`}
-              key={group.subscription.name}
-            >
+            <Link to={`/view-group/${group.id}`} key={group.subscription.name}>
               <SubscriptionComponent
                 image={group?.subscription?.image}
                 cost={group?.subscription?.cost.toString()}
@@ -272,7 +218,7 @@ export default function GroupList(props: { session: Session | null }) {
 
         {invitedSubscriptions.map((invitedGroup) => (
           <Flex key={invitedGroup.subscription.name} justify="space-between">
-            <Link to={`/view-group/${invitedGroup.subscription.name}`}>
+            <Link to={`/view-group/${invitedGroup.id}`}>
               <SubscriptionComponent
                 image={invitedGroup?.subscription?.image}
                 cost={invitedGroup?.subscription?.cost.toString()}
@@ -280,18 +226,22 @@ export default function GroupList(props: { session: Session | null }) {
                 members={invitedGroup?.friends}
               />
             </Link>
-            <Button
-              colorScheme="green"
-              onClick={() => handleAcceptInvitation(invitedGroup)}
-            >
-              Accept
-            </Button>
-            <Button
-              colorScheme="red"
-              onClick={() => handleDeclineInvitation(invitedGroup)}
-            >
-              Decline
-            </Button>
+            <Flex>
+              <Button
+                colorScheme="green"
+                onClick={() => handleAcceptInvitation(invitedGroup)}
+                variant="ghost"
+              >
+                Accept
+              </Button>
+              <Button
+                variant="ghost"
+                colorScheme="red"
+                onClick={() => handleDeclineInvitation(invitedGroup)}
+              >
+                Decline
+              </Button>
+            </Flex>
           </Flex>
         ))}
       </Stack>

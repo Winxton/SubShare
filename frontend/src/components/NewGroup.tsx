@@ -12,8 +12,12 @@ import {
   TabList,
   Tab,
   Flex,
+  InputGroup,
+  InputLeftElement,
+  Icon,
   Text,
 } from "@chakra-ui/react";
+import { GearIcon } from "@radix-ui/react-icons";
 
 import {
   Modal,
@@ -43,9 +47,9 @@ import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
+import ImageUpload from "./ImageUpload";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
-  const [searchText, setSearchText] = React.useState<string>("");
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
   const [friends, setFriends] = React.useState<Friend[]>([]);
@@ -115,14 +119,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     fetchUserData();
   }, [props.session]); // Run this effect when the session prop changes
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setSearchText(event.target.value);
-  }
-
-  const filteredSubscriptions = subscriptions.filter((subscription) => {
-    return subscription.name.toLowerCase().includes(searchText.toLowerCase());
-  });
-
   function sendPostRequestToServer(group: Group) {
     // Define the URL of the server where you want to send the POST request
     const url = `${API_URL}/groups`;
@@ -182,21 +178,85 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     });
   }
 
+  function renderGroupDetails() {
+    if (!selectedSubscription) {
+      return;
+    }
+
+    return (
+      <Flex mb="4" alignItems={"center"}>
+        <Square size="100px" borderRadius={"md"}>
+          <ImageUpload
+            onImageUpload={(image) => {
+              setSelectedSubscription({
+                ...selectedSubscription,
+                image: image as string,
+              } as Subscription);
+            }}
+          >
+            {selectedSubscription.image ? (
+              <Image
+                src={selectedSubscription.image}
+                alt={selectedSubscription.name}
+              />
+            ) : (
+              <Icon
+                as={GearIcon}
+                width="50px"
+                height="50px"
+                color="gray.400"
+                cursor="pointer"
+              />
+            )}
+          </ImageUpload>
+        </Square>
+        <Flex ml="2" direction={"column"}>
+          <Input
+            variant="flushed"
+            value={selectedSubscription?.name}
+            onChange={(e) => {
+              setSelectedSubscription({
+                ...selectedSubscription,
+                name: e.target.value,
+              } as Subscription);
+            }}
+          />
+
+          <InputGroup>
+            <InputLeftElement
+              pointerEvents="none"
+              color="gray.300"
+              fontSize="1.2em"
+              children="$"
+            />
+            <Input
+              variant="flushed"
+              value={`${selectedSubscription?.cost}`}
+              onChange={(e) => {
+                setSelectedSubscription({
+                  ...selectedSubscription,
+                  cost: parseInt(e.target.value),
+                } as Subscription);
+              }}
+            />
+          </InputGroup>
+        </Flex>
+      </Flex>
+    );
+  }
+
   function renderNewGroup() {
     return (
       <Box>
+        {renderGroupDetails()}
+
         <Heading size="sm" mb="1">
           Select a Subscription
         </Heading>
 
-        <Input
-          placeholder="Search Subscriptions"
-          size="sm"
-          value={searchText}
-          onChange={handleInputChange}
-        />
         <Wrap>
-          {filteredSubscriptions.map((subscription) => {
+          {/* List of known subscriptions */}
+          {subscriptions.map((subscription) => {
             const isSelected = selectedSubscription?.name === subscription.name;
             return (
               <WrapItem
@@ -218,6 +278,26 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
               </WrapItem>
             );
           })}
+
+          {/* Add a custom subscription */}
+          <WrapItem
+            margin="5px"
+            onClick={() => {
+              setSelectedSubscription(
+                new Subscription("My Subscription", "", 0)
+              );
+            }}
+            border={"none"}
+            borderRadius={"md"}
+          >
+            <Square
+              size="100px"
+              border="1px solid lightgray"
+              borderRadius={"md"}
+            >
+              <Icon as={GearIcon} width="50px" height="50px" color="gray.400" />
+            </Square>
+          </WrapItem>
         </Wrap>
         <Tabs
           mt="2"

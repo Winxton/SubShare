@@ -12,21 +12,23 @@ import loginImageURL from "../images/subshare-logo.webp";
 import { useState } from "react";
 import { supabase } from "../App";
 
-const APP_URL = process.env.REACT_APP_URL;
-
 export default function Login() {
   const [email, setEmail] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [error, setError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const loginWithOTP = async () => {
+    setIsLoggingIn(true);
+
     try {
+      const appUrl = window.location.origin;
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {
           // set this to false if you do not want the user to be automatically signed up
           shouldCreateUser: true,
-          emailRedirectTo: APP_URL,
+          emailRedirectTo: appUrl,
         },
       });
 
@@ -36,7 +38,10 @@ export default function Login() {
         setIsEmailSent(true);
         resetError(); // Reset the error state when there is no error
       }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   const handleGoBack = () => {
@@ -54,6 +59,11 @@ export default function Login() {
     // Reset the error state when the email input changes
     resetError();
     setEmail(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    loginWithOTP();
   };
 
   return (
@@ -91,23 +101,29 @@ export default function Login() {
           Sent email to {email}. Check your email for the login link!
         </Text>
       ) : (
-        <Input
-          placeholder="Email"
-          onChange={handleEmailChange}
-          value={email}
-          w="300px"
-          mb={4}
-        />
+        <form onSubmit={handleSubmit} style={{ width: "300px" }}>
+          <Input
+            placeholder="Email"
+            onChange={handleEmailChange}
+            value={email}
+            w="100%"
+            mb={4}
+          />
+          <Button
+            type="submit"
+            colorScheme="blue"
+            w="100%"
+            isLoading={isLoggingIn}
+          >
+            Login
+          </Button>
+        </form>
       )}
 
       <Box width="300px">
-        {isEmailSent ? (
+        {isEmailSent && (
           <Button colorScheme="blue" onClick={handleGoBack} w="100%">
             Go Back
-          </Button>
-        ) : (
-          <Button colorScheme="blue" onClick={loginWithOTP} w="100%">
-            Login
           </Button>
         )}
       </Box>

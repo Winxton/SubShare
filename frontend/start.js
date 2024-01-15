@@ -2,11 +2,19 @@
 const dotenv = require("dotenv");
 const path = require("path");
 
-// Load environment variables from the specified file
-const result = dotenv.config({ path: path.resolve(__dirname, "../.env") });
+const isProduction = process.env.NODE_ENV === "production";
 
-if (result.error) {
-  throw result.error;
+if (isProduction) {
+  // Your production-specific code here
+  // Environment variables should already be set on the server
+} else {
+  // Your development or other environment code here
+  // Load environment variables from the specified file
+  const result = dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
+  if (result.error) {
+    throw result.error;
+  }
 }
 
 // Start the React application
