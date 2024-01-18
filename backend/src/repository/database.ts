@@ -78,7 +78,7 @@ export async function createGroup(userId, name, cost, createdDate, image) {
 export async function createMember(
   groupId,
   email,
-  isOwner,
+  isowner,
   accepted,
   accepted_date,
   balance,
@@ -88,7 +88,7 @@ export async function createMember(
     {
       group_id: groupId,
       email: email,
-      isowner: isOwner,
+      isowner: isowner,
       accepted: accepted,
       accepted_date: accepted_date,
       balance: balance,

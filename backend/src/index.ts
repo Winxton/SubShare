@@ -172,7 +172,7 @@ app.post("/api/groups", async (req, res) => {
     const createdFriend = await createMember(
       createdGroup.id, // the return data (id) when you create a group table in supabase
       memberData.email,
-      memberData.isOwner,
+      memberData.isowner,
       memberData.accepted,
       new Date(),
       memberData.balance,

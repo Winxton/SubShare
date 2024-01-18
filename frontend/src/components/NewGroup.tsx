@@ -119,7 +119,14 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
         const userData = await response.json();
         //using the auth user email we create a new Friend(group member) then add the new friend into the friend state
-        const myself = new Friend(null, null, userData.user.email, true, 0);
+        const myself = new Friend(
+          null,
+          null,
+          userData.user.email,
+          true,
+          0,
+          true
+        );
         setFriends([myself]);
         setUser(userData.user.email);
       } catch (error) {
@@ -170,30 +177,15 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   function updateFriendSubscriptionCost(
     friends: Friend[],
     email?: string,
-    splitMode?: "equally" | "byAmount",
-    amounts?: Number,
-    pricePerMember?: number
+    amounts?: Number
   ): Friend[] {
     return friends.map((friend) => {
       if (friend.email === email) {
-        let newSubscriptionCost;
-
-        if (splitMode === "equally") {
-          newSubscriptionCost = pricePerMember;
-        } else {
-          newSubscriptionCost =
-            typeof friend.subscription_cost === "object" &&
-            friend.subscription_cost !== null
-              ? {
-                  ...friend.subscription_cost,
-                  ...amounts,
-                }
-              : amounts;
-        }
+        const newSubscriptionCost = amounts;
 
         return {
           ...friend,
-          subscription_cost: newSubscriptionCost,
+          subscription_cost: newSubscriptionCost as number,
         };
       }
       return friend;
@@ -339,7 +331,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email, false, 0 || null);
+            const newFriend = new Friend(null, null, email, false, 0, false);
             setFriends([...friends, newFriend]);
           }}
         />
@@ -377,9 +369,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                   const updatedFriends = updateFriendSubscriptionCost(
                     friends,
                     email,
-                    splitMode,
-                    amount,
-                    pricePerMember
+                    amount
                   );
                   // Update the states
                   setFriends(updatedFriends);
