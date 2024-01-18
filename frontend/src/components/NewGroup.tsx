@@ -81,14 +81,25 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         )
       : 0;
   useEffect(() => {
-    if (selectedSubscription) {
-      setPricePerMember(selectedSubscription.cost / friends.length);
+    if (splitMode === "equally" && selectedSubscription) {
+      // Calculate the average subscription cost
+      const totalSubscriptionCost = selectedSubscription.cost;
+      const averageSubscriptionCost = totalSubscriptionCost / friends.length;
 
-      // Now `pricePerMember` is updated, and you can use it in the next effect
-    } else {
-      console.error("Selected subscription is undefined");
+      // Check if the pricePerMember has changed before updating
+      if (averageSubscriptionCost !== pricePerMember) {
+        // Update each friend with the average subscription cost
+        const updatedFriends = friends.map((friend) => ({
+          ...friend,
+          subscription_cost: averageSubscriptionCost,
+        }));
+
+        // Update the states
+        setFriends(updatedFriends);
+        setPricePerMember(averageSubscriptionCost);
+      }
     }
-  }, [selectedSubscription, friends]);
+  }, [splitMode, selectedSubscription, friends, pricePerMember]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -160,7 +171,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     friends: Friend[],
     email?: string,
     splitMode?: "equally" | "byAmount",
-    amounts?: Record<string, number> | null,
+    amounts?: Number,
     pricePerMember?: number
   ): Friend[] {
     return friends.map((friend) => {
@@ -174,7 +185,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             typeof friend.subscription_cost === "object" &&
             friend.subscription_cost !== null
               ? {
-                  ...(friend.subscription_cost as Record<string, number>),
+                  ...friend.subscription_cost,
                   ...amounts,
                 }
               : amounts;
@@ -367,7 +378,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                     friends,
                     email,
                     splitMode,
-                    { [email]: amount },
+                    amount,
                     pricePerMember
                   );
                   // Update the states

@@ -25,18 +25,6 @@ export function Friend(props: {
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
     props.email
   )}?s=200&d=identicon`;
-  useEffect(() => {
-    console.log(props.subscriptionCostPerMember);
-    if (
-      props.splitMode === "equally" &&
-      typeof props.subscriptionCostPerMember === "number"
-    ) {
-      props.handleCustomAmountChange!(
-        props.email,
-        props.subscriptionCostPerMember
-      );
-    }
-  }, [props.splitMode, props.email, props.subscriptionCostPerMember]);
 
   return (
     <Flex
@@ -71,7 +59,7 @@ export function Friend(props: {
             <Input
               type="number"
               placeholder="Enter custom amount"
-              value={props.splitCustomAmount}
+              value={props.splitCustomAmount || ""}
               onChange={(e) => {
                 props.handleCustomAmountChange!(
                   props.email,

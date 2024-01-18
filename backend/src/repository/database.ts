@@ -81,7 +81,8 @@ export async function createMember(
   isOwner,
   accepted,
   accepted_date,
-  balance
+  balance,
+  subscription_cost
 ) {
   const resp = await supabase.from("members").insert([
     {
@@ -91,6 +92,7 @@ export async function createMember(
       accepted: accepted,
       accepted_date: accepted_date,
       balance: balance,
+      subscription_cost:subscription_cost
     },
   ]);
   if (resp.error) {

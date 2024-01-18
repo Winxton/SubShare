@@ -175,7 +175,8 @@ app.post("/api/groups", async (req, res) => {
       memberData.isOwner,
       memberData.accepted,
       new Date(),
-      memberData.balance
+      memberData.balance,
+      memberData.subscription_cost
     );
   }
   res.status(201).json(newGroup);
