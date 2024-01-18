@@ -83,12 +83,13 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   useEffect(() => {
     if (selectedSubscription) {
       setPricePerMember(selectedSubscription.cost / friends.length);
+
+      // Now `pricePerMember` is updated, and you can use it in the next effect
     } else {
-      // Handle the case where selectedSubscription is undefined
-      // For example, you might set a default price or show an error message.
       console.error("Selected subscription is undefined");
     }
   }, [selectedSubscription, friends]);
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -157,21 +158,31 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   }
   function updateFriendSubscriptionCost(
     friends: Friend[],
-    email: string,
-    splitMode: "equally" | "byAmount",
-    amount: number | Record<string, number> | null,
-    pricePerMember: number
+    email?: string,
+    splitMode?: "equally" | "byAmount",
+    amounts?: Record<string, number> | null,
+    pricePerMember?: number
   ): Friend[] {
     return friends.map((friend) => {
       if (friend.email === email) {
+        let newSubscriptionCost;
+
+        if (splitMode === "equally") {
+          newSubscriptionCost = pricePerMember;
+        } else {
+          newSubscriptionCost =
+            typeof friend.subscription_cost === "object" &&
+            friend.subscription_cost !== null
+              ? {
+                  ...(friend.subscription_cost as Record<string, number>),
+                  ...amounts,
+                }
+              : amounts;
+        }
+
         return {
           ...friend,
-          subscription_cost:
-            splitMode === "equally"
-              ? pricePerMember
-              : typeof amount === "number"
-              ? amount
-              : amount?.[email] || 0,
+          subscription_cost: newSubscriptionCost,
         };
       }
       return friend;
@@ -344,22 +355,21 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                   }
                 }}
                 splitMode={splitMode}
-                splitCustomAmount={customAmounts[friend.email] || null}
+                splitCustomAmount={customAmounts[friend.email]}
                 subscriptionCostPerMember={pricePerMember}
                 handleCustomAmountChange={(email: string, amount: number) => {
-                  setCustomAmounts({
+                  setCustomAmounts((prevCustomAmounts) => ({
+                    ...prevCustomAmounts,
                     [email]: amount,
-                  });
-
+                  }));
                   // Use the helper function to update friends state
                   const updatedFriends = updateFriendSubscriptionCost(
                     friends,
                     email,
                     splitMode,
-                    customAmounts,
+                    { [email]: amount },
                     pricePerMember
                   );
-
                   // Update the states
                   setFriends(updatedFriends);
                 }}
@@ -405,6 +415,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
 
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
+              // for testing
               console.log(newGroup);
               setSelectedSubscription(null);
               setFriends([]);

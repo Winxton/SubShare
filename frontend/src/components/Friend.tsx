@@ -10,14 +10,14 @@ import {
 import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/react";
 import md5 from "md5";
-
+import { useEffect } from "react";
 export function Friend(props: {
   email: string;
   isMe?: boolean;
   isSelected?: boolean;
   onRemove?: (email: string) => void;
   splitMode?: string;
-  splitCustomAmount: number | null;
+  splitCustomAmount: number;
   subscriptionCostPerMember?: number;
   handleCustomAmountChange?: (email: string, value: number) => void;
 }) {
@@ -25,6 +25,18 @@ export function Friend(props: {
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
     props.email
   )}?s=200&d=identicon`;
+  useEffect(() => {
+    console.log(props.subscriptionCostPerMember);
+    if (
+      props.splitMode === "equally" &&
+      typeof props.subscriptionCostPerMember === "number"
+    ) {
+      props.handleCustomAmountChange!(
+        props.email,
+        props.subscriptionCostPerMember
+      );
+    }
+  }, [props.splitMode, props.email, props.subscriptionCostPerMember]);
 
   return (
     <Flex
@@ -59,7 +71,7 @@ export function Friend(props: {
             <Input
               type="number"
               placeholder="Enter custom amount"
-              value={props.splitCustomAmount || undefined}
+              value={props.splitCustomAmount}
               onChange={(e) => {
                 props.handleCustomAmountChange!(
                   props.email,
