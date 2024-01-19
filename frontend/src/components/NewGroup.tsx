@@ -16,6 +16,7 @@ import {
   InputLeftElement,
   Icon,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { GearIcon } from "@radix-ui/react-icons";
 
@@ -48,6 +49,7 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
+import useFetchUserData from "../utils/useFetchUserData";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [selectedSubscription, setSelectedSubscription] =
@@ -65,13 +67,14 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
-  const [user, setUser] = useState(null); // new state
+  const [user, setUser] = useState<string | null>(null);
+  const userData = useFetchUserData(props.session);
 
   const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
     {}
   );
   const [pricePerMember, setPricePerMember] = useState(Number);
-
+  const toast = useToast();
   const subscriptionBalance =
     selectedSubscription && splitMode === "byAmount"
       ? selectedSubscription.cost -
@@ -80,6 +83,15 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
           0
         )
       : 0;
+  if (subscriptionBalance < 0) {
+    toast({
+      title: "Error",
+      description: "The amount entered exceeds the remaining balance.",
+      status: "error",
+      duration: 2000,
+      isClosable: true,
+    });
+  }
   useEffect(() => {
     if (splitMode === "equally" && selectedSubscription) {
       // Calculate the average subscription cost
@@ -102,41 +114,14 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   }, [splitMode, selectedSubscription, friends, pricePerMember]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        // Fetch user data from the server using the API
-        const response = await fetch(`${API_URL}/user`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            access_token: props.session!.access_token,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const userData = await response.json();
-        //using the auth user email we create a new Friend(group member) then add the new friend into the friend state
-        const myself = new Friend(
-          null,
-          null,
-          userData.user.email,
-          true,
-          0,
-          true
-        );
-        setFriends([myself]);
-        setUser(userData.user.email);
-      } catch (error) {
-        console.error("There was a problem fetching user data:", error);
+    if (userData) {
+      const myself = new Friend(null, null, userData.user.email, true, 0, true);
+      setFriends([myself]);
+      if (userData.user.email) {
+        setUser(userData.user.email); // Set user to the email string if it's not null or empty
       }
-    };
-
-    // Call the fetchUserData function when the component mounts
-    fetchUserData();
-  }, [props.session]); // Run this effect when the session prop changes
+    }
+  }, [userData]);
 
   function sendPostRequestToServer(group: Group) {
     // Define the URL of the server where you want to send the POST request
@@ -361,6 +346,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 splitCustomAmount={customAmounts[friend.email]}
                 subscriptionCostPerMember={pricePerMember}
                 handleCustomAmountChange={(email: string, amount: number) => {
+                  console.log(`entered amount ${amount}`);
+                  console.log(`subscriptionBalance ${subscriptionBalance}`);
                   setCustomAmounts((prevCustomAmounts) => ({
                     ...prevCustomAmounts,
                     [email]: amount,
@@ -380,13 +367,15 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         })}
         <Flex
           margin="50px"
-          border={subscriptionBalance > 0 ? "2px solid red" : "2px solid green"}
+          border={
+            subscriptionBalance !== 0 ? "2px solid red" : "2px solid green"
+          }
           p={3}
           borderRadius="md"
           justifyContent="space-around"
         >
           <Text>Balance Remaining</Text>
-          <Text ml={2} color={subscriptionBalance > 0 ? "red" : "green"}>
+          <Text ml={2} color={subscriptionBalance !== 0 ? "red" : "green"}>
             $ {subscriptionBalance}
           </Text>
         </Flex>
