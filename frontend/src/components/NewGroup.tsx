@@ -346,8 +346,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 splitCustomAmount={customAmounts[friend.email]}
                 subscriptionCostPerMember={pricePerMember}
                 handleCustomAmountChange={(email: string, amount: number) => {
-                  console.log(`entered amount ${amount}`);
-                  console.log(`subscriptionBalance ${subscriptionBalance}`);
                   setCustomAmounts((prevCustomAmounts) => ({
                     ...prevCustomAmounts,
                     [email]: amount,
