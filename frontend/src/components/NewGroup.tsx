@@ -378,10 +378,17 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             </Flex>
           );
         })}
-        <Flex margin="50px">
-          {" "}
+        <Flex
+          margin="50px"
+          border={subscriptionBalance > 0 ? "2px solid red" : "2px solid green"}
+          p={3}
+          borderRadius="md"
+          justifyContent="space-around"
+        >
           <Text>Balance Remaining</Text>
-          <Text>{subscriptionBalance}</Text>
+          <Text ml={2} color={subscriptionBalance > 0 ? "red" : "green"}>
+            $ {subscriptionBalance}
+          </Text>
         </Flex>
       </Box>
     );
