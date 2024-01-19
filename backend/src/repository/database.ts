@@ -105,7 +105,7 @@ export async function createMember(
 //add comment
 export async function getMemberGroups(
   userEmail: string,
-  accepted: boolean | null
+  accepted: boolean | null,
 ): Promise<Group[] | null> {
   try {
     // Fetch groups based on the user's email in the members table
@@ -167,7 +167,7 @@ export async function getMembers(GroupId): Promise<Friend[]> {
   const members = resp.data;
 
   return members.map((member) => {
-    return new Friend(member.name, member.image, member.email);
+    return new Friend(member.name, member.image, member.email, member.subscription_cost);
   });
 }
 

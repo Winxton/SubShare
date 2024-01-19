@@ -6,7 +6,6 @@ import {
   Container,
   Box,
   Flex,
-  useTheme,
   Avatar,
   Heading,
   Text,
@@ -23,9 +22,7 @@ import { IconButton } from "@chakra-ui/react";
 import { Session } from "@supabase/supabase-js";
 
 import { Subscription as SubscriptionComponent } from "./Subscription";
-import { Subscription } from "../models/Subscription";
-import disney from "../images/disney.png";
-import { API_URL } from "../constants";
+import useFetchUserData from "../utils/useFetchUserData";
 
 import NewGroup from "./NewGroup";
 import { Group } from "../models/Group";
@@ -34,14 +31,14 @@ import { supabase } from "../App";
 import * as API from "../utils/Api";
 
 export default function GroupList(props: { session: Session | null }) {
-  const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
   const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
-  const subscriptionCost = "$8.10";
+  const [subscriptionCost, setSubscriptionCost] = useState<string>("$0.00");
   const savings = "$14.90";
   const profilePicture = "https://bit.ly/sage-adebayo";
+  const userData = useFetchUserData(props.session);
 
   const handleDeleteGroup = (groupToDelete) => {
     // Send a DELETE request to your API to delete the group
@@ -88,6 +85,23 @@ export default function GroupList(props: { session: Session | null }) {
   useEffect(() => {
     refreshGroups();
   }, [isOpen]);
+  useEffect(() => {
+    // Calculate the total subscription cost for groups matching user's email
+    let totalCost = 0;
+
+    groups.forEach((group) => {
+      if (userData?.user?.email) {
+        // Check if the user's email is in the group's friends list
+        group.friends.forEach((friend) => {
+          if (friend.email === userData.user.email) {
+            totalCost += parseFloat(friend.subscription_cost.toString());
+          }
+        });
+      }
+    });
+
+    setSubscriptionCost(`$${totalCost.toFixed(2)}`);
+  }, [groups, userData]);
 
   function refreshGroups() {
     const requestOptions = {
