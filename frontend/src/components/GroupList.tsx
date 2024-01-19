@@ -216,7 +216,13 @@ export default function GroupList(props: { session: Session | null }) {
             <Link to={`/view-group/${group.id}`} key={group.subscription.name}>
               <SubscriptionComponent
                 image={group?.subscription?.image}
-                cost={group?.subscription?.cost.toString()}
+                cost={
+                  userData?.user?.email
+                    ? group?.friends
+                        .find((friend) => friend.email === userData.user.email)
+                        ?.subscription_cost.toString() || "0.00"
+                    : "0.00"
+                }
                 name={group?.subscription?.name}
                 members={group?.friends}
               />
