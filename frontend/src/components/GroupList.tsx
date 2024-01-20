@@ -26,7 +26,7 @@ import useFetchUserData from "../utils/useFetchUserData";
 
 import NewGroup from "./NewGroup";
 import { Group } from "../models/Group";
-
+import { getGravatarUrl } from "./Friend";
 import { supabase } from "../App";
 import * as API from "../utils/Api";
 
@@ -37,9 +37,14 @@ export default function GroupList(props: { session: Session | null }) {
   const [loading, setLoading] = useState(true);
   const [subscriptionCost, setSubscriptionCost] = useState<string>("$0.00");
   const savings = "$14.90";
-  const profilePicture = "https://bit.ly/sage-adebayo";
   const userData = useFetchUserData(props.session);
+  const [userEmail, setUserEmail] = useState("");
 
+  useEffect(() => {
+    if (userData?.user?.email) {
+      setUserEmail(userData.user.email);
+    }
+  }, [userData]);
   const handleDeleteGroup = (groupToDelete) => {
     // Send a DELETE request to your API to delete the group
     const groupId = groupToDelete.id;
@@ -90,18 +95,16 @@ export default function GroupList(props: { session: Session | null }) {
     let totalCost = 0;
 
     groups.forEach((group) => {
-      if (userData?.user?.email) {
-        // Check if the user's email is in the group's friends list
-        group.friends.forEach((friend) => {
-          if (friend.email === userData.user.email) {
-            totalCost += parseFloat(friend.subscription_cost.toString());
-          }
-        });
-      }
+      // Check if the user's email is in the group's friends list
+      group.friends.forEach((friend) => {
+        if (friend.email === userEmail) {
+          totalCost += parseFloat(friend.subscription_cost.toString());
+        }
+      });
     });
 
     setSubscriptionCost(`$${totalCost.toFixed(2)}`);
-  }, [groups, userData]);
+  }, [groups, userEmail]);
 
   function refreshGroups() {
     const requestOptions = {
@@ -163,7 +166,11 @@ export default function GroupList(props: { session: Session | null }) {
         </Button>
       </Box>
       <Flex className="Profile" margin="10px">
-        <Avatar src={profilePicture} marginRight="10px" />
+        <Avatar
+          key={userEmail}
+          src={getGravatarUrl(userEmail, 300)}
+          margin="10px"
+        />
         <Box>
           <Text fontWeight="bold"> Total Subscriptions</Text>
           <Text>

@@ -1,6 +1,5 @@
 import { Box, Image, Flex, Text, Avatar, Square } from "@chakra-ui/react";
 import { Friend } from "../models/Friend";
-import { Friend as FriendComponent } from "./Friend";
 import { getGravatarUrl } from "./Friend";
 
 export function Subscription(props: {

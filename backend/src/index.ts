@@ -8,7 +8,7 @@ import {
   getGroup,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
-
+import { sendInvitedToGroupEmail } from "./service/emails";
 import { Group, Friend } from "./models/models";
 
 const express = require("express");
@@ -226,9 +226,22 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
   }
 });
 
+app.post('/send-invite', async (req, res) => {
+  const { senderName, recipient, groupName } = req.body;
+
+  try {
+    await sendInvitedToGroupEmail(senderName, recipient, groupName);
+    res.status(200).send('Invitation email sent successfully.');
+  } catch (error) {
+    res.status(500).send('Error sending email.');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
 
 // Export the Express API
 module.exports = app;

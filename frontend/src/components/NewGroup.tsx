@@ -50,6 +50,7 @@ import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
 import useFetchUserData from "../utils/useFetchUserData";
+import * as API from "../utils/Api";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [selectedSubscription, setSelectedSubscription] =
@@ -67,7 +68,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<string>("");
   const userData = useFetchUserData(props.session);
 
   const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
@@ -159,6 +160,26 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         console.error("There was a problem with the fetch operation:", error);
       });
   }
+  const handleButtonClick = () => {
+    friends.forEach((friend) => {
+      if (friend.email) {
+        API.sendGroupInvite(
+          user,
+          friend.email,
+          selectedSubscription?.name || ""
+        )
+          .then((data) => {
+            console.log("Success:", data);
+            // Handle success here for each friend (e.g., show a success message)
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            // Handle error here (e.g., show an error message)
+          });
+      }
+    });
+  };
+
   function updateFriendSubscriptionCost(
     friends: Friend[],
     email?: string,
@@ -412,10 +433,11 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
               const newGroup = new Group(selectedSubscription, friends, null);
               // for testing
               console.log(newGroup);
+              sendPostRequestToServer(newGroup);
+
+              handleButtonClick();
               setSelectedSubscription(null);
               setFriends([]);
-
-              sendPostRequestToServer(newGroup);
             }}
             isLoading={isCreatingGroup} // set isLoading to isCreatingGroup
           >
