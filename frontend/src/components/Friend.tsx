@@ -14,14 +14,11 @@ import md5 from "md5";
 export function Friend(props: {
   email: string;
   isMe?: boolean;
-  isSelected?: boolean;
   onRemove?: (email: string) => void;
-  splitMode?: string;
-  splitCustomAmount: number;
-  subscriptionCostPerMember?: number;
-  handleCustomAmountChange?: (email: string, value: number) => void;
+  isAmountEditable?: boolean;
+  subscriptionCost?: number;
+  handleSubscriptionCostChange?: (email: string, value: number) => void;
 }) {
-  // Gravatar URL construction
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
     props.email
   )}?s=200&d=identicon`;
@@ -52,7 +49,23 @@ export function Friend(props: {
         </GridItem>
 
         <GridItem colSpan={1}>
-          {props.splitMode === "equally" && (
+          {props.isAmountEditable ? (
+            <Flex alignItems="center">
+              <Text>$ </Text>
+              <Input
+                minWidth="150px"
+                type="number"
+                placeholder="Custom Amount"
+                value={props.subscriptionCost || ""}
+                onChange={(e) => {
+                  props.handleSubscriptionCostChange!(
+                    props.email,
+                    parseFloat(e.target.value)
+                  );
+                }}
+              />
+            </Flex>
+          ) : (
             <Flex justifyContent="flex-end">
               <Box
                 borderWidth="1px"
@@ -61,26 +74,8 @@ export function Friend(props: {
                 p="3"
                 boxShadow="base"
               >
-                <Text>$ {props.subscriptionCostPerMember}</Text>
+                <Text>$ {props.subscriptionCost}</Text>
               </Box>
-            </Flex>
-          )}
-
-          {props.splitMode === "byAmount" && (
-            <Flex alignItems="center">
-              <Text>$ </Text>
-              <Input
-                minWidth="150px"
-                type="number"
-                placeholder="Custom Amount"
-                value={props.splitCustomAmount || ""}
-                onChange={(e) => {
-                  props.handleCustomAmountChange!(
-                    props.email,
-                    parseFloat(e.target.value)
-                  );
-                }}
-              />
             </Flex>
           )}
         </GridItem>

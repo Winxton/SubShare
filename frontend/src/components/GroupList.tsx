@@ -29,16 +29,17 @@ import { Group } from "../models/Group";
 import { getGravatarUrl } from "./Friend";
 import { supabase } from "../App";
 import * as API from "../utils/Api";
+import { getSubscriptionCost } from "../utils/SubscriptionCostUtils";
 
 export default function GroupList(props: { session: Session | null }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
   const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
-  const [subscriptionCost, setSubscriptionCost] = useState<string>("$0.00");
   const savings = "$14.90";
   const userData = useFetchUserData(props.session);
   const [userEmail, setUserEmail] = useState("");
+  const totalSubscriptionCost = getSubscriptionCost(groups, userEmail);
 
   useEffect(() => {
     if (userData?.user?.email) {
@@ -90,21 +91,6 @@ export default function GroupList(props: { session: Session | null }) {
   useEffect(() => {
     refreshGroups();
   }, [isOpen]);
-  useEffect(() => {
-    // Calculate the total subscription cost for groups matching user's email
-    let totalCost = 0;
-
-    groups.forEach((group) => {
-      // Check if the user's email is in the group's friends list
-      group.friends.forEach((friend) => {
-        if (friend.email === userEmail) {
-          totalCost += parseFloat(friend.subscription_cost.toString());
-        }
-      });
-    });
-
-    setSubscriptionCost(`$${totalCost.toFixed(2)}`);
-  }, [groups, userEmail]);
 
   function refreshGroups() {
     const requestOptions = {
@@ -176,7 +162,7 @@ export default function GroupList(props: { session: Session | null }) {
           <Text>
             You owe{" "}
             <Text as="span" fontWeight="bold">
-              {subscriptionCost}
+              {totalSubscriptionCost}
             </Text>
             /month
           </Text>
@@ -224,9 +210,10 @@ export default function GroupList(props: { session: Session | null }) {
               <SubscriptionComponent
                 image={group?.subscription?.image}
                 cost={
-                  userData?.user?.email
+                  //looks for the user's subscription cost
+                  userEmail
                     ? group?.friends
-                        .find((friend) => friend.email === userData.user.email)
+                        .find((friend) => friend.email === userEmail)
                         ?.subscription_cost.toString() || "0.00"
                     : "0.00"
                 }
