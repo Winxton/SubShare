@@ -226,7 +226,7 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
   }
 });
 
-app.post('/send-invite', async (req, res) => {
+app.post('/api/send-invite', async (req, res) => {
   const { senderName, recipient, groupName } = req.body;
 
   try {

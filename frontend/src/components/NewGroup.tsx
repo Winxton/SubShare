@@ -47,6 +47,7 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
+import * as API from "../utils/Api";
 
 function NewGroup(props: { onClose: () => void; session: Session | null }) {
   const [selectedSubscription, setSelectedSubscription] =
@@ -64,7 +65,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
-  const [user, setUser] = useState(null); // new state
+  const [user, setUser] = useState(String); // new state
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -132,7 +133,25 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         console.error("There was a problem with the fetch operation:", error);
       });
   }
-
+  const handleButtonClick = () => {
+    friends.forEach((friend) => {
+      if (friend.email) {
+        API.sendGroupInvite(
+          user,
+          friend.email,
+          selectedSubscription?.name || ""
+        )
+          .then((data) => {
+            console.log("Success:", data);
+            // Handle success here for each friend (e.g., show a success message)
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            // Handle error here (e.g., show an error message)
+          });
+      }
+    });
+  };
   function renderGroupDetails() {
     if (!selectedSubscription) {
       return;
@@ -338,6 +357,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
               setFriends([]);
 
               sendPostRequestToServer(newGroup);
+              handleButtonClick();
             }}
             isLoading={isCreatingGroup} // set isLoading to isCreatingGroup
           >
