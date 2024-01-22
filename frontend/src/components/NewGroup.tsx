@@ -79,23 +79,17 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   );
 
   const toast = useToast();
-  const subscriptionBalance =
-    selectedSubscription && splitMode === "byAmount"
-      ? selectedSubscription.cost -
-        Object.values(customAmounts).reduce(
-          (acc, amount) => acc + (amount || 0),
-          0
-        )
-      : 0;
-  if (subscriptionBalance < 0) {
-    toast({
-      title: "Error",
-      description: "The amount entered exceeds the remaining balance.",
-      status: "error",
-      duration: 2000,
-      isClosable: true,
-    });
+  let subscriptionBalance: number = 0;
+
+  if (selectedSubscription && splitMode === "byAmount") {
+    subscriptionBalance =
+      selectedSubscription.cost -
+      Object.values(customAmounts).reduce(
+        (acc, amount) => acc + (amount || 0),
+        0
+      );
   }
+
   useEffect(() => {
     // Update each friend with the average subscription cost
     const updatedFriends = friends.map((friend) => ({
@@ -378,9 +372,15 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 console.log("Error: Please select a subscription");
                 return;
               }
-
-              if (friends.length === 0) {
-                console.log("Error: Please select at least one friend");
+              if (subscriptionBalance !== 0) {
+                toast({
+                  title: "Error",
+                  description:
+                    "The amount entered exceeds the remaining balance.",
+                  status: "error",
+                  duration: 2000,
+                  isClosable: true,
+                });
                 return;
               }
 
