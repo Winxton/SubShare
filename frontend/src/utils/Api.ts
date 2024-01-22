@@ -110,3 +110,18 @@ export function getInvitedGroups(requestOptions: any) {
       });
     });
 }
+export function sendGroupInvite(senderName: string, recipient: string, groupName: string): Promise<any> {
+  return fetch(`${API_URL}/send-invite`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ senderName, recipient, groupName }),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  });
+}
