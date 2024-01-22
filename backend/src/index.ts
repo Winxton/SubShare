@@ -172,10 +172,11 @@ app.post("/api/groups", async (req, res) => {
     const createdFriend = await createMember(
       createdGroup.id, // the return data (id) when you create a group table in supabase
       memberData.email,
-      memberData.isOwner,
+      memberData.isowner,
       memberData.accepted,
       new Date(),
-      memberData.balance
+      memberData.balance,
+      memberData.subscription_cost
     );
   }
   res.status(201).json(newGroup);
@@ -225,11 +226,6 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-
 app.post('/send-invite', async (req, res) => {
   const { senderName, recipient, groupName } = req.body;
 
@@ -244,6 +240,8 @@ app.post('/send-invite', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
 
 // Export the Express API
 module.exports = app;
