@@ -25,16 +25,49 @@ export default function ViewGroup(props: { session: Session }) {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
-  const savedAmount = "10";
-  const owedAmount = "5";
+  const [totalCost, setTotalCost] = useState<number | null>(null);
+
+  const [savedAmount, setSavedAmount] = useState<number | null>(null);
 
   useEffect(() => {
-    if (groupId) {
-      API.getGroup(groupId, props.session.access_token).then((group) => {
-        setSelectGroup(group);
-      });
-    }
-  }, [groupId]);
+    const fetchData = async () => {
+      try {
+        if (groupId) {
+          const group = await API.getGroup(groupId, props.session.access_token);
+          setSelectGroup(group);
+
+          // Log the value of group.subscription.cost
+
+          // Check if group.subscription.cost is a valid number
+          const totalCost =
+            typeof group.subscription.cost === "number"
+              ? group.subscription.cost
+              : null;
+
+          setTotalCost(totalCost);
+
+          // Calculate savedAmount dynamically
+          const numberOfMembers = group.friends.length;
+
+          if (totalCost !== null && numberOfMembers > 0) {
+            const savedPerMember = totalCost - totalCost / numberOfMembers;
+
+            const formattedSavedPerMember = parseFloat(
+              savedPerMember.toFixed(2)
+            );
+
+            setSavedAmount(formattedSavedPerMember);
+          } else {
+            setSavedAmount(null);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching group data:", error);
+      }
+    };
+
+    fetchData();
+  }, [groupId, props.session.access_token]);
 
   if (selectGroup === null) {
     return (
@@ -79,18 +112,20 @@ export default function ViewGroup(props: { session: Session }) {
             />
           </Center>
 
-          <Text mt={2} textAlign="center">
-            {/* You owe {selectGroup.members.find((member) => member.isMe)?.name || "me"}{" "} */}
-            <Text as="span" fontWeight="bold">
-              {owedAmount}
-            </Text>
-          </Text>
-
           <Text textAlign="center">
+            Total cost of the group is&nbsp;${" "}
+            <Text as="span" fontWeight="bold" color="black">
+              {totalCost}
+            </Text>{" "}
+            {/* Add a space here */}
+            per month
+          </Text>
+          <Text textAlign="center">
+            You are saving ${" "}
             <Text as="span" fontWeight="bold" color="green">
-              {savedAmount}{" "}
-            </Text>
-            saved
+              {savedAmount}
+            </Text>{" "}
+            per month
           </Text>
         </Box>
 
