@@ -50,12 +50,23 @@ import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
 import useFetchUserData from "../utils/useFetchUserData";
-import { updateFriendSubscriptionCost } from "../utils/SubscriptionCostUtils";
+import { subscriptionCosts } from "../utils/SubscriptionCostUtils";
 
-function NewGroup(props: { onClose: () => void; session: Session | null }) {
+type NewGroupProps = {
+  onClose: () => void;
+  session: Session | null;
+  userEmail: string;
+};
+
+function NewGroup(props: NewGroupProps) {
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
-  const [friends, setFriends] = React.useState<Friend[]>([]);
+
+  const user = props.userEmail
+    ? [new Friend(null, null, props.userEmail, true, 0, true)]
+    : [];
+
+  const [friends, setFriends] = React.useState<Friend[]>(user);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
 
   const subscriptions = [
@@ -68,8 +79,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
-  const [user, setUser] = useState<string>("");
-  const userData = useFetchUserData(props.session);
+
   let pricePerMember = 0;
   if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
     pricePerMember = selectedSubscription.cost / friends.length;
@@ -79,8 +89,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   );
 
   const toast = useToast();
-  let subscriptionBalance: number = 0;
 
+  // calculates the balance of the new subscription group
+  let subscriptionBalance: number = 0;
   if (selectedSubscription && splitMode === "byAmount") {
     subscriptionBalance =
       selectedSubscription.cost -
@@ -89,27 +100,17 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         0
       );
   }
-
   useEffect(() => {
-    // Update each friend with the average subscription cost
-    const updatedFriends = friends.map((friend) => ({
-      ...friend,
-      subscription_cost: pricePerMember,
-    }));
-
-    // Update the states
-    setFriends(updatedFriends);
-  }, [pricePerMember, friends]);
-
-  useEffect(() => {
-    if (userData) {
-      const myself = new Friend(null, null, userData.user.email, true, 0, true);
-      setFriends([myself]);
-      if (userData.user.email) {
-        setUser(userData.user.email); // Set user to the email string if it's not null or empty
-      }
+    if (selectedSubscription && friends.length > 0) {
+      const updatedFriends = subscriptionCosts(
+        friends,
+        pricePerMember,
+        splitMode,
+        customAmounts
+      );
+      setFriends(updatedFriends);
     }
-  }, [userData]);
+  }, [selectedSubscription, customAmounts, splitMode, pricePerMember]);
 
   function sendPostRequestToServer(group: Group) {
     // Define the URL of the server where you want to send the POST request
@@ -293,9 +294,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         />
 
         {friends.map((friend) => {
-          const isUser = friend.email === user;
+          const isUser = friend.email === props.userEmail;
           const isAmountEditable = splitMode === "byAmount"; // Determine if the amount is editable based on splitMode
-
           return (
             <Flex key={friend.email}>
               <FriendComponent
@@ -323,12 +323,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                     ...prevCustomAmounts,
                     [email]: amount,
                   }));
-                  const updatedFriends = updateFriendSubscriptionCost(
-                    friends,
-                    email,
-                    amount
-                  );
-                  setFriends(updatedFriends);
                 }}
               ></FriendComponent>
             </Flex>

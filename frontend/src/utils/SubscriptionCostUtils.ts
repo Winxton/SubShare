@@ -12,20 +12,22 @@ export const getSubscriptionCost = (groups,userEmail ) => {
 
   return `$${totalCost.toFixed(2)}`;
 };
-export function updateFriendSubscriptionCost(
-  friends: Friend[],
-  email?: string,
-  amounts?: Number
-): Friend[] {
-  return friends.map((friend) => {
-    if (friend.email === email) {
-      const newSubscriptionCost = amounts;
+export function subscriptionCosts(friends, pricePerMember, splitMode, customAmounts = {}) {
+  let updatedFriends = [];
 
-      return {
-        ...friend,
-        subscription_cost: newSubscriptionCost as number,
-      };
-    }
-    return friend;
-  });
+  if (splitMode === "equally") {
+    // Split the total cost equally among friends
+    updatedFriends = friends.map(friend => ({
+      ...friend,
+      subscription_cost: pricePerMember
+    }));
+  } else if (splitMode === "byAmount") {
+    // Use custom amounts for each friend
+    updatedFriends = friends.map(friend => ({
+      ...friend,
+      subscription_cost: customAmounts[friend.email] || 0
+    }));
+  }
+
+  return updatedFriends;
 }

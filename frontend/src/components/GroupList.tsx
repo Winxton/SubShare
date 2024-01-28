@@ -260,7 +260,13 @@ export default function GroupList(props: { session: Session | null }) {
         ))}
       </Stack>
 
-      {isOpen && <NewGroup onClose={onClose} session={props.session} />}
+      {isOpen && (
+        <NewGroup
+          onClose={onClose}
+          session={props.session}
+          userEmail={userEmail}
+        />
+      )}
     </Container>
   );
 }
