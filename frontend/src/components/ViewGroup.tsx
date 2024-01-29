@@ -25,9 +25,27 @@ export default function ViewGroup(props: { session: Session }) {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
-  const [totalCost, setTotalCost] = useState<number | null>(null);
 
-  const [savedAmount, setSavedAmount] = useState<number | null>(null);
+  const totalCost = setTotalCost(selectGroup);
+
+  // Calculate savedAmount dynamically
+  const numberOfMembers = selectGroup?.friends.length ?? 0;
+  const savedAmount = setSavedAmount(totalCost, numberOfMembers);
+
+  function setTotalCost(selectGroup: Group | null) {
+    return typeof selectGroup?.subscription.cost === "number"
+      ? selectGroup?.subscription.cost
+      : null;
+  }
+
+  function setSavedAmount(totalCost: number | null, numberOfMembers: number) {
+    if (totalCost !== null && numberOfMembers > 0) {
+      const savedPerMember = totalCost - totalCost / numberOfMembers;
+      return parseFloat(savedPerMember.toFixed(2));
+    } else {
+      return null;
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,31 +53,6 @@ export default function ViewGroup(props: { session: Session }) {
         if (groupId) {
           const group = await API.getGroup(groupId, props.session.access_token);
           setSelectGroup(group);
-
-          // Log the value of group.subscription.cost
-
-          // Check if group.subscription.cost is a valid number
-          const totalCost =
-            typeof group.subscription.cost === "number"
-              ? group.subscription.cost
-              : null;
-
-          setTotalCost(totalCost);
-
-          // Calculate savedAmount dynamically
-          const numberOfMembers = group.friends.length;
-
-          if (totalCost !== null && numberOfMembers > 0) {
-            const savedPerMember = totalCost - totalCost / numberOfMembers;
-
-            const formattedSavedPerMember = parseFloat(
-              savedPerMember.toFixed(2)
-            );
-
-            setSavedAmount(formattedSavedPerMember);
-          } else {
-            setSavedAmount(null);
-          }
         }
       } catch (error) {
         console.error("Error fetching group data:", error);
