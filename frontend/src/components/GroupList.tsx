@@ -171,7 +171,7 @@ export default function GroupList(props: { session: Session | null }) {
             {savings}
             <Text as="span" fontSize="xs" color="black" fontWeight="thin">
               {" "}
-              You are saving
+              Saved
             </Text>
           </Text>
         </Box>
