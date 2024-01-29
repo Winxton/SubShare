@@ -110,7 +110,7 @@ export function getInvitedGroups(requestOptions: any) {
       });
     });
 }
-export function sendGroupInvite(senderName: string, recipient: string, groupName: string): Promise<any> {
+export function sendGroupInviteEmail(senderName: string, recipient: string[], groupName: string): Promise<any> {
   return fetch(`${API_URL}/send-invite`, {
     method: 'POST',
     headers: {

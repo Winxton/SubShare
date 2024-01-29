@@ -226,16 +226,23 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
   }
 });
 
-app.post('/api/send-invite', async (req, res) => {
-  const { senderName, recipient, groupName } = req.body;
+app.post('/api/send-invites', async (req, res) => {
+  const { senderName, recipients, groupName } = req.body;
 
   try {
-    await sendInvitedToGroupEmail(senderName, recipient, groupName);
-    res.status(200).send('Invitation email sent successfully.');
+    const sendEmailPromises = recipients.map(recipient =>
+      sendInvitedToGroupEmail(senderName, recipient, groupName)
+    );
+
+    await Promise.all(sendEmailPromises);
+
+    res.status(200).send('Invitation emails sent successfully.');
   } catch (error) {
-    res.status(500).send('Error sending email.');
+    console.error('Error sending emails:', error);
+    res.status(500).send('Error sending emails.');
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

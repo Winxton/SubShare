@@ -134,24 +134,23 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
       });
   }
   const handleButtonClick = () => {
-    friends.forEach((friend) => {
-      if (friend.email) {
-        API.sendGroupInvite(
-          user,
-          friend.email,
-          selectedSubscription?.name || ""
-        )
-          .then((data) => {
-            console.log("Success:", data);
-            // Handle success here for each friend (e.g., show a success message)
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            // Handle error here (e.g., show an error message)
-          });
-      }
-    });
+    if (selectedSubscription?.name && friends.length > 0) {
+      API.sendGroupInviteEmail(
+        user,
+        friends.map((friend) => friend.email),
+        selectedSubscription.name
+      )
+        .then((data) => {
+          console.log("Success:", data);
+          // Handle success here (e.g., show a success message)
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          // Handle error here (e.g., show an error message)
+        });
+    }
   };
+
   function renderGroupDetails() {
     if (!selectedSubscription) {
       return;
