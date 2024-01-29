@@ -25,28 +25,6 @@ export default function ViewGroup(props: { session: Session }) {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
-
-  const totalCost = getTotalCost(selectGroup);
-
-  // Calculate savedAmount dynamically
-  const numberOfMembers = selectGroup?.friends.length ?? 0;
-  const savedAmount = setSavedAmount(totalCost, numberOfMembers);
-
-  function getTotalCost(selectGroup: Group | null) {
-    return typeof selectGroup?.subscription.cost === "number"
-      ? selectGroup?.subscription.cost
-      : null;
-  }
-
-  function setSavedAmount(totalCost: number | null, numberOfMembers: number) {
-    if (totalCost !== null && numberOfMembers > 0) {
-      const savedPerMember = totalCost - totalCost / numberOfMembers;
-      return parseFloat(savedPerMember.toFixed(2));
-    } else {
-      return null;
-    }
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -68,6 +46,21 @@ export default function ViewGroup(props: { session: Session }) {
         <Spinner size="xl" />
       </Center>
     );
+  }
+
+  const totalCost = selectGroup.subscription.cost;
+
+  // Calculate savedAmount dynamically
+  const numberOfMembers = selectGroup?.friends.length ?? 0;
+  const savedAmount = getSavedAmount(totalCost, numberOfMembers);
+
+  function getSavedAmount(totalCost: number | null, numberOfMembers: number) {
+    if (totalCost !== null && numberOfMembers > 0) {
+      const savedPerMember = totalCost - totalCost / numberOfMembers;
+      return parseFloat(savedPerMember.toFixed(2));
+    } else {
+      return null;
+    }
   }
 
   return (
