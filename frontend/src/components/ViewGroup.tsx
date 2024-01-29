@@ -26,13 +26,13 @@ export default function ViewGroup(props: { session: Session }) {
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
 
-  const totalCost = setTotalCost(selectGroup);
+  const totalCost = getTotalCost(selectGroup);
 
   // Calculate savedAmount dynamically
   const numberOfMembers = selectGroup?.friends.length ?? 0;
   const savedAmount = setSavedAmount(totalCost, numberOfMembers);
 
-  function setTotalCost(selectGroup: Group | null) {
+  function getTotalCost(selectGroup: Group | null) {
     return typeof selectGroup?.subscription.cost === "number"
       ? selectGroup?.subscription.cost
       : null;
@@ -106,7 +106,7 @@ export default function ViewGroup(props: { session: Session }) {
           </Center>
 
           <Text textAlign="center">
-            Total cost of the group is&nbsp;${" "}
+            Total cost of the group is $
             <Text as="span" fontWeight="bold" color="black">
               {totalCost}
             </Text>{" "}
@@ -114,7 +114,7 @@ export default function ViewGroup(props: { session: Session }) {
             per month
           </Text>
           <Text textAlign="center">
-            You are saving ${" "}
+            You are saving $
             <Text as="span" fontWeight="bold" color="green">
               {savedAmount}
             </Text>{" "}
