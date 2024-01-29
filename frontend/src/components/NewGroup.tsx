@@ -49,7 +49,6 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
-import useFetchUserData from "../utils/useFetchUserData";
 import { subscriptionCosts } from "../utils/SubscriptionCostUtils";
 
 type NewGroupProps = {
@@ -59,6 +58,7 @@ type NewGroupProps = {
 };
 
 function NewGroup(props: NewGroupProps) {
+  const toast = useToast();
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
 
@@ -66,7 +66,7 @@ function NewGroup(props: NewGroupProps) {
     ? [new Friend(null, null, props.userEmail, true, 0, true)]
     : [];
 
-  const [_friends, setFriends] = React.useState<Friend[]>(user);
+  const [friends, setFriends] = React.useState<Friend[]>(user);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
 
   const subscriptions = [
@@ -80,39 +80,19 @@ function NewGroup(props: NewGroupProps) {
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
-  let pricePerMember = 0;
-  if (splitMode === "equally" && selectedSubscription && _friends.length > 0) {
-    pricePerMember = selectedSubscription.cost / _friends.length;
-  }
-  const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
-    {}
-  );
-
-  const toast = useToast();
+  useEffect(() => {
+    if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
+      const pricePerMember = selectedSubscription.cost / friends.length;
+      const updatedFriends = subscriptionCosts(friends, pricePerMember);
+      setFriends(updatedFriends);
+    }
+  }, [splitMode, selectedSubscription, friends]);
 
   // calculates the balance of the new subscription group
   let subscriptionBalance: number = 0;
   if (selectedSubscription && splitMode === "byAmount") {
-    subscriptionBalance =
-      selectedSubscription.cost -
-      Object.values(customAmounts).reduce(
-        (acc, amount) => acc + (amount || 0),
-        0
-      );
+    subscriptionBalance = 0;
   }
-  const updatedFriends = (currentFriends) => {
-    if (selectedSubscription && currentFriends.length > 0) {
-      const updatedFriends = subscriptionCosts(
-        currentFriends,
-        pricePerMember,
-        splitMode,
-        customAmounts
-      );
-      return updatedFriends;
-    }
-    return currentFriends;
-  };
-  const friends = updatedFriends(_friends);
 
   function sendPostRequestToServer(group: Group) {
     // Define the URL of the server where you want to send the POST request
@@ -291,7 +271,7 @@ function NewGroup(props: NewGroupProps) {
         <AddFriend
           onAddFriend={(email) => {
             const newFriend = new Friend(null, null, email, false, 0, false);
-            setFriends([..._friends, newFriend]);
+            setFriends([...friends, newFriend]);
           }}
         />
 
@@ -307,24 +287,12 @@ function NewGroup(props: NewGroupProps) {
                   if (!isUser) {
                     const newFriends = friends.filter((f) => f.email !== email);
                     setFriends(newFriends);
-
-                    // Remove the corresponding custom amount
-                    const { [email]: removedAmount, ...restAmounts } =
-                      customAmounts;
-                    setCustomAmounts(restAmounts);
                   }
                 }}
                 isAmountEditable={isAmountEditable}
-                subscriptionCost={
-                  isAmountEditable
-                    ? customAmounts[friend.email]
-                    : pricePerMember
-                }
+                subscriptionCost={friend.subscription_cost}
                 handleSubscriptionCostChange={(email, amount) => {
-                  setCustomAmounts((prevCustomAmounts) => ({
-                    ...prevCustomAmounts,
-                    [email]: amount,
-                  }));
+                  setFriends(subscriptionCosts(friends, amount));
                 }}
               ></FriendComponent>
             </Flex>
