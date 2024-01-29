@@ -56,7 +56,7 @@ export default function ViewGroup(props: { session: Session }) {
 
   function getSavedAmount(totalCost: number | null, numberOfMembers: number) {
     if (totalCost !== null && numberOfMembers > 0) {
-      const savedPerMember = totalCost - totalCost / numberOfMembers;
+      const savedPerMember = totalCost - totalCost / numberOfMembers; //use subscription amount column
       return parseFloat(savedPerMember.toFixed(2));
     } else {
       return null;
@@ -103,7 +103,6 @@ export default function ViewGroup(props: { session: Session }) {
             <Text as="span" fontWeight="bold" color="black">
               {totalCost}
             </Text>{" "}
-            {/* Add a space here */}
             per month
           </Text>
           <Text textAlign="center">
