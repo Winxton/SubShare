@@ -38,14 +38,9 @@ export default function GroupList(props: { session: Session | null }) {
   const [loading, setLoading] = useState(true);
   const savings = "$14.90";
   const userData = useFetchUserData(props.session);
-  const [userEmail, setUserEmail] = useState("");
+  const userEmail = userData?.user.email as string;
   const totalSubscriptionCost = getSubscriptionCost(groups, userEmail);
 
-  useEffect(() => {
-    if (userData?.user?.email) {
-      setUserEmail(userData.user.email);
-    }
-  }, [userData]);
   const handleDeleteGroup = (groupToDelete) => {
     // Send a DELETE request to your API to delete the group
     const groupId = groupToDelete.id;
