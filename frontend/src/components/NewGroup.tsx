@@ -292,7 +292,7 @@ function NewGroup(props: NewGroupProps) {
                 isAmountEditable={isAmountEditable}
                 subscriptionCost={friend.subscription_cost}
                 handleSubscriptionCostChange={(email, amount) => {
-                  setFriends(subscriptionCosts(friends, amount));
+                  subscriptionCosts(friends, amount);
                 }}
               ></FriendComponent>
             </Flex>
