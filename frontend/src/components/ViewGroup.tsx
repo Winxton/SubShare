@@ -25,16 +25,20 @@ export default function ViewGroup(props: { session: Session }) {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
-  const savedAmount = "10";
-  const owedAmount = "5";
-
   useEffect(() => {
-    if (groupId) {
-      API.getGroup(groupId, props.session.access_token).then((group) => {
-        setSelectGroup(group);
-      });
-    }
-  }, [groupId]);
+    const fetchData = async () => {
+      try {
+        if (groupId) {
+          const group = await API.getGroup(groupId, props.session.access_token);
+          setSelectGroup(group);
+        }
+      } catch (error) {
+        console.error("Error fetching group data:", error);
+      }
+    };
+
+    fetchData();
+  }, [groupId, props.session.access_token]);
 
   if (selectGroup === null) {
     return (
@@ -42,6 +46,21 @@ export default function ViewGroup(props: { session: Session }) {
         <Spinner size="xl" />
       </Center>
     );
+  }
+
+  const totalCost = selectGroup.subscription.cost;
+
+  // Calculate savedAmount dynamically
+  const numberOfMembers = selectGroup?.friends.length ?? 0;
+  const savedAmount = getSavedAmount(totalCost, numberOfMembers);
+
+  function getSavedAmount(totalCost: number | null, numberOfMembers: number) {
+    if (totalCost !== null && numberOfMembers > 0) {
+      const savedPerMember = totalCost - totalCost / numberOfMembers; //use subscription amount column
+      return parseFloat(savedPerMember.toFixed(2));
+    } else {
+      return null;
+    }
   }
 
   return (
@@ -79,18 +98,19 @@ export default function ViewGroup(props: { session: Session }) {
             />
           </Center>
 
-          <Text mt={2} textAlign="center">
-            {/* You owe {selectGroup.members.find((member) => member.isMe)?.name || "me"}{" "} */}
-            <Text as="span" fontWeight="bold">
-              {owedAmount}
-            </Text>
-          </Text>
-
           <Text textAlign="center">
+            Total cost of the group is $
+            <Text as="span" fontWeight="bold" color="black">
+              {totalCost}
+            </Text>{" "}
+            per month
+          </Text>
+          <Text textAlign="center">
+            You are saving $
             <Text as="span" fontWeight="bold" color="green">
-              {savedAmount}{" "}
-            </Text>
-            saved
+              {savedAmount}
+            </Text>{" "}
+            per month
           </Text>
         </Box>
 
