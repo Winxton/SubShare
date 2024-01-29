@@ -15,10 +15,11 @@ import {
   useDisclosure,
   Center,
   Spinner,
+  IconButton,
 } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
-import { IconButton } from "@chakra-ui/react";
 
+import ConfirmDeleteGroupModal from "./ConfirmDeleteGroupModal";
+import { DeleteIcon } from "@chakra-ui/icons";
 import { Session } from "@supabase/supabase-js";
 
 import { Subscription as SubscriptionComponent } from "./Subscription";
@@ -41,24 +42,8 @@ export default function GroupList(props: { session: Session | null }) {
   const userEmail = userData?.user.email as string;
   const totalSubscriptionCost = getSubscriptionCost(groups, userEmail);
 
-  const handleDeleteGroup = (groupToDelete) => {
-    // Send a DELETE request to your API to delete the group
-    const groupId = groupToDelete.id;
-
-    if (!groupId) {
-      console.error("Invalid groupId:", groupId);
-      return;
-    }
-
-    API.deleteGroup(groupId).then(() => {
-      // Remove the deleted group from the state or UI
-      // (You might need to adjust this based on your application's state management)
-      // For example, if using React state:
-      setGroups((prevGroups) =>
-        prevGroups.filter((group) => group !== groupToDelete)
-      );
-    });
-  };
+  // The group to delete, in order to show the confirmation modal
+  const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
 
   //to do nina
   const handleDeclineInvitation = (groupToDecline) => {};
@@ -86,6 +71,30 @@ export default function GroupList(props: { session: Session | null }) {
   useEffect(() => {
     refreshGroups();
   }, [isOpen]);
+
+  async function handleDeleteGroup() {
+    if (!groupToDelete) {
+      console.error("Invalid groupToDelete:", groupToDelete);
+      return;
+    }
+
+    // Send a DELETE request to your API to delete the group
+    const groupId = groupToDelete.id;
+
+    if (!groupId) {
+      console.error("Invalid groupId:", groupId);
+      return;
+    }
+
+    await API.deleteGroup(groupId);
+
+    // Remove the deleted group from the state or UI
+    // (You might need to adjust this based on your application's state management)
+    // For example, if using React state:
+    setGroups((prevGroups) =>
+      prevGroups.filter((group) => group !== groupToDelete)
+    );
+  }
 
   function refreshGroups() {
     const requestOptions = {
@@ -165,7 +174,7 @@ export default function GroupList(props: { session: Session | null }) {
             {savings}
             <Text as="span" fontSize="xs" color="black" fontWeight="thin">
               {" "}
-              Saved
+              You are saving
             </Text>
           </Text>
         </Box>
@@ -219,7 +228,7 @@ export default function GroupList(props: { session: Session | null }) {
             <IconButton
               aria-label="delete group"
               icon={<DeleteIcon />}
-              onClick={() => handleDeleteGroup(group)}
+              onClick={() => setGroupToDelete(group)}
             />
           </Flex>
         ))}
@@ -262,6 +271,14 @@ export default function GroupList(props: { session: Session | null }) {
           userEmail={userEmail}
         />
       )}
+      <ConfirmDeleteGroupModal
+        groupName={groupToDelete?.subscription.name ?? ""}
+        isOpen={groupToDelete !== null}
+        onClose={() => {
+          setGroupToDelete(null);
+        }}
+        onConfirm={handleDeleteGroup}
+      />
     </Container>
   );
 }

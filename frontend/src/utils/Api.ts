@@ -2,7 +2,8 @@ import { API_URL } from "../constants";
 import { Group } from "../models/Group";
 import { Subscription } from "../models/Subscription";
 
-export function deleteGroup(groupId: number) {
+console.log(API_URL);
+export function deleteGroup(groupId: string) {
   // Send a DELETE request to your API to delete the group
   return fetch(`${API_URL}/groups/${groupId}`, {
     method: "DELETE",
