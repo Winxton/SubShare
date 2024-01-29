@@ -31,3 +31,11 @@ export function subscriptionCosts(friends, pricePerMember, splitMode, customAmou
 
   return updatedFriends;
 }
+export function calculateSavings(group, userEmail) {
+  if (!group.subscription || !group.friends) return 0;
+
+  const costOfSubsciptionService = group.subscription.cost;
+  const userSubsciptionCost = group.friends.find(friend => friend.email === userEmail)?.subscription_cost
+
+  return costOfSubsciptionService - userSubsciptionCost;
+}
