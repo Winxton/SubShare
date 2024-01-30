@@ -49,7 +49,6 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
-import { subscriptionCosts } from "../utils/SubscriptionCostUtils";
 
 type NewGroupProps = {
   onClose: () => void;
@@ -80,12 +79,18 @@ function NewGroup(props: NewGroupProps) {
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
+  let pricePerMember = 0;
+
   if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
-    const pricePerMember = selectedSubscription.cost / friends.length;
+    pricePerMember = parseFloat(
+      (selectedSubscription.cost / friends.length).toFixed(2)
+    );
+
     const updatedFriends = friends.map((friend) => ({
       ...friend,
       subscription_cost: pricePerMember,
     }));
+
     if (
       !friends.every((friend) => friend.subscription_cost === pricePerMember)
     ) {
@@ -99,9 +104,16 @@ function NewGroup(props: NewGroupProps) {
     : 0;
 
   if (selectedSubscription) {
-    friends.forEach((friend) => {
-      subscriptionBalance -= friend.subscription_cost;
-    });
+    if (splitMode === "byAmount") {
+      // When splitMode is "byAmount", subtract each friend's subscription_cost from the total
+      friends.forEach((friend) => {
+        subscriptionBalance -= friend.subscription_cost;
+      });
+    } else {
+      subscriptionBalance = 0;
+    }
+    // Optionally, round subscriptionBalance if necessary
+    subscriptionBalance = parseFloat(subscriptionBalance.toFixed(2));
   }
 
   function sendPostRequestToServer(group: Group) {
