@@ -112,8 +112,6 @@ function NewGroup(props: NewGroupProps) {
     } else {
       subscriptionBalance = 0;
     }
-    // Optionally, round subscriptionBalance if necessary
-    subscriptionBalance = parseFloat(subscriptionBalance.toFixed(2));
   }
 
   function sendPostRequestToServer(group: Group) {
