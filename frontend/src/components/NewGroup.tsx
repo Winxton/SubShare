@@ -66,7 +66,7 @@ function NewGroup(props: NewGroupProps) {
     ? [new Friend(null, null, props.userEmail, true, 0, true)]
     : [];
 
-  const [friends, setFriends] = React.useState<Friend[]>(user);
+  const [_friends, setFriends] = React.useState<Friend[]>(user);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
 
   const subscriptions = [
@@ -81,8 +81,8 @@ function NewGroup(props: NewGroupProps) {
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
   let pricePerMember = 0;
-  if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
-    pricePerMember = selectedSubscription.cost / friends.length;
+  if (splitMode === "equally" && selectedSubscription && _friends.length > 0) {
+    pricePerMember = selectedSubscription.cost / _friends.length;
   }
   const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
     {}
@@ -100,17 +100,19 @@ function NewGroup(props: NewGroupProps) {
         0
       );
   }
-  useEffect(() => {
-    if (selectedSubscription && friends.length > 0) {
+  const updatedFriends = (currentFriends) => {
+    if (selectedSubscription && currentFriends.length > 0) {
       const updatedFriends = subscriptionCosts(
-        friends,
+        currentFriends,
         pricePerMember,
         splitMode,
         customAmounts
       );
-      setFriends(updatedFriends);
+      return updatedFriends;
     }
-  }, [selectedSubscription, customAmounts, splitMode, pricePerMember]);
+    return currentFriends;
+  };
+  const friends = updatedFriends(_friends);
 
   function sendPostRequestToServer(group: Group) {
     // Define the URL of the server where you want to send the POST request
@@ -131,8 +133,6 @@ function NewGroup(props: NewGroupProps) {
       },
       body: JSON.stringify(data), // Convert the data object to a JSON string
     };
-
-    console.log(url);
 
     // Send the POST request using the fetch function
     fetch(url, requestOptions)
@@ -291,7 +291,7 @@ function NewGroup(props: NewGroupProps) {
         <AddFriend
           onAddFriend={(email) => {
             const newFriend = new Friend(null, null, email, false, 0, false);
-            setFriends([...friends, newFriend]);
+            setFriends([..._friends, newFriend]);
           }}
         />
 
