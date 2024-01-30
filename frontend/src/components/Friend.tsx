@@ -60,7 +60,7 @@ export function Friend(props: {
                 onChange={(e) => {
                   props.handleSubscriptionCostChange!(
                     props.email,
-                    parseFloat(e.target.value)
+                    parseFloat(e.target.value) || 0
                   );
                 }}
               />

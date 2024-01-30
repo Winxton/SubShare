@@ -80,18 +80,28 @@ function NewGroup(props: NewGroupProps) {
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
-  useEffect(() => {
-    if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
-      const pricePerMember = selectedSubscription.cost / friends.length;
-      const updatedFriends = subscriptionCosts(friends, null, pricePerMember);
+  if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
+    const pricePerMember = selectedSubscription.cost / friends.length;
+    const updatedFriends = friends.map((friend) => ({
+      ...friend,
+      subscription_cost: pricePerMember,
+    }));
+    if (
+      !friends.every((friend) => friend.subscription_cost === pricePerMember)
+    ) {
       setFriends(updatedFriends);
     }
-  }, [splitMode, selectedSubscription]);
+  }
 
   // calculates the balance of the new subscription group
-  let subscriptionBalance: number = 0;
-  if (selectedSubscription && splitMode === "byAmount") {
-    subscriptionBalance = 0;
+  let subscriptionBalance: number = selectedSubscription
+    ? selectedSubscription.cost
+    : 0;
+
+  if (selectedSubscription) {
+    friends.forEach((friend) => {
+      subscriptionBalance -= friend.subscription_cost;
+    });
   }
 
   function sendPostRequestToServer(group: Group) {
@@ -188,7 +198,7 @@ function NewGroup(props: NewGroupProps) {
               onChange={(e) => {
                 setSelectedSubscription({
                   ...selectedSubscription,
-                  cost: parseInt(e.target.value),
+                  cost: parseInt(e.target.value) || 0,
                 } as Subscription);
               }}
             />
