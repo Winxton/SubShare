@@ -40,14 +40,10 @@ export default function GroupList(props: { session: Session | null }) {
   const [groups, setGroups] = useState<Group[]>([]);
   const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
-
   const userData = useFetchUserData(props.session);
   const userEmail = userData?.user.email as string;
   const totalSubscriptionCost = getSubscriptionCost(groups, userEmail);
-  const savings = groups.reduce(
-    (acc, group) => acc + calculateSavings(group, userEmail),
-    0
-  );
+  const savings = calculateSavings(groups, userEmail);
   // The group to delete, in order to show the confirmation modal
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
 
