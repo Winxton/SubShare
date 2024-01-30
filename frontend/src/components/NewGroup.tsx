@@ -83,10 +83,10 @@ function NewGroup(props: NewGroupProps) {
   useEffect(() => {
     if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
       const pricePerMember = selectedSubscription.cost / friends.length;
-      const updatedFriends = subscriptionCosts(friends, pricePerMember);
+      const updatedFriends = subscriptionCosts(friends, null, pricePerMember);
       setFriends(updatedFriends);
     }
-  }, [splitMode, selectedSubscription, friends]);
+  }, [splitMode, selectedSubscription]);
 
   // calculates the balance of the new subscription group
   let subscriptionBalance: number = 0;
@@ -292,7 +292,17 @@ function NewGroup(props: NewGroupProps) {
                 isAmountEditable={isAmountEditable}
                 subscriptionCost={friend.subscription_cost}
                 handleSubscriptionCostChange={(email, amount) => {
-                  subscriptionCosts(friends, amount);
+                  // Find the friend with the matching email
+                  const updatedFriends = friends.map((friend) => {
+                    if (friend.email === email) {
+                      // Update the subscription_cost for the matched friend
+                      return { ...friend, subscription_cost: amount };
+                    }
+                    return friend;
+                  });
+
+                  // Update the state with the updated friends array
+                  setFriends(updatedFriends);
                 }}
               ></FriendComponent>
             </Flex>
