@@ -133,7 +133,6 @@ function NewGroup(props: NewGroupProps) {
       },
       body: JSON.stringify(data), // Convert the data object to a JSON string
     };
-
     // Send the POST request using the fetch function
     fetch(url, requestOptions)
       .then((response) => {
