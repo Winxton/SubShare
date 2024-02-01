@@ -49,8 +49,7 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
-import useFetchUserData from "../utils/useFetchUserData";
-import { subscriptionCosts } from "../utils/SubscriptionCostUtils";
+import { updateSubscriptionCost } from "../utils/SubscriptionCostUtils";
 
 type NewGroupProps = {
   onClose: () => void;
@@ -59,6 +58,7 @@ type NewGroupProps = {
 };
 
 function NewGroup(props: NewGroupProps) {
+  const toast = useToast();
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
 
@@ -66,7 +66,7 @@ function NewGroup(props: NewGroupProps) {
     ? [new Friend(null, null, props.userEmail, true, 0, true)]
     : [];
 
-  const [_friends, setFriends] = React.useState<Friend[]>(user);
+  const [friends, setFriends] = React.useState<Friend[]>(user);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
 
   const subscriptions = [
@@ -81,38 +81,36 @@ function NewGroup(props: NewGroupProps) {
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
   let pricePerMember = 0;
-  if (splitMode === "equally" && selectedSubscription && _friends.length > 0) {
-    pricePerMember = selectedSubscription.cost / _friends.length;
+
+  if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
+    pricePerMember = parseFloat(
+      (selectedSubscription.cost / friends.length).toFixed(2)
+    );
   }
-  const [customAmounts, setCustomAmounts] = useState<Record<string, number>>(
-    {}
-  );
-
-  const toast = useToast();
-
+  useEffect(() => {
+    const updatedFriends = updateSubscriptionCost(
+      friends,
+      splitMode,
+      null,
+      pricePerMember
+    );
+    setFriends(updatedFriends);
+  }, [splitMode, pricePerMember]);
   // calculates the balance of the new subscription group
-  let subscriptionBalance: number = 0;
-  if (selectedSubscription && splitMode === "byAmount") {
-    subscriptionBalance =
-      selectedSubscription.cost -
-      Object.values(customAmounts).reduce(
-        (acc, amount) => acc + (amount || 0),
-        0
-      );
-  }
-  const updatedFriends = (currentFriends) => {
-    if (selectedSubscription && currentFriends.length > 0) {
-      const updatedFriends = subscriptionCosts(
-        currentFriends,
-        pricePerMember,
-        splitMode,
-        customAmounts
-      );
-      return updatedFriends;
+  let subscriptionBalance: number = selectedSubscription
+    ? selectedSubscription.cost
+    : 0;
+
+  if (selectedSubscription) {
+    if (splitMode === "byAmount") {
+      // When splitMode is "byAmount", subtract each friend's subscription_cost from the total
+      friends.forEach((friend) => {
+        subscriptionBalance -= friend.subscription_cost;
+      });
+    } else {
+      subscriptionBalance = 0;
     }
-    return currentFriends;
-  };
-  const friends = updatedFriends(_friends);
+  }
 
   function sendPostRequestToServer(group: Group) {
     // Define the URL of the server where you want to send the POST request
@@ -208,7 +206,7 @@ function NewGroup(props: NewGroupProps) {
               onChange={(e) => {
                 setSelectedSubscription({
                   ...selectedSubscription,
-                  cost: parseInt(e.target.value),
+                  cost: parseInt(e.target.value) || 0,
                 } as Subscription);
               }}
             />
@@ -291,7 +289,7 @@ function NewGroup(props: NewGroupProps) {
         <AddFriend
           onAddFriend={(email) => {
             const newFriend = new Friend(null, null, email, false, 0, false);
-            setFriends([..._friends, newFriend]);
+            setFriends([...friends, newFriend]);
           }}
         />
 
@@ -307,24 +305,20 @@ function NewGroup(props: NewGroupProps) {
                   if (!isUser) {
                     const newFriends = friends.filter((f) => f.email !== email);
                     setFriends(newFriends);
-
-                    // Remove the corresponding custom amount
-                    const { [email]: removedAmount, ...restAmounts } =
-                      customAmounts;
-                    setCustomAmounts(restAmounts);
                   }
                 }}
                 isAmountEditable={isAmountEditable}
-                subscriptionCost={
-                  isAmountEditable
-                    ? customAmounts[friend.email]
-                    : pricePerMember
-                }
+                subscriptionCost={friend.subscription_cost}
                 handleSubscriptionCostChange={(email, amount) => {
-                  setCustomAmounts((prevCustomAmounts) => ({
-                    ...prevCustomAmounts,
-                    [email]: amount,
-                  }));
+                  // Find the friend with the matching email
+                  const updatedFriends = updateSubscriptionCost(
+                    friends,
+                    splitMode,
+                    email,
+                    amount
+                  );
+                  // Update the state with the updated friends array
+                  setFriends(updatedFriends);
                 }}
               ></FriendComponent>
             </Flex>
