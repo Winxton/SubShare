@@ -96,6 +96,7 @@ function NewGroup(props: NewGroupProps) {
     );
     setFriends(updatedFriends);
   }, [splitMode, pricePerMember]);
+
   // calculates the balance of the new subscription group
   let subscriptionBalance: number = selectedSubscription
     ? selectedSubscription.cost
@@ -364,8 +365,7 @@ function NewGroup(props: NewGroupProps) {
               if (subscriptionBalance !== 0) {
                 toast({
                   title: "Error",
-                  description:
-                    "The amount entered exceeds the remaining balance.",
+                  description: `The amount entered does not equal to ${selectedSubscription.name}'s subscription cost.`,
                   status: "error",
                   duration: 2000,
                   isClosable: true,

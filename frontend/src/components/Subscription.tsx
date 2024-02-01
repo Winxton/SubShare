@@ -3,7 +3,7 @@ import { Friend } from "../models/Friend";
 import { getGravatarUrl } from "./Friend";
 
 export function Subscription(props: {
-  cost: string;
+  myCost: string;
   image: string;
   name: string;
   members: Friend[];
@@ -20,7 +20,7 @@ export function Subscription(props: {
         <Box marginLeft={"10px"}>
           <Text fontWeight={"medium"}>{props.name} </Text>
           <Box>
-            <Text>${props.cost}/month · </Text>
+            <Text>${props.myCost}/month · </Text>
             <Text as="span">{numberOfMembers} members</Text>
             <Box>
               {" "}

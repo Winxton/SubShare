@@ -154,10 +154,10 @@ app.get("/api/groups/:groupId", async (req, res) => {
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
   const { subscription, friends, id } = req.body; //getting subscription and friends from the front end
-
-  const newGroup = new Group(subscription, friends, id); // id is undefined
+  const newGroup = new Group(subscription, friends, id);
 
   const accessToken = req.headers.access_token;
+
   const user = await getUser(accessToken);
 
   const createdGroup = await createGroup(
@@ -187,7 +187,6 @@ app.delete("/api/groups/:id", async (req, res) => {
   try {
     // Get the name of the group to delete from the request parameters
     const groupID = req.params.id;
-
     // Call the deleteGroup function from the database to delete the group
     const success = await deleteGroup(groupID);
 
@@ -229,8 +228,6 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-
 
 // Export the Express API
 module.exports = app;
