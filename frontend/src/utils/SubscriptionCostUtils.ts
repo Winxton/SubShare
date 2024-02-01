@@ -32,3 +32,21 @@ export function updateSubscriptionCost(
     });
   }
 }
+export function calculateSavings(groups, userEmail) {
+  return groups.reduce((acc, group) => {
+    // Check if the group has a valid subscription and friends list
+    if (!group.subscription || !group.friends) return acc;
+
+    const costOfSubscriptionService = group.subscription.cost;
+    // Find the user's subscription cost in the group
+    const userSubscriptionCost = group.friends.find(friend => friend.email === userEmail)?.subscription_cost;
+
+    // If the user is not part of the group, continue with the accumulated value
+    if (userSubscriptionCost === undefined) return acc;
+
+    // Calculate the savings and accumulate
+    const savings = costOfSubscriptionService - userSubscriptionCost;
+    return acc + savings;
+  }, 0); // Start accumulating from 0
+}
+
