@@ -30,18 +30,20 @@ import { Group } from "../models/Group";
 import { getGravatarUrl } from "./Friend";
 import { supabase } from "../App";
 import * as API from "../utils/Api";
-import { getSubscriptionCost } from "../utils/SubscriptionCostUtils";
+import {
+  getSubscriptionCost,
+  calculateSavings,
+} from "../utils/SubscriptionCostUtils";
 
 export default function GroupList(props: { session: Session | null }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
   const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
-  const savings = "$14.90";
   const userData = useFetchUserData(props.session);
   const userEmail = userData?.user.email as string;
   const totalSubscriptionCost = getSubscriptionCost(groups, userEmail);
-
+  const savings = calculateSavings(groups, userEmail);
   // The group to delete, in order to show the confirmation modal
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
 
@@ -171,11 +173,11 @@ export default function GroupList(props: { session: Session | null }) {
             /month
           </Text>
           <Text fontWeight="bold" color="green">
-            {savings}
             <Text as="span" fontSize="xs" color="black" fontWeight="thin">
               {" "}
-              Saved
+              You are saving $
             </Text>
+            {savings}
           </Text>
         </Box>
       </Flex>
