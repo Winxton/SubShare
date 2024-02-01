@@ -49,6 +49,7 @@ import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
 import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
+import { updateSubscriptionCost } from "../utils/SubscriptionCostUtils";
 
 type NewGroupProps = {
   onClose: () => void;
@@ -85,19 +86,16 @@ function NewGroup(props: NewGroupProps) {
     pricePerMember = parseFloat(
       (selectedSubscription.cost / friends.length).toFixed(2)
     );
-
-    const updatedFriends = friends.map((friend) => ({
-      ...friend,
-      subscription_cost: pricePerMember,
-    }));
-
-    if (
-      !friends.every((friend) => friend.subscription_cost === pricePerMember)
-    ) {
-      setFriends(updatedFriends);
-    }
   }
-
+  useEffect(() => {
+    const updatedFriends = updateSubscriptionCost(
+      friends,
+      splitMode,
+      null,
+      pricePerMember
+    );
+    setFriends(updatedFriends);
+  }, [splitMode, pricePerMember]);
   // calculates the balance of the new subscription group
   let subscriptionBalance: number = selectedSubscription
     ? selectedSubscription.cost
@@ -313,14 +311,12 @@ function NewGroup(props: NewGroupProps) {
                 subscriptionCost={friend.subscription_cost}
                 handleSubscriptionCostChange={(email, amount) => {
                   // Find the friend with the matching email
-                  const updatedFriends = friends.map((friend) => {
-                    if (friend.email === email) {
-                      // Update the subscription_cost for the matched friend
-                      return { ...friend, subscription_cost: amount };
-                    }
-                    return friend;
-                  });
-
+                  const updatedFriends = updateSubscriptionCost(
+                    friends,
+                    splitMode,
+                    email,
+                    amount
+                  );
                   // Update the state with the updated friends array
                   setFriends(updatedFriends);
                 }}
