@@ -110,3 +110,33 @@ export function getInvitedGroups(requestOptions: any) {
       });
     });
 }
+
+export function createGroup(group: Group, accessToken: string) {
+  // Create an object with the data you want to send in the request body
+  const data = {
+    subscription: group.subscription,
+    friends: group.friends,
+  };
+
+  // Create the request configuration object
+  const requestOptions = {
+    method: "POST", // HTTP request method
+    headers: {
+      "Content-Type": "application/json", // Set the content type to JSON
+      access_token: accessToken,
+    },
+    body: JSON.stringify(data), // Convert the data object to a JSON string
+  };
+
+  // Send the POST request using the fetch function
+  return fetch(`${API_URL}/groups`, requestOptions)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json(); // Parse the response body as JSON
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
