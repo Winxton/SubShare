@@ -47,9 +47,9 @@ import { Friend as FriendComponent } from "./Friend";
 import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
-import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
 import { updateSubscriptionCost } from "../utils/SubscriptionCostUtils";
+import * as API from "../utils/Api";
 
 type NewGroupProps = {
   onClose: () => void;
@@ -109,42 +109,6 @@ function NewGroup(props: NewGroupProps) {
     } else {
       subscriptionBalance = 0;
     }
-  }
-
-  function sendPostRequestToServer(group: Group) {
-    // Define the URL of the server where you want to send the POST request
-    const url = `${API_URL}/groups`;
-
-    // Create an object with the data you want to send in the request body
-    const data = {
-      subscription: group.subscription,
-      friends: group.friends,
-    };
-
-    // Create the request configuration object
-    const requestOptions = {
-      method: "POST", // HTTP request method
-      headers: {
-        "Content-Type": "application/json", // Set the content type to JSON
-        access_token: props.session!.access_token,
-      },
-      body: JSON.stringify(data), // Convert the data object to a JSON string
-    };
-    // Send the POST request using the fetch function
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json(); // Parse the response body as JSON
-      })
-      .then((data) => {
-        // Close the modal after successful response
-        props.onClose();
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-      });
   }
 
   function renderGroupDetails() {
@@ -376,10 +340,13 @@ function NewGroup(props: NewGroupProps) {
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
 
-              sendPostRequestToServer(newGroup);
-
               setSelectedSubscription(null);
               setFriends([]);
+              API.createGroup(newGroup, props.session!.access_token).then(
+                () => {
+                  props.onClose();
+                }
+              );
             }}
             isLoading={isCreatingGroup} // set isLoading to isCreatingGroup
           >
