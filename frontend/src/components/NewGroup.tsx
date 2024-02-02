@@ -62,11 +62,9 @@ function NewGroup(props: NewGroupProps) {
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
 
-  const user = props.userEmail
-    ? [new Friend(null, null, props.userEmail, true, 0, true)]
-    : [];
+  const user = new Friend(null, null, props.userEmail, true, 0, true);
 
-  const [friends, setFriends] = React.useState<Friend[]>(user);
+  const [friends, setFriends] = React.useState<Friend[]>([user]);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
 
   const subscriptions = [
