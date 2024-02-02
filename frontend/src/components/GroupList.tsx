@@ -6,7 +6,6 @@ import {
   Container,
   Box,
   Flex,
-  useTheme,
   Avatar,
   Heading,
   Text,
@@ -24,25 +23,27 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import { Session } from "@supabase/supabase-js";
 
 import { Subscription as SubscriptionComponent } from "./Subscription";
-import { Subscription } from "../models/Subscription";
-import disney from "../images/disney.png";
+import useFetchUserData from "../utils/useFetchUserData";
 
 import NewGroup from "./NewGroup";
 import { Group } from "../models/Group";
-
+import { getGravatarUrl } from "./Friend";
 import { supabase } from "../App";
 import * as API from "../utils/Api";
+import {
+  getSubscriptionCost,
+  calculateSavings,
+} from "../utils/SubscriptionCostUtils";
 
 export default function GroupList(props: { session: Session | null }) {
-  const theme = useTheme();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
   const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
-  const subscriptionCost = "$8.10";
-  const savings = "$14.90";
-  const profilePicture = "https://bit.ly/sage-adebayo";
-
+  const userData = useFetchUserData(props.session);
+  const userEmail = userData?.user.email as string;
+  const totalSubscriptionCost = getSubscriptionCost(groups, userEmail);
+  const savings = calculateSavings(groups, userEmail);
   // The group to delete, in order to show the confirmation modal
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
 
@@ -157,22 +158,26 @@ export default function GroupList(props: { session: Session | null }) {
         </Button>
       </Box>
       <Flex className="Profile" margin="10px">
-        <Avatar src={profilePicture} marginRight="10px" />
+        <Avatar
+          key={userEmail}
+          src={getGravatarUrl(userEmail, 300)}
+          margin="10px"
+        />
         <Box>
           <Text fontWeight="bold"> Total Subscriptions</Text>
           <Text>
             You owe{" "}
             <Text as="span" fontWeight="bold">
-              {subscriptionCost}
+              {totalSubscriptionCost}
             </Text>
             /month
           </Text>
           <Text fontWeight="bold" color="green">
-            {savings}
             <Text as="span" fontSize="xs" color="black" fontWeight="thin">
               {" "}
-              You are saving
+              You are saving $
             </Text>
+            {savings}
           </Text>
         </Box>
       </Flex>
@@ -210,7 +215,14 @@ export default function GroupList(props: { session: Session | null }) {
             <Link to={`/view-group/${group.id}`} key={group.subscription.name}>
               <SubscriptionComponent
                 image={group?.subscription?.image}
-                cost={group?.subscription?.cost.toString()}
+                myCost={
+                  //looks for the user's subscription cost
+                  userEmail
+                    ? group?.friends
+                        .find((friend) => friend.email === userEmail)
+                        ?.subscription_cost.toString() || "0.00"
+                    : "0.00"
+                }
                 name={group?.subscription?.name}
                 members={group?.friends}
               />
@@ -229,7 +241,7 @@ export default function GroupList(props: { session: Session | null }) {
             <Link to={`/view-group/${invitedGroup.id}`}>
               <SubscriptionComponent
                 image={invitedGroup?.subscription?.image}
-                cost={invitedGroup?.subscription?.cost.toString()}
+                myCost={invitedGroup?.subscription?.cost.toString()}
                 name={invitedGroup?.subscription?.name}
                 members={invitedGroup?.friends}
               />
@@ -254,8 +266,13 @@ export default function GroupList(props: { session: Session | null }) {
         ))}
       </Stack>
 
-      {isOpen && <NewGroup onClose={onClose} session={props.session} />}
-
+      {isOpen && (
+        <NewGroup
+          onClose={onClose}
+          session={props.session}
+          userEmail={userEmail}
+        />
+      )}
       <ConfirmDeleteGroupModal
         groupName={groupToDelete?.subscription.name ?? ""}
         isOpen={groupToDelete !== null}

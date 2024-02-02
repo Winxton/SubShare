@@ -2585,6 +2585,16 @@
     "@babel/runtime" "^7.13.10"
     "@radix-ui/react-compose-refs" "1.0.1"
 
+"@reduxjs/toolkit@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.0.1.tgz"
+  integrity sha512-fxIjrR9934cmS8YXIGd9e7s1XRsEU++aFc9DVNMFMRTM5Vtsg2DCRMj21eslGtDt43IUf9bJL3h5bwUlZleibA==
+  dependencies:
+    immer "^10.0.3"
+    redux "^5.0.0"
+    redux-thunk "^3.1.0"
+    reselect "^5.0.1"
+
 "@remix-run/router@1.10.0":
   version "1.10.0"
   resolved "https://registry.npmjs.org/@remix-run/router/-/router-1.10.0.tgz"
@@ -6364,6 +6374,11 @@ ignore@^5.2.0:
   resolved "https://registry.npmjs.org/ignore/-/ignore-5.2.4.tgz"
   integrity sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==
 
+immer@^10.0.3:
+  version "10.0.3"
+  resolved "https://registry.npmjs.org/immer/-/immer-10.0.3.tgz"
+  integrity sha512-pwupu3eWfouuaowscykeckFmVTpqbzW+rXFCX8rQLkZzM9ftBmU/++Ra+o+L27mz03zJTlyV4UUr+fdKNffo4A==
+
 immer@^9.0.7:
   version "9.0.21"
   resolved "https://registry.npmjs.org/immer/-/immer-9.0.21.tgz"
@@ -8993,7 +9008,7 @@ react-is@^18.0.0:
 
 react-kawaii@^0.18.0:
   version "0.18.0"
-  resolved "https://registry.yarnpkg.com/react-kawaii/-/react-kawaii-0.18.0.tgz#bc95c6b1f76acfcaca83fcc6a4790e10beb821db"
+  resolved "https://registry.npmjs.org/react-kawaii/-/react-kawaii-0.18.0.tgz"
   integrity sha512-/+WLnb2sNyqpfE8wurxZRtx2NkypZWHU6XMphj0yo2nvUFm1BX7MD7o+L+gAwkD7UJvfBDtzFP9a+CmIXkge3A==
   dependencies:
     prop-types "^15.6.2"
@@ -9167,6 +9182,11 @@ redent@^3.0.0:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
 
+redux-thunk@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/redux-thunk/-/redux-thunk-3.1.0.tgz"
+  integrity sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==
+
 redux@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/redux/-/redux-5.0.0.tgz"
@@ -9276,6 +9296,11 @@ requires-port@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/requires-port/-/requires-port-1.0.0.tgz"
   integrity sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==
+
+reselect@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/reselect/-/reselect-5.0.1.tgz"
+  integrity sha512-D72j2ubjgHpvuCiORWkOUxndHJrxDaSolheiz5CO+roz8ka97/4msh2E8F5qay4GawR5vzBt5MkbDHT+Rdy/Wg==
 
 resolve-cwd@^3.0.0:
   version "3.0.0"
