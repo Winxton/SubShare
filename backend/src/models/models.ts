@@ -13,10 +13,11 @@ export class Friend {
     public name: string,
     public image: string,
     public email?: string,
+    public subscription_cost?: number,
     public group_id?: string,
     public isowner?: boolean,
     public accepted?: boolean,
     public accepted_date?: Date,
-    public balance?: number
+    public balance?: number,
   ) {}
 }

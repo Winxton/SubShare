@@ -1,4 +1,5 @@
 import { API_URL } from "../constants";
+import { Friend } from "../models/Friend";
 import { Group } from "../models/Group";
 import { Subscription } from "../models/Subscription";
 
@@ -110,18 +111,50 @@ export function getInvitedGroups(requestOptions: any) {
       });
     });
 }
-export function sendGroupInviteEmail(senderName: string, recipient: string[], groupName: string): Promise<any> {
+export function sendGroupInviteEmail(
+  senderName: Friend,
+  recipient: string[],
+  groupName: string
+): Promise<any> {
   return fetch(`${API_URL}/send-invite`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ senderName, recipient, groupName }),
-  })
-  .then(response => {
+  }).then((response) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     return response.json();
   });
+}
+export function createGroup(group: Group, accessToken: string) {
+  // Create an object with the data you want to send in the request body
+  const data = {
+    subscription: group.subscription,
+    friends: group.friends,
+  };
+
+  // Create the request configuration object
+  const requestOptions = {
+    method: "POST", // HTTP request method
+    headers: {
+      "Content-Type": "application/json", // Set the content type to JSON
+      access_token: accessToken,
+    },
+    body: JSON.stringify(data), // Convert the data object to a JSON string
+  };
+
+  // Send the POST request using the fetch function
+  return fetch(`${API_URL}/groups`, requestOptions)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json(); // Parse the response body as JSON
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
 }
