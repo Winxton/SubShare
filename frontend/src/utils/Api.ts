@@ -111,40 +111,12 @@ export function getInvitedGroups(requestOptions: any) {
       });
     });
 }
-export function sendGroupInviteEmail(
-  senderName: Friend,
-  recipient: string[],
-  groupName: string
-): Promise<any> {
-  return fetch(`${API_URL}/send-invite`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ senderName, recipient, groupName }),
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  });
-}
-export function createGroup(group: Group, accessToken: string, user: Friend) {
+export function createGroup(group: Group, accessToken: string) {
   // Create an object with the data you want to send in the request body
   const data = {
-    group: {
-      subscription: group.subscription,
-      friends: group.friends,
-    },
-    invites: {
-      senderName: user.email, // assuming 'user' object has a 'name' property
-      recipients: group.friends
-        .filter((friend) => friend.email !== user.email) // Exclude the user from the recipients
-        .map((friend) => friend.email),
-      groupName: group.subscription.name, // or any other appropriate identifier for the group
-    },
+    subscription: group.subscription,
+    friends: group.friends,
   };
-
   // Create the request configuration object
   const requestOptions = {
     method: "POST", // HTTP request method
@@ -154,7 +126,6 @@ export function createGroup(group: Group, accessToken: string, user: Friend) {
     },
     body: JSON.stringify(data), // Convert the data object to a JSON string
   };
-
   // Send the POST request using the fetch function
   return fetch(`${API_URL}/groups`, requestOptions)
     .then((response) => {

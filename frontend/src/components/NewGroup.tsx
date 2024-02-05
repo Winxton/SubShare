@@ -339,10 +339,9 @@ function NewGroup(props: NewGroupProps) {
 
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
-              console.log(newGroup);
               setSelectedSubscription(null);
               setFriends([]);
-              API.createGroup(newGroup, props.session!.access_token, user).then(
+              API.createGroup(newGroup, props.session!.access_token).then(
                 () => {
                   props.onClose();
                 }
