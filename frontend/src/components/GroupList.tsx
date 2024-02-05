@@ -125,7 +125,8 @@ export default function GroupList(props: { session: Session | null }) {
       setLoading(false);
     });
   }
-  function findSubscriptionCostByEmail(group, userEmail) {
+
+  function findSubscriptionCostByEmail(group: Group, userEmail: string) {
     const friend = group.friends.find((friend) => friend.email === userEmail);
     return friend?.subscription_cost.toString();
   }
