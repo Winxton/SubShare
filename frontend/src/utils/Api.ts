@@ -129,11 +129,20 @@ export function sendGroupInviteEmail(
     return response.json();
   });
 }
-export function createGroup(group: Group, accessToken: string) {
+export function createGroup(group: Group, accessToken: string, user: Friend) {
   // Create an object with the data you want to send in the request body
   const data = {
-    subscription: group.subscription,
-    friends: group.friends,
+    group: {
+      subscription: group.subscription,
+      friends: group.friends,
+    },
+    invites: {
+      senderName: user.email, // assuming 'user' object has a 'name' property
+      recipients: group.friends
+        .filter((friend) => friend.email !== user.email) // Exclude the user from the recipients
+        .map((friend) => friend.email),
+      groupName: group.subscription.name, // or any other appropriate identifier for the group
+    },
   };
 
   // Create the request configuration object
@@ -149,10 +158,21 @@ export function createGroup(group: Group, accessToken: string) {
   // Send the POST request using the fetch function
   return fetch(`${API_URL}/groups`, requestOptions)
     .then((response) => {
+      // Check if the response was ok
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      return response.json(); // Parse the response body as JSON
+      // Check the content type to decide how to parse the response
+      const contentType = response.headers.get("Content-Type");
+      if (contentType && contentType.includes("application/json")) {
+        return response.json(); // If JSON, parse as JSON
+      } else {
+        return response.text(); // If not, return text to avoid parsing issues
+      }
+    })
+    .then((data) => {
+      console.log("Response:", data);
+      // Handle the response here (whether it's JSON or text)
     })
     .catch((error) => {
       console.error("There was a problem with the fetch operation:", error);

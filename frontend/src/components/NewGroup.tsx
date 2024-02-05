@@ -110,23 +110,6 @@ function NewGroup(props: NewGroupProps) {
       subscriptionBalance = 0;
     }
   }
-  const handleButtonClick = () => {
-    if (selectedSubscription?.name && friends.length > 0) {
-      API.sendGroupInviteEmail(
-        user,
-        friends.map((friend) => friend.email),
-        selectedSubscription.name
-      )
-        .then((data) => {
-          console.log("Success:", data);
-          // Handle success here (e.g., show a success message)
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          // Handle error here (e.g., show an error message)
-        });
-    }
-  };
 
   function renderGroupDetails() {
     if (!selectedSubscription) {
@@ -356,11 +339,10 @@ function NewGroup(props: NewGroupProps) {
 
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
-
+              console.log(newGroup);
               setSelectedSubscription(null);
               setFriends([]);
-              handleButtonClick();
-              API.createGroup(newGroup, props.session!.access_token).then(
+              API.createGroup(newGroup, props.session!.access_token, user).then(
                 () => {
                   props.onClose();
                 }

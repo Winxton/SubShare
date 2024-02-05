@@ -153,7 +153,10 @@ app.get("/api/groups/:groupId", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
-  const { subscription, friends, id } = req.body; //getting subscription and friends from the front end
+  const {
+    group: { subscription, friends, id },
+    invites: { senderName, recipients, groupName },
+  } = req.body; //getting subscription and friends from the front end
   const newGroup = new Group(subscription, friends, id);
 
   const accessToken = req.headers.access_token;
@@ -179,7 +182,19 @@ app.post("/api/groups", async (req, res) => {
       memberData.subscription_cost
     );
   }
-  res.status(201).json(newGroup);
+
+  try {
+    const sendEmailPromises = recipients.map((recipient) =>
+      sendInvitedToGroupEmail(senderName, recipient, groupName)
+    );
+
+    await Promise.all(sendEmailPromises);
+
+    res.status(201).send("Invitation emails sent successfully.");
+  } catch (error) {
+    console.error("Error sending emails:", error);
+    res.status(501).send("Error sending emails.");
+  }
 });
 
 // Delete a group
@@ -222,23 +237,6 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
   } catch (error) {
     console.error("Error updating group:", error);
     res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.post("/api/send-invites", async (req, res) => {
-  const { senderName, recipients, groupName } = req.body;
-
-  try {
-    const sendEmailPromises = recipients.map((recipient) =>
-      sendInvitedToGroupEmail(senderName, recipient, groupName)
-    );
-
-    await Promise.all(sendEmailPromises);
-
-    res.status(200).send("Invitation emails sent successfully.");
-  } catch (error) {
-    console.error("Error sending emails:", error);
-    res.status(500).send("Error sending emails.");
   }
 });
 
