@@ -24,6 +24,7 @@ export default function ViewGroup(props: { session: Session }) {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -119,7 +120,10 @@ export default function ViewGroup(props: { session: Session }) {
           </Heading>
 
           {selectGroup.friends.map((member) => (
-            <Friend email={member.email} />
+            <Friend
+              email={member.email}
+              subscriptionCost={member.subscription_cost}
+            />
           ))}
         </VStack>
       </Box>
