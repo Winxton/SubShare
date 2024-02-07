@@ -126,6 +126,10 @@ export default function GroupList(props: { session: Session | null }) {
     });
   }
 
+  function findSubscriptionCostByEmail(group: Group, userEmail: string) {
+    const friend = group.friends.find((friend) => friend.email === userEmail);
+    return friend?.subscription_cost.toString();
+  }
   if (loading) {
     return (
       <Center height="100vh">
@@ -215,14 +219,7 @@ export default function GroupList(props: { session: Session | null }) {
             <Link to={`/view-group/${group.id}`} key={group.subscription.name}>
               <SubscriptionComponent
                 image={group?.subscription?.image}
-                myCost={
-                  //looks for the user's subscription cost
-                  userEmail
-                    ? group?.friends
-                        .find((friend) => friend.email === userEmail)
-                        ?.subscription_cost.toString() || "0.00"
-                    : "0.00"
-                }
+                myCost={findSubscriptionCostByEmail(group, userEmail)}
                 name={group?.subscription?.name}
                 members={group?.friends}
               />
@@ -241,7 +238,7 @@ export default function GroupList(props: { session: Session | null }) {
             <Link to={`/view-group/${invitedGroup.id}`}>
               <SubscriptionComponent
                 image={invitedGroup?.subscription?.image}
-                myCost={invitedGroup?.subscription?.cost.toString()}
+                myCost={findSubscriptionCostByEmail(invitedGroup, userEmail)}
                 name={invitedGroup?.subscription?.name}
                 members={invitedGroup?.friends}
               />
