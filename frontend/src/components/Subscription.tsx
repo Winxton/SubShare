@@ -3,7 +3,7 @@ import { Friend } from "../models/Friend";
 import { getGravatarUrl } from "./Friend";
 
 export function Subscription(props: {
-  myCost: string;
+  myCost: string | undefined;
   image: string;
   name: string;
   members: Friend[];
