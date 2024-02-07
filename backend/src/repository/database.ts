@@ -232,12 +232,6 @@ export async function declineInvitedGroup(email: string, groupID: string) {
       return false; // Indicate failure
     }
 
-    // Optionally, check if the deletion actually affected any rows
-    if (data.length === 0) {
-      console.log("No matching records found to delete.");
-      return false; // Indicate failure or that no action was needed
-    }
-
     // If we reach here, the deletion was successful
     console.log("User successfully declined invitation.");
     return true; // Indicate success
