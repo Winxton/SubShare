@@ -92,7 +92,7 @@ export async function createMember(
       accepted: accepted,
       accepted_date: accepted_date,
       balance: balance,
-      subscription_cost:subscription_cost
+      subscription_cost: subscription_cost,
     },
   ]);
   if (resp.error) {
@@ -105,7 +105,7 @@ export async function createMember(
 //add comment
 export async function getMemberGroups(
   userEmail: string,
-  accepted: boolean | null,
+  accepted: boolean | null
 ): Promise<Group[] | null> {
   try {
     // Fetch groups based on the user's email in the members table
@@ -167,7 +167,12 @@ export async function getMembers(GroupId): Promise<Friend[]> {
   const members = resp.data;
 
   return members.map((member) => {
-    return new Friend(member.name, member.image, member.email, member.subscription_cost);
+    return new Friend(
+      member.name,
+      member.image,
+      member.email,
+      member.subscription_cost
+    );
   });
 }
 
@@ -213,3 +218,32 @@ export async function acceptInvitedGroup(email: string, groupID: string) {
 }
 
 //Function to update the decline status of a group in the database
+export async function declineInvitedGroup(email: string, groupID: string) {
+  try {
+    // Attempt to delete the member with the specified email and group ID
+    const { data, error } = await supabase
+      .from("members")
+      .delete()
+      .match({ email: email, group_id: groupID });
+
+    // Check if there was an error in the deletion process
+    if (error) {
+      console.error("Error deleting user:", error.message);
+      return false; // Indicate failure
+    }
+
+    // Optionally, check if the deletion actually affected any rows
+    if (data.length === 0) {
+      console.log("No matching records found to delete.");
+      return false; // Indicate failure or that no action was needed
+    }
+
+    // If we reach here, the deletion was successful
+    console.log("User successfully declined invitation.");
+    return true; // Indicate success
+  } catch (error) {
+    // Log any errors that occur during the request or processing
+    console.error("Error updating group:", error);
+    return false; // Indicate failure
+  }
+}

@@ -63,6 +63,24 @@ export function acceptInvite(groupId: number, accessToken: string) {
       console.error("Error deleting group:", error);
     });
 }
+export function declineInvite(groupId: number, accessToken: string) {
+  return fetch(`${API_URL}/decline_invite/${groupId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      access_token: accessToken,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response;
+    })
+    .catch((error) => {
+      console.error("Error deleting group:", error);
+    });
+}
 
 export function getAcceptedGroups(requestOptions: any) {
   return fetch(`${API_URL}/groups?accepted=true`, requestOptions)

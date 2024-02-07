@@ -5,6 +5,7 @@ import {
   getMembers,
   deleteGroup,
   acceptInvitedGroup,
+  declineInvitedGroup,
   getGroup,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
@@ -227,6 +228,30 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
     // Update the group status in the database
 
     const success = await acceptInvitedGroup(user.email, groupID);
+
+    if (success) {
+      res.json({ message: "Group updated successfully" });
+    } else {
+      res.status(404).json({ message: "Group not found or update failed" });
+    }
+  } catch (error) {
+    console.error("Error updating group:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.put("/api/decline_invite/:groupId", async (req, res) => {
+  try {
+    // Get the ID of the group to delete from the request parameters
+    const groupID = req.params.groupId;
+
+    const accessToken = req.headers.access_token;
+
+    const user = await getUser(accessToken);
+
+    // delete user in the specific group in the database
+
+    const success = await declineInvitedGroup(user.email, groupID);
 
     if (success) {
       res.json({ message: "Group updated successfully" });

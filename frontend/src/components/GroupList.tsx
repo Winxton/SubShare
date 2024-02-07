@@ -47,26 +47,34 @@ export default function GroupList(props: { session: Session | null }) {
   // The group to delete, in order to show the confirmation modal
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
 
-  //to do nina
-  const handleDeclineInvitation = (groupToDecline) => {};
-  const handleAcceptInvitation = (groupToAccept) => {
-    // Send a PUT request to API to update the group status
-    const groupId = groupToAccept.id;
+  const handleInvitationResponse = (groupToRespond, action) => {
+    // Ensure the action is either "accept" or "decline"
+    if (!["accept", "decline"].includes(action)) {
+      console.error("Invalid action:", action);
+      return;
+    }
 
+    const groupId = groupToRespond.id;
     if (!groupId) {
       console.error("Invalid groupId:", groupId);
       return;
     }
 
-    API.acceptInvite(groupId, props.session!.access_token)
+    const token = props.session!.access_token;
+
+    // Determine which API method to call based on the action
+    const apiMethod =
+      action === "accept" ? API.acceptInvite : API.declineInvite;
+
+    apiMethod(groupId, token)
       .then(() => {
         setInvitedSubscriptions((prevInvitedGroups) =>
-          prevInvitedGroups.filter((group) => group !== groupToAccept)
+          prevInvitedGroups.filter((group) => group !== groupToRespond)
         );
         refreshGroups();
       })
       .catch((error) => {
-        console.error("Error accepting group invitation:", error);
+        console.error(`Error ${action}ing group invitation:`, error);
       });
   };
 
@@ -249,7 +257,7 @@ export default function GroupList(props: { session: Session | null }) {
             <Flex>
               <Button
                 colorScheme="green"
-                onClick={() => handleAcceptInvitation(invitedGroup)}
+                onClick={() => handleInvitationResponse(invitedGroup, "accept")}
                 variant="ghost"
               >
                 Accept
@@ -257,7 +265,9 @@ export default function GroupList(props: { session: Session | null }) {
               <Button
                 variant="ghost"
                 colorScheme="red"
-                onClick={() => handleDeclineInvitation(invitedGroup)}
+                onClick={() =>
+                  handleInvitationResponse(invitedGroup, "decline")
+                }
               >
                 Decline
               </Button>
