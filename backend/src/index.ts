@@ -9,7 +9,11 @@ import {
   getGroup,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
-import { sendInvitedToGroupEmail } from "./service/emails";
+import {
+  sendInvitedToGroupEmail,
+  sendDecisionEmail,
+  sendDisbandedToGroupEmail,
+} from "./service/emails";
 import { Group, Friend } from "./models/models";
 
 const express = require("express");
@@ -200,16 +204,33 @@ app.post("/api/groups", async (req, res) => {
 // Delete a group
 app.delete("/api/groups/:id", async (req, res) => {
   try {
-    // Get the name of the group to delete from the request parameters
     const groupID = req.params.id;
-    // Call the deleteGroup function from the database to delete the group
-    const success = await deleteGroup(groupID);
+    const accessToken = req.headers.access_token;
+    const user = await getUser(accessToken);
+    const groupDetails = await getGroup(user.email, groupID);
 
-    if (success) {
-      res.json({ message: "Group deleted successfully" });
-    } else {
-      res.status(404).json({ message: "Group not found" });
+    if (!groupDetails) {
+      return res.status(404).json({ message: "Group not found" });
     }
+
+    const success = await deleteGroup(groupID);
+    if (!success) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    const sendEmailPromises = groupDetails.friends.map((recipient) =>
+      sendDisbandedToGroupEmail(
+        user.email,
+        recipient.email || "",
+        groupDetails.subscription.name
+        // need the date that the subcription is cancelled
+      )
+    );
+
+    // Use Promise.allSettled to avoid failing the entire operation due to individual promise rejections
+    await Promise.allSettled(sendEmailPromises);
+
+    res.json({ message: "Group deleted successfully" });
   } catch (error) {
     console.error("Error deleting group:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -225,11 +246,21 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
 
     const user = await getUser(accessToken);
 
-    // Update the group status in the database
+    // Update the group status in the database when you accept invite
 
     const success = await acceptInvitedGroup(user.email, groupID);
 
     if (success) {
+      const groupDetails = await getGroup(user.email, groupID);
+      const groupOwner = groupDetails?.friends.find((friend) => friend.isowner);
+      // Send email notification to the group owner
+      await sendDecisionEmail(
+        user.email,
+        groupOwner?.email as string,
+        groupDetails?.subscription.name as string,
+        "accepted"
+      );
+
       res.json({ message: "Group updated successfully" });
     } else {
       res.status(404).json({ message: "Group not found or update failed" });
@@ -239,6 +270,8 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+//To do: need to also update the balance for the remaining members in supabase
 
 app.put("/api/decline_invite/:groupId", async (req, res) => {
   try {
@@ -254,6 +287,16 @@ app.put("/api/decline_invite/:groupId", async (req, res) => {
     const success = await declineInvitedGroup(user.email, groupID);
 
     if (success) {
+      const groupDetails = await getGroup(user.email, groupID);
+      const groupOwner = groupDetails?.friends.find((friend) => friend.isowner);
+      // Send email notification to the group owner
+      await sendDecisionEmail(
+        user.email,
+        groupOwner?.email as string,
+        groupDetails?.subscription.name as string,
+        "declined"
+      );
+
       res.json({ message: "Group updated successfully" });
     } else {
       res.status(404).json({ message: "Group not found or update failed" });

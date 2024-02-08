@@ -22,39 +22,32 @@ export async function sendInvitedToGroupEmail(
     html: `${senderName} has invited you to join his ${groupName} group. \nTo accept the invitation, head over to the <a href="${APP_URL}">subshare app</a>.`,
   });
 }
+
+/* TODO: Add subscription cancellation date */
+
 export async function sendDisbandedToGroupEmail(
   senderName: string,
   recipient: string,
   groupName: string
+  //subcriptionCancellationDate: string
 ) {
   return resend.emails.send({
     from: "hello@subshare.app",
     to: recipient,
-    subject: `Subshare Invitation to ${groupName}`,
-    html: `${senderName} has invited you to join his ${groupName} group. \nTo accept the invitation, head over to the <a href="${APP_URL}">subshare app</a>.`,
+    subject: `Subshare ${groupName} group disbandment`,
+    html: `${senderName} has decided to disband his ${groupName} group. \n You still have access to the ${groupName} subscription until .`,
   });
 }
-export async function sendAcceptedToGroupOwnerEmail(
-  senderName: string, //Users that accepts
+export async function sendDecisionEmail(
+  senderName: string, // groupDetails?.friends,Users that accepts
   recipient: string, //Group Owner
-  groupName: string
+  groupName: string,
+  decision: string
 ) {
   return resend.emails.send({
     from: "hello@subshare.app",
     to: recipient,
-    subject: `${senderName} has accepted your invitation to ${groupName}`,
-    html: ``,
-  });
-}
-export async function sendRejectedToGroupOwnerEmail(
-  senderName: string, //Users that rejects
-  recipient: string, //Group Owner
-  groupName: string
-) {
-  return resend.emails.send({
-    from: "hello@subshare.app",
-    to: recipient,
-    subject: `${senderName} has rejected your invitation to ${groupName}`,
+    subject: `${senderName} has ${decision} your invitation to ${groupName}`,
     html: ``,
   });
 }
