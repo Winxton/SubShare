@@ -201,36 +201,18 @@ app.post("/api/groups", async (req, res) => {
   }
 });
 
-// Delete a group
 app.delete("/api/groups/:id", async (req, res) => {
   try {
+    // Get the name of the group to delete from the request parameters
     const groupID = req.params.id;
-    const accessToken = req.headers.access_token;
-    const user = await getUser(accessToken);
-    const groupDetails = await getGroup(user.email, groupID);
-
-    if (!groupDetails) {
-      return res.status(404).json({ message: "Group not found" });
-    }
-
+    // Call the deleteGroup function from the database to delete the group
     const success = await deleteGroup(groupID);
-    if (!success) {
-      return res.status(404).json({ message: "Group not found" });
+
+    if (success) {
+      res.json({ message: "Group deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Group not found" });
     }
-
-    const sendEmailPromises = groupDetails.friends.map((recipient) =>
-      sendDisbandedToGroupEmail(
-        user.email,
-        recipient.email || "",
-        groupDetails.subscription.name
-        // need the date that the subcription is cancelled
-      )
-    );
-
-    // Use Promise.allSettled to avoid failing the entire operation due to individual promise rejections
-    await Promise.allSettled(sendEmailPromises);
-
-    res.json({ message: "Group deleted successfully" });
   } catch (error) {
     console.error("Error deleting group:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -253,14 +235,20 @@ app.put("/api/accept_invite/:groupId", async (req, res) => {
     if (success) {
       const groupDetails = await getGroup(user.email, groupID);
       const groupOwner = groupDetails?.friends.find((friend) => friend.isowner);
+      console.log(groupDetails?.friends);
       // Send email notification to the group owner
-      await sendDecisionEmail(
-        user.email,
-        groupOwner?.email as string,
-        groupDetails?.subscription.name as string,
-        "accepted"
-      );
-
+      try {
+        await sendDecisionEmail(
+          user.email,
+          groupOwner?.email as string,
+          groupDetails?.subscription.name as string,
+          "accepted"
+        );
+        console.log("successful sent accepted email");
+      } catch (error) {
+        console.error("Error senting email for deleting group:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
       res.json({ message: "Group updated successfully" });
     } else {
       res.status(404).json({ message: "Group not found or update failed" });
@@ -290,12 +278,18 @@ app.put("/api/decline_invite/:groupId", async (req, res) => {
       const groupDetails = await getGroup(user.email, groupID);
       const groupOwner = groupDetails?.friends.find((friend) => friend.isowner);
       // Send email notification to the group owner
-      await sendDecisionEmail(
-        user.email,
-        groupOwner?.email as string,
-        groupDetails?.subscription.name as string,
-        "declined"
-      );
+      try {
+        await sendDecisionEmail(
+          user.email,
+          groupOwner?.email as string,
+          groupDetails?.subscription.name as string,
+          "declined"
+        );
+        console.log("successful declined email");
+      } catch (error) {
+        console.error("Error senting email for deleting group:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
 
       res.json({ message: "Group updated successfully" });
     } else {

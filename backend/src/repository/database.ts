@@ -171,7 +171,8 @@ export async function getMembers(GroupId): Promise<Friend[]> {
       member.name,
       member.image,
       member.email,
-      member.subscription_cost
+      member.subscription_cost,
+      member.isowner
     );
   });
 }
