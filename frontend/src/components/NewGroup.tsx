@@ -14,6 +14,7 @@ import {
   Flex,
   InputGroup,
   InputLeftElement,
+  InputRightElement,
   Icon,
 } from "@chakra-ui/react";
 import { GearIcon } from "@radix-ui/react-icons";
@@ -53,14 +54,15 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     React.useState<Subscription | null>(null);
   const [friends, setFriends] = React.useState<Friend[]>([]);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
+  const today = new Date();
 
   const subscriptions = [
-    new Subscription("Netflix", netflixImage, 20),
-    new Subscription("HBO", hboImage, 30),
-    new Subscription("Disney", disney, 25),
-    new Subscription("Spotify", spotify, 10),
-    new Subscription("Youtube", youtubeImage, 12),
-    new Subscription("Crunchy", crunchyrollImage, 7),
+    new Subscription("Netflix", netflixImage, 20, today),
+    new Subscription("HBO", hboImage, 30, today),
+    new Subscription("Disney", disney, 25, today),
+    new Subscription("Spotify", spotify, 10, today),
+    new Subscription("Youtube", youtubeImage, 12, today),
+    new Subscription("Crunchy", crunchyrollImage, 7, today),
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
@@ -139,8 +141,9 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
     }
 
     return (
-      <Flex mb="4" alignItems={"center"}>
-        <Square size="100px" borderRadius={"md"}>
+      <Flex mb="4" alignItems="flex-start">
+        {/* Square with image upload */}
+        <Square size="100px" borderRadius="md" mr="2">
           <ImageUpload
             onImageUpload={(image) => {
               setSelectedSubscription({
@@ -165,7 +168,10 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             )}
           </ImageUpload>
         </Square>
-        <Flex ml="2" direction={"column"}>
+
+        {/* Subscription details */}
+        <Flex direction="column">
+          {/* Subscription name input */}
           <Input
             variant="flushed"
             value={selectedSubscription?.name}
@@ -175,8 +181,10 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                 name: e.target.value,
               } as Subscription);
             }}
+            mb="2" // Add margin bottom for spacing
           />
 
+          {/* Cost input */}
           <InputGroup>
             <InputLeftElement
               pointerEvents="none"
@@ -193,13 +201,48 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
                   cost: parseInt(e.target.value),
                 } as Subscription);
               }}
+              mr="2" // Add margin right for spacing
             />
           </InputGroup>
+
+          {/* Billing date input */}
+          <div>
+            <label htmlFor="start" style={{ display: "block" }}>
+              Billing Date:
+            </label>
+            <input
+              type="date"
+              id="start"
+              name="billing_date"
+              style={{ width: "100%", padding: "0.5rem" }}
+              value={formatDate(selectedSubscription?.billing_date)}
+              onChange={(e) => {
+                setSelectedSubscription({
+                  ...selectedSubscription,
+                  billing_date: new Date(e.target.value + "T00:00:00"),
+                });
+              }}
+            />
+          </div>
         </Flex>
       </Flex>
     );
   }
+  // Helper function to format date as "yyyy-MM-dd"
+  function formatDate(date) {
+    const isoString = date.toISOString();
 
+    const formattedDate = isoString.split("T")[0];
+
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    } else {
+      return "";
+    }
+  }
   function renderNewGroup() {
     return (
       <Box>
@@ -239,7 +282,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             margin="5px"
             onClick={() => {
               setSelectedSubscription(
-                new Subscription("My Subscription", "", 0)
+                new Subscription("My Subscription", "", 0, today)
               );
             }}
             border={"none"}
@@ -314,35 +357,58 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         <ModalBody>{renderNewGroup()}</ModalBody>
 
         <ModalFooter>
-          <Button variant="ghost" mr={3} onClick={props.onClose}>
-            Close
-          </Button>
-          <Button
-            colorScheme="blue"
-            onClick={() => {
-              if (!selectedSubscription) {
-                console.log("Error: Please select a subscription");
-                return;
-              }
+          <React.Fragment>
+            <Button variant="ghost" mr={3} onClick={props.onClose}>
+              Close
+            </Button>
 
-              if (friends.length === 0) {
-                console.log("Error: Please select at least one friend");
-                return;
-              }
+            <Button
+              colorScheme="blue"
+              onClick={async () => {
+                if (!selectedSubscription) {
+                  console.log("Error: Please select a subscription");
+                  return;
+                }
 
-              setIsCreatingGroup(true); // set isCreatingGroup to true
+                if (friends.length === 0) {
+                  console.log("Error: Please select at least one friend");
+                  return;
+                }
 
-              // If both conditions are met, proceed to create and send the API request
-              const newGroup = new Group(selectedSubscription, friends, null);
-              setSelectedSubscription(null);
-              setFriends([]);
+                if (!selectedSubscription.billing_date) {
+                  console.log("Error: Please select a billing date");
+                  return;
+                }
 
-              sendPostRequestToServer(newGroup);
-            }}
-            isLoading={isCreatingGroup} // set isLoading to isCreatingGroup
-          >
-            {isCreatingGroup ? "Creating Group..." : "Create Group"}
-          </Button>
+                setIsCreatingGroup(true);
+
+                try {
+                  const newGroup = new Group(
+                    selectedSubscription,
+                    friends,
+                    null
+                  );
+
+                  // Update the billing date in the new group
+
+                  // Send the POST request to create the group
+                  await sendPostRequestToServer(newGroup);
+
+                  // Reset form fields and state after creating the group
+                  setSelectedSubscription(null);
+                  setFriends([]);
+                } catch (error) {
+                  console.error("Error creating group:", error);
+                } finally {
+                  // Reset isCreatingGroup after creating the group or encountering an error
+                  setIsCreatingGroup(false);
+                }
+              }}
+              isLoading={isCreatingGroup}
+            >
+              {isCreatingGroup ? "Creating Group..." : "Create Group"}
+            </Button>
+          </React.Fragment>
         </ModalFooter>
       </ModalContent>
     </Modal>
