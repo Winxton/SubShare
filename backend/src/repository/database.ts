@@ -69,7 +69,7 @@ export async function createGroup(userId, name, cost, createdDate, image, billin
         cost: cost,
         created_date: createdDate,
         image: image,
-        billing_date:billing_date
+       
         
       },
     ])
