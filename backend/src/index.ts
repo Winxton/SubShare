@@ -165,9 +165,10 @@ app.post("/api/groups", async (req, res) => {
     user.id,
     subscription.name,
     subscription.cost,
+    subscription.billing_date,
     new Date(),
     subscription.image,
-    subscription.billing_date
+    
   );
 
   for (const memberData of friends) {

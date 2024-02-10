@@ -59,7 +59,7 @@ export async function getGroup(userEmail: string, groupId: string) {
   );
 }
 
-export async function createGroup(userId, name, cost, createdDate, image, billing_date) {
+export async function createGroup(userId, name, cost, billing_date, createdDate, image) {
   const resp = await supabase
     .from("groups")
     .insert([
@@ -67,6 +67,7 @@ export async function createGroup(userId, name, cost, createdDate, image, billin
         user_id: userId,
         name: name,
         cost: cost,
+        billing_date: billing_date,
         created_date: createdDate,
         image: image,
        
@@ -81,6 +82,8 @@ export async function createGroup(userId, name, cost, createdDate, image, billin
   }
   
   const createdGroupId = resp.data[0];
+  
+
 
   return createdGroupId;
 }
