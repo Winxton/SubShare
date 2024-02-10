@@ -1,18 +1,15 @@
 import { Box, Image, Flex, Text, Avatar, Square } from "@chakra-ui/react";
 import { Friend } from "../models/Friend";
-import { Friend as FriendComponent } from "./Friend";
 import { getGravatarUrl } from "./Friend";
 
 export function Subscription(props: {
-  cost: string;
+  myCost: string | undefined;
   image: string;
   name: string;
   members: Friend[];
 }) {
   const numberOfMembers = props.members.length;
-  const costPerMember = parseFloat(
-    (parseFloat(props.cost) / numberOfMembers).toFixed(2)
-  );
+
   return (
     <Box>
       <Flex className="profile" marginRight="10px" alignItems="center">
@@ -23,7 +20,7 @@ export function Subscription(props: {
         <Box marginLeft={"10px"}>
           <Text fontWeight={"medium"}>{props.name} </Text>
           <Box>
-            <Text>${costPerMember}/month · </Text>
+            <Text>${props.myCost}/month · </Text>
             <Text as="span">{numberOfMembers} members</Text>
             <Box>
               {" "}

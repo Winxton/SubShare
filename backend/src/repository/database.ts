@@ -23,7 +23,6 @@ export async function getUser(accessToken: string) {
 }
 
 // Get Groups
-
 export async function getGroup(userEmail: string, groupId: string) {
   // Get group from the database
   const { data: groups, error } = await supabase
@@ -59,7 +58,10 @@ export async function getGroup(userEmail: string, groupId: string) {
   );
 }
 
+
 export async function createGroup(userId, name, cost, billing_date, createdDate, image) {
+
+
   const resp = await supabase
     .from("groups")
     .insert([
@@ -90,19 +92,21 @@ export async function createGroup(userId, name, cost, billing_date, createdDate,
 export async function createMember(
   groupId,
   email,
-  isOwner,
+  isowner,
   accepted,
   accepted_date,
-  balance
+  balance,
+  subscription_cost
 ) {
   const resp = await supabase.from("members").insert([
     {
       group_id: groupId,
       email: email,
-      isowner: isOwner,
+      isowner: isowner,
       accepted: accepted,
       accepted_date: accepted_date,
       balance: balance,
+      subscription_cost: subscription_cost,
     },
   ]);
   if (resp.error) {
@@ -178,7 +182,12 @@ export async function getMembers(GroupId): Promise<Friend[]> {
   const members = resp.data;
 
   return members.map((member) => {
-    return new Friend(member.name, member.image, member.email);
+    return new Friend(
+      member.name,
+      member.image,
+      member.email,
+      member.subscription_cost
+    );
   });
 }
 

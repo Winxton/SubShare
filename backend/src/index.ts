@@ -8,7 +8,7 @@ import {
   getGroup,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
-
+import { sendInvitedToGroupEmail } from "./service/emails";
 import { Group, Friend } from "./models/models";
 
 const express = require("express");
@@ -112,7 +112,7 @@ app.get("/api/groups", async (req, res) => {
     groups = await getMemberGroups(user.email, true);
   } else {
     // Groups that I'm invited to.
-    groups = await getMemberGroups(user.email, null);
+    groups = await getMemberGroups(user.email, false);
   }
 
   if (!groups) {
@@ -153,12 +153,15 @@ app.get("/api/groups/:groupId", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
+
   
   const { subscription, friends, id} = req.body; //getting subscription and friends from the front end
 
   const newGroup = new Group(subscription, friends, id); // id is undefined
 
+
   const accessToken = req.headers.access_token;
+
   const user = await getUser(accessToken);
 
   const createdGroup = await createGroup(
@@ -175,10 +178,11 @@ app.post("/api/groups", async (req, res) => {
     const createdFriend = await createMember(
       createdGroup.id, // the return data (id) when you create a group table in supabase
       memberData.email,
-      memberData.isOwner,
+      memberData.isowner,
       memberData.accepted,
       new Date(),
-      memberData.balance
+      memberData.balance,
+      memberData.subscription_cost
     );
   }
   res.status(201).json(newGroup);
@@ -189,7 +193,6 @@ app.delete("/api/groups/:id", async (req, res) => {
   try {
     // Get the name of the group to delete from the request parameters
     const groupID = req.params.id;
-
     // Call the deleteGroup function from the database to delete the group
     const success = await deleteGroup(groupID);
 

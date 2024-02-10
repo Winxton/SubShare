@@ -16,6 +16,8 @@ import {
   InputLeftElement,
   InputRightElement,
   Icon,
+  Text,
+  useToast,
 } from "@chakra-ui/react";
 import { GearIcon } from "@radix-ui/react-icons";
 
@@ -46,13 +48,24 @@ import { Friend as FriendComponent } from "./Friend";
 import { Friend } from "../models/Friend";
 import { Subscription } from "../models/Subscription";
 import { Group } from "../models/Group";
-import { API_URL } from "../constants";
 import ImageUpload from "./ImageUpload";
+import { updateSubscriptionCost } from "../utils/SubscriptionCostUtils";
+import * as API from "../utils/Api";
 
-function NewGroup(props: { onClose: () => void; session: Session | null }) {
+type NewGroupProps = {
+  onClose: () => void;
+  session: Session | null;
+  userEmail: string;
+};
+
+function NewGroup(props: NewGroupProps) {
+  const toast = useToast();
   const [selectedSubscription, setSelectedSubscription] =
     React.useState<Subscription | null>(null);
-  const [friends, setFriends] = React.useState<Friend[]>([]);
+
+  const user = new Friend(null, null, props.userEmail, true, 0, true);
+
+  const [friends, setFriends] = React.useState<Friend[]>([user]);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
   const today = new Date();
 
@@ -66,73 +79,38 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
-  const [user, setUser] = useState(null); // new state
 
+  let pricePerMember = 0;
+
+  if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
+    pricePerMember = parseFloat(
+      (selectedSubscription.cost / friends.length).toFixed(2)
+    );
+  }
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        // Fetch user data from the server using the API
-        const response = await fetch(`${API_URL}/user`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            access_token: props.session!.access_token,
-          },
-        });
+    const updatedFriends = updateSubscriptionCost(
+      friends,
+      splitMode,
+      null,
+      pricePerMember
+    );
+    setFriends(updatedFriends);
+  }, [splitMode, pricePerMember]);
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+  // calculates the balance of the new subscription group
+  let subscriptionBalance: number = selectedSubscription
+    ? selectedSubscription.cost
+    : 0;
 
-        const userData = await response.json();
-        //using the auth user email we create a new Friend(group member) then add the new friend into the friend state
-        const myself = new Friend(null, null, userData.user.email, true);
-        setFriends([myself]);
-        setUser(userData.user.email);
-      } catch (error) {
-        console.error("There was a problem fetching user data:", error);
-      }
-    };
-
-    // Call the fetchUserData function when the component mounts
-    fetchUserData();
-  }, [props.session]); // Run this effect when the session prop changes
-
-  function sendPostRequestToServer(group: Group) {
-    // Define the URL of the server where you want to send the POST request
-    const url = `${API_URL}/groups`;
-
-    // Create an object with the data you want to send in the request body
-    const data = {
-      subscription: group.subscription,
-      friends: group.friends,
-    };
-
-    // Create the request configuration object
-    const requestOptions = {
-      method: "POST", // HTTP request method
-      headers: {
-        "Content-Type": "application/json", // Set the content type to JSON
-        access_token: props.session!.access_token,
-      },
-      body: JSON.stringify(data), // Convert the data object to a JSON string
-    };
-
-    // Send the POST request using the fetch function
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json(); // Parse the response body as JSON
-      })
-      .then((data) => {
-        // Close the modal after successful response
-        props.onClose();
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
+  if (selectedSubscription) {
+    if (splitMode === "byAmount") {
+      // When splitMode is "byAmount", subtract each friend's subscription_cost from the total
+      friends.forEach((friend) => {
+        subscriptionBalance -= friend.subscription_cost;
       });
+    } else {
+      subscriptionBalance = 0;
+    }
   }
 
   function renderGroupDetails() {
@@ -198,7 +176,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
               onChange={(e) => {
                 setSelectedSubscription({
                   ...selectedSubscription,
-                  cost: parseInt(e.target.value),
+                  cost: parseInt(e.target.value) || 0,
                 } as Subscription);
               }}
               mr="2" // Add margin right for spacing
@@ -297,41 +275,6 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             </Square>
           </WrapItem>
         </Wrap>
-
-        <Heading size="sm" mt="2" mb="1">
-          Select Members
-        </Heading>
-
-        <AddFriend
-          onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email, null);
-            setFriends([...friends, newFriend]);
-          }}
-        />
-
-        {friends.map((friend) => {
-          const isUser = friend.email === user;
-          return (
-            <Flex key={friend.email}>
-              <FriendComponent
-                email={friend.email}
-                isMe={isUser}
-                onRemove={(email) => {
-                  // Check if it's the ser before removing
-                  if (!isUser) {
-                    const newFriends = friends.filter(
-                      (friend) => friend.email !== email
-                    );
-                    setFriends(newFriends);
-                  }
-                }}
-                splitMode={splitMode}
-                subscriptionCost={selectedSubscription?.cost}
-                friendCount={friends.length}
-              ></FriendComponent>
-            </Flex>
-          );
-        })}
         <Tabs
           mt="2"
           variant="soft-rounded"
@@ -344,6 +287,63 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
             <Tab onClick={() => setSplitMode("byAmount")}>By Amounts</Tab>
           </TabList>
         </Tabs>
+        <Heading size="sm" mt="2" mb="1">
+          Select Members
+        </Heading>
+
+        <AddFriend
+          onAddFriend={(email) => {
+            const newFriend = new Friend(null, null, email, false, 0, false);
+            setFriends([...friends, newFriend]);
+          }}
+        />
+
+        {friends.map((friend) => {
+          const isUser = friend.email === props.userEmail;
+          const isAmountEditable = splitMode === "byAmount"; // Determine if the amount is editable based on splitMode
+          return (
+            <Flex key={friend.email}>
+              <FriendComponent
+                email={friend.email}
+                isMe={isUser}
+                onRemove={(email) => {
+                  if (!isUser) {
+                    const newFriends = friends.filter((f) => f.email !== email);
+                    setFriends(newFriends);
+                  }
+                }}
+                isAmountEditable={isAmountEditable}
+                subscriptionCost={friend.subscription_cost}
+                handleSubscriptionCostChange={(email, amount) => {
+                  // Find the friend with the matching email
+                  const updatedFriends = updateSubscriptionCost(
+                    friends,
+                    splitMode,
+                    email,
+                    amount
+                  );
+                  // Update the state with the updated friends array
+                  setFriends(updatedFriends);
+                }}
+              ></FriendComponent>
+            </Flex>
+          );
+        })}
+
+        <Flex
+          margin="50px"
+          border={
+            subscriptionBalance !== 0 ? "2px solid red" : "2px solid green"
+          }
+          p={3}
+          borderRadius="md"
+          justifyContent="space-around"
+        >
+          <Text>Balance Remaining</Text>
+          <Text ml={2} color={subscriptionBalance !== 0 ? "red" : "green"}>
+            $ {subscriptionBalance}
+          </Text>
+        </Flex>
       </Box>
     );
   }
@@ -357,6 +357,7 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
         <ModalBody>{renderNewGroup()}</ModalBody>
 
         <ModalFooter>
+
           <React.Fragment>
             <Button variant="ghost" mr={3} onClick={props.onClose}>
               Close
@@ -409,6 +410,8 @@ function NewGroup(props: { onClose: () => void; session: Session | null }) {
               {isCreatingGroup ? "Creating Group..." : "Create Group"}
             </Button>
           </React.Fragment>
+
+         
         </ModalFooter>
       </ModalContent>
     </Modal>
