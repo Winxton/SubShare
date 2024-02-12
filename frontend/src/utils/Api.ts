@@ -40,9 +40,7 @@ export function getGroup(groupId: string, accessToken: string) {
           data.subscription.billing_date
         ),
         data.friends,
-        data.id,
-       
-        
+        data.id
       );
     });
 }
@@ -85,34 +83,7 @@ export function getAcceptedGroups(requestOptions: any) {
             groupData.subscription.billing_date
           ),
           groupData.friends,
-          groupData.id,
-         
-        );
-      });
-    });
-}
-
-export function getInvitedGroups(requestOptions: any) {
-  return fetch(`${API_URL}/groups`, requestOptions)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      return response.json();
-    })
-    .then((data) => {
-      return data.map((groupData: any) => {
-        return new Group(
-          new Subscription(
-            groupData.subscription.name,
-            groupData.subscription.image,
-            groupData.subscription.cost,
-            groupData.subscription.billing_date
-          ),
-          groupData.friends,
-          groupData.id,
-          
+          groupData.id
         );
       });
     });
