@@ -145,8 +145,10 @@ app.get("/api/groups/:groupId", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
+
   const { subscription, friends, id } = req.body; //getting subscription and friends from the front end
-  const newGroup = new Group(subscription, friends, id);
+
+  const newGroup = new Group(subscription, friends, id); // id is undefined
 
   const accessToken = req.headers.access_token;
 
@@ -156,6 +158,7 @@ app.post("/api/groups", async (req, res) => {
     user.id,
     subscription.name,
     subscription.cost,
+    subscription.billing_date,
     new Date(),
     subscription.image
   );
