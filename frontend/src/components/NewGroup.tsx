@@ -357,61 +357,43 @@ function NewGroup(props: NewGroupProps) {
         <ModalBody>{renderNewGroup()}</ModalBody>
 
         <ModalFooter>
+          <Button variant="ghost" mr={3} onClick={props.onClose}>
+            Close
+          </Button>
+          <Button
+            colorScheme="blue"
+            onClick={() => {
+              if (!selectedSubscription) {
+                console.log("Error: Please select a subscription");
+                return;
+              }
+              if (subscriptionBalance !== 0) {
+                toast({
+                  title: "Error",
+                  description: `The amount entered does not equal to ${selectedSubscription.name}'s subscription cost.`,
+                  status: "error",
+                  duration: 2000,
+                  isClosable: true,
+                });
+                return;
+              }
 
-          <React.Fragment>
-            <Button variant="ghost" mr={3} onClick={props.onClose}>
-              Close
-            </Button>
+              setIsCreatingGroup(true); // set isCreatingGroup to true
+              // If both conditions are met, proceed to create and send the API request
+              const newGroup = new Group(selectedSubscription, friends, null);
 
-            <Button
-              colorScheme="blue"
-              onClick={async () => {
-                if (!selectedSubscription) {
-                  console.log("Error: Please select a subscription");
-                  return;
+              setSelectedSubscription(null);
+              setFriends([]);
+              API.createGroup(newGroup, props.session!.access_token).then(
+                () => {
+                  props.onClose();
                 }
-
-                if (friends.length === 0) {
-                  console.log("Error: Please select at least one friend");
-                  return;
-                }
-
-                if (!selectedSubscription.billing_date) {
-                  console.log("Error: Please select a billing date");
-                  return;
-                }
-
-                setIsCreatingGroup(true);
-
-                try {
-                  const newGroup = new Group(
-                    selectedSubscription,
-                    friends,
-                    null
-                  );
-
-                  // Update the billing date in the new group
-
-                  // Send the POST request to create the group
-                  await sendPostRequestToServer(newGroup);
-
-                  // Reset form fields and state after creating the group
-                  setSelectedSubscription(null);
-                  setFriends([]);
-                } catch (error) {
-                  console.error("Error creating group:", error);
-                } finally {
-                  // Reset isCreatingGroup after creating the group or encountering an error
-                  setIsCreatingGroup(false);
-                }
-              }}
-              isLoading={isCreatingGroup}
-            >
-              {isCreatingGroup ? "Creating Group..." : "Create Group"}
-            </Button>
-          </React.Fragment>
-
-         
+              );
+            }}
+            isLoading={isCreatingGroup} // set isLoading to isCreatingGroup
+          >
+            {isCreatingGroup ? "Creating Group..." : "Create Group"}
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
