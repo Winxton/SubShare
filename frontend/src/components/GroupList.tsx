@@ -38,7 +38,6 @@ import {
 export default function GroupList(props: { session: Session | null }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
-  const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const userData = useFetchUserData(props.session);
   const userEmail = userData?.user.email as string;
@@ -46,29 +45,6 @@ export default function GroupList(props: { session: Session | null }) {
   const savings = calculateSavings(groups, userEmail);
   // The group to delete, in order to show the confirmation modal
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
-
-  //to do nina
-  const handleDeclineInvitation = (groupToDecline) => {};
-  const handleAcceptInvitation = (groupToAccept) => {
-    // Send a PUT request to API to update the group status
-    const groupId = groupToAccept.id;
-
-    if (!groupId) {
-      console.error("Invalid groupId:", groupId);
-      return;
-    }
-
-    API.acceptInvite(groupId, props.session!.access_token)
-      .then(() => {
-        setInvitedSubscriptions((prevInvitedGroups) =>
-          prevInvitedGroups.filter((group) => group !== groupToAccept)
-        );
-        refreshGroups();
-      })
-      .catch((error) => {
-        console.error("Error accepting group invitation:", error);
-      });
-  };
 
   useEffect(() => {
     refreshGroups();
@@ -113,15 +89,7 @@ export default function GroupList(props: { session: Session | null }) {
         console.error("Error fetching accepted groups:", error);
       });
 
-    const p2 = API.getInvitedGroups(requestOptions)
-      .then((data) => {
-        setInvitedSubscriptions(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching all groups:", error);
-      });
-
-    Promise.all([p1, p2]).then(() => {
+    p1.then(() => {
       setLoading(false);
     });
   }
@@ -229,36 +197,6 @@ export default function GroupList(props: { session: Session | null }) {
               icon={<DeleteIcon />}
               onClick={() => setGroupToDelete(group)}
             />
-          </Flex>
-        ))}
-        <Text fontWeight="bold">Invited Groups</Text>
-
-        {invitedSubscriptions.map((invitedGroup) => (
-          <Flex key={invitedGroup.subscription.name} justify="space-between">
-            <Link to={`/view-group/${invitedGroup.id}`}>
-              <SubscriptionComponent
-                image={invitedGroup?.subscription?.image}
-                myCost={findSubscriptionCostByEmail(invitedGroup, userEmail)}
-                name={invitedGroup?.subscription?.name}
-                members={invitedGroup?.friends}
-              />
-            </Link>
-            <Flex>
-              <Button
-                colorScheme="green"
-                onClick={() => handleAcceptInvitation(invitedGroup)}
-                variant="ghost"
-              >
-                Accept
-              </Button>
-              <Button
-                variant="ghost"
-                colorScheme="red"
-                onClick={() => handleDeclineInvitation(invitedGroup)}
-              >
-                Decline
-              </Button>
-            </Flex>
           </Flex>
         ))}
       </Stack>
