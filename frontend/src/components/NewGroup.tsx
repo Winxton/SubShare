@@ -3,6 +3,8 @@ import { Session } from "@supabase/supabase-js";
 
 import {
   Button,
+  FormControl,
+  FormLabel,
   Box,
   Square,
   Input,
@@ -184,9 +186,11 @@ function NewGroup(props: NewGroupProps) {
           </InputGroup>
 
           <div>
-            <label htmlFor="start" style={{ display: "block" }}>
-              Billing Date:
-            </label>
+            <FormControl>
+              <FormLabel marginTop="4" fontSize="sm">
+                Billing Date
+              </FormLabel>
+            </FormControl>
             <Input
               type="date"
               id="start"
