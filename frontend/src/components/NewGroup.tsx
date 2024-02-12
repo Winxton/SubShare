@@ -187,7 +187,7 @@ function NewGroup(props: NewGroupProps) {
             <label htmlFor="start" style={{ display: "block" }}>
               Billing Date:
             </label>
-            <input
+            <Input
               type="date"
               id="start"
               name="billing_date"
