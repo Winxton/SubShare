@@ -118,16 +118,14 @@ export async function createMember(
 }
 //add comment
 export async function getMemberGroups(
-  userEmail: string,
-  accepted: boolean | null
+  userEmail: string
 ): Promise<Group[] | null> {
   try {
     // Fetch groups based on the user's email in the members table
     const { data: memberData, error: memberError } = await supabase
       .from("members")
       .select("group_id")
-      .eq("email", userEmail)
-      .is("accepted", accepted);
+      .eq("email", userEmail);
 
     if (memberError) {
       throw new Error(`Error getting groups for user: ${memberError.message}`);

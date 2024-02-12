@@ -100,20 +100,12 @@ app.get("/api/user", async (req, res) => {
 // API For Groups
 
 app.get("/api/groups", async (req, res) => {
-  const { groupName, accepted } = req.query;
+  const { groupName } = req.query;
 
   // Get all groups from the database
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
-
-  let groups;
-  if (accepted) {
-    // Groups that I have accepted.
-    groups = await getMemberGroups(user.email, true);
-  } else {
-    // Groups that I'm invited to.
-    groups = await getMemberGroups(user.email, false);
-  }
+  const groups = await getMemberGroups(user.email);
 
   if (!groups) {
     return res.status(404).json({ message: "Error fetching groups" });
@@ -200,30 +192,6 @@ app.delete("/api/groups/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error deleting group:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.put("/api/accept_invite/:groupId", async (req, res) => {
-  try {
-    // Get the ID of the group to update from the request parameters
-    const groupID = req.params.groupId;
-
-    const accessToken = req.headers.access_token;
-
-    const user = await getUser(accessToken);
-
-    // Update the group status in the database
-
-    const success = await acceptInvitedGroup(user.email, groupID);
-
-    if (success) {
-      res.json({ message: "Group updated successfully" });
-    } else {
-      res.status(404).json({ message: "Group not found or update failed" });
-    }
-  } catch (error) {
-    console.error("Error updating group:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
