@@ -206,7 +206,7 @@ function NewGroup(props: NewGroupProps) {
     );
   }
   // Helper function to format date as "yyyy-MM-dd"
-  function formatDate(date) {
+  function formatDate(date: Date) {
     const isoString = date.toISOString();
 
     const formattedDate = isoString.split("T")[0];
@@ -217,8 +217,7 @@ function NewGroup(props: NewGroupProps) {
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     } else {
-      return (
-        console.error,
+      throw new Error(
         "date is either not an instance or not a valid time value"
       );
     }
