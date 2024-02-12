@@ -183,7 +183,6 @@ function NewGroup(props: NewGroupProps) {
             />
           </InputGroup>
 
-          {/* Billing date input */}
           <div>
             <label htmlFor="start" style={{ display: "block" }}>
               Billing Date:
@@ -218,7 +217,10 @@ function NewGroup(props: NewGroupProps) {
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     } else {
-      return "";
+      return (
+        console.error,
+        "date is either not an instance or not a valid time value"
+      );
     }
   }
   function renderNewGroup() {

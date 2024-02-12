@@ -58,10 +58,14 @@ export async function getGroup(userEmail: string, groupId: string) {
   );
 }
 
-
-export async function createGroup(userId, name, cost, billing_date, createdDate, image) {
-
-
+export async function createGroup(
+  userId,
+  name,
+  cost,
+  billing_date,
+  createdDate,
+  image
+) {
   const resp = await supabase
     .from("groups")
     .insert([
@@ -72,8 +76,6 @@ export async function createGroup(userId, name, cost, billing_date, createdDate,
         billing_date: billing_date,
         created_date: createdDate,
         image: image,
-       
-        
       },
     ])
     .select();
@@ -82,10 +84,8 @@ export async function createGroup(userId, name, cost, billing_date, createdDate,
     console.error("Error creating group:", resp.error);
     return null;
   }
-  
-  const createdGroupId = resp.data[0];
-  
 
+  const createdGroupId = resp.data[0];
 
   return createdGroupId;
 }
@@ -153,7 +153,12 @@ export async function getMemberGroups(
       groups.map(async (group) => {
         const members = await getMembers(group.id);
         return new Group(
-          new Subscription(group.name, group.image, group.cost,group.billing_date),
+          new Subscription(
+            group.name,
+            group.image,
+            group.cost,
+            group.billing_date
+          ),
           members || [],
           group.id
         );
@@ -162,7 +167,6 @@ export async function getMemberGroups(
 
     return groupsWithMembers;
   } catch (error) {
-    
     console.error(error);
     return null;
   }
