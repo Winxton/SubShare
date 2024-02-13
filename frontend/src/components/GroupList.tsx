@@ -38,7 +38,6 @@ import {
 export default function GroupList(props: { session: Session | null }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groups, setGroups] = useState<Group[]>([]);
-  const [invitedSubscriptions, setInvitedSubscriptions] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const userData = useFetchUserData(props.session);
   const userEmail = userData?.user.email as string;
@@ -46,37 +45,6 @@ export default function GroupList(props: { session: Session | null }) {
   const savings = calculateSavings(groups, userEmail);
   // The group to delete, in order to show the confirmation modal
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
-
-  const handleInvitationResponse = (groupToRespond, action) => {
-    // Ensure the action is either "accept" or "decline"
-    if (!["accept", "decline"].includes(action)) {
-      console.error("Invalid action:", action);
-      return;
-    }
-
-    const groupId = groupToRespond.id;
-    if (!groupId) {
-      console.error("Invalid groupId:", groupId);
-      return;
-    }
-
-    const token = props.session!.access_token;
-
-    // Determine which API method to call based on the action
-    const apiMethod =
-      action === "accept" ? API.acceptInvite : API.declineInvite;
-
-    apiMethod(groupId, token)
-      .then(() => {
-        setInvitedSubscriptions((prevInvitedGroups) =>
-          prevInvitedGroups.filter((group) => group !== groupToRespond)
-        );
-        refreshGroups();
-      })
-      .catch((error) => {
-        console.error(`Error ${action}ing group invitation:`, error);
-      });
-  };
 
   useEffect(() => {
     refreshGroups();
@@ -121,15 +89,7 @@ export default function GroupList(props: { session: Session | null }) {
         console.error("Error fetching accepted groups:", error);
       });
 
-    const p2 = API.getInvitedGroups(requestOptions)
-      .then((data) => {
-        setInvitedSubscriptions(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching all groups:", error);
-      });
-
-    Promise.all([p1, p2]).then(() => {
+    p1.then(() => {
       setLoading(false);
     });
   }
@@ -237,38 +197,6 @@ export default function GroupList(props: { session: Session | null }) {
               icon={<DeleteIcon />}
               onClick={() => setGroupToDelete(group)}
             />
-          </Flex>
-        ))}
-        <Text fontWeight="bold">Invited Groups</Text>
-
-        {invitedSubscriptions.map((invitedGroup) => (
-          <Flex key={invitedGroup.subscription.name} justify="space-between">
-            <Link to={`/view-group/${invitedGroup.id}`}>
-              <SubscriptionComponent
-                image={invitedGroup?.subscription?.image}
-                myCost={findSubscriptionCostByEmail(invitedGroup, userEmail)}
-                name={invitedGroup?.subscription?.name}
-                members={invitedGroup?.friends}
-              />
-            </Link>
-            <Flex>
-              <Button
-                colorScheme="green"
-                onClick={() => handleInvitationResponse(invitedGroup, "accept")}
-                variant="ghost"
-              >
-                Accept
-              </Button>
-              <Button
-                variant="ghost"
-                colorScheme="red"
-                onClick={() =>
-                  handleInvitationResponse(invitedGroup, "decline")
-                }
-              >
-                Decline
-              </Button>
-            </Flex>
           </Flex>
         ))}
       </Stack>

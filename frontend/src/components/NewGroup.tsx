@@ -3,6 +3,8 @@ import { Session } from "@supabase/supabase-js";
 
 import {
   Button,
+  FormControl,
+  FormLabel,
   Box,
   Square,
   Input,
@@ -14,6 +16,7 @@ import {
   Flex,
   InputGroup,
   InputLeftElement,
+  InputRightElement,
   Icon,
   Text,
   useToast,
@@ -66,14 +69,15 @@ function NewGroup(props: NewGroupProps) {
 
   const [friends, setFriends] = React.useState<Friend[]>([user]);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
+  const today = new Date();
 
   const subscriptions = [
-    new Subscription("Netflix", netflixImage, 20),
-    new Subscription("HBO", hboImage, 30),
-    new Subscription("Disney", disney, 25),
-    new Subscription("Spotify", spotify, 10),
-    new Subscription("Youtube", youtubeImage, 12),
-    new Subscription("Crunchy", crunchyrollImage, 7),
+    new Subscription("Netflix", netflixImage, 20, today),
+    new Subscription("HBO", hboImage, 30, today),
+    new Subscription("Disney", disney, 25, today),
+    new Subscription("Spotify", spotify, 10, today),
+    new Subscription("Youtube", youtubeImage, 12, today),
+    new Subscription("Crunchy", crunchyrollImage, 7, today),
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
@@ -117,8 +121,9 @@ function NewGroup(props: NewGroupProps) {
     }
 
     return (
-      <Flex mb="4" alignItems={"center"}>
-        <Square size="100px" borderRadius={"md"}>
+      <Flex mb="4" alignItems="flex-start">
+        {/* Square with image upload */}
+        <Square size="100px" borderRadius="md" mr="2">
           <ImageUpload
             onImageUpload={(image) => {
               setSelectedSubscription({
@@ -143,7 +148,10 @@ function NewGroup(props: NewGroupProps) {
             )}
           </ImageUpload>
         </Square>
-        <Flex ml="2" direction={"column"}>
+
+        {/* Subscription details */}
+        <Flex direction="column">
+          {/* Subscription name input */}
           <Input
             variant="flushed"
             value={selectedSubscription?.name}
@@ -153,8 +161,10 @@ function NewGroup(props: NewGroupProps) {
                 name: e.target.value,
               } as Subscription);
             }}
+            mb="2" // Add margin bottom for spacing
           />
 
+          {/* Cost input */}
           <InputGroup>
             <InputLeftElement
               pointerEvents="none"
@@ -171,13 +181,51 @@ function NewGroup(props: NewGroupProps) {
                   cost: parseInt(e.target.value) || 0,
                 } as Subscription);
               }}
+              mr="2" // Add margin right for spacing
             />
           </InputGroup>
+
+          <div>
+            <FormControl>
+              <FormLabel marginTop="4" fontSize="sm">
+                Billing Date
+              </FormLabel>
+            </FormControl>
+            <Input
+              type="date"
+              id="start"
+              name="billing_date"
+              style={{ width: "100%", padding: "0.5rem" }}
+              value={formatDate(selectedSubscription?.billing_date)}
+              onChange={(e) => {
+                setSelectedSubscription({
+                  ...selectedSubscription,
+                  billing_date: new Date(e.target.value + "T00:00:00"),
+                });
+              }}
+            />
+          </div>
         </Flex>
       </Flex>
     );
   }
+  // Helper function to format date as "yyyy-MM-dd"
+  function formatDate(date: Date) {
+    const isoString = date.toISOString();
 
+    const formattedDate = isoString.split("T")[0];
+
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    } else {
+      throw new Error(
+        "date is either not an instance or not a valid time value"
+      );
+    }
+  }
   function renderNewGroup() {
     return (
       <Box>
@@ -217,7 +265,7 @@ function NewGroup(props: NewGroupProps) {
             margin="5px"
             onClick={() => {
               setSelectedSubscription(
-                new Subscription("My Subscription", "", 0)
+                new Subscription("My Subscription", "", 0, today)
               );
             }}
             border={"none"}
@@ -336,7 +384,6 @@ function NewGroup(props: NewGroupProps) {
               }
 
               setIsCreatingGroup(true); // set isCreatingGroup to true
-
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
               setSelectedSubscription(null);

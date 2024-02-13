@@ -105,20 +105,12 @@ app.get("/api/user", async (req, res) => {
 // API For Groups
 
 app.get("/api/groups", async (req, res) => {
-  const { groupName, accepted } = req.query;
+  const { groupName } = req.query;
 
   // Get all groups from the database
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
-
-  let groups;
-  if (accepted) {
-    // Groups that I have accepted.
-    groups = await getMemberGroups(user.email, true);
-  } else {
-    // Groups that I'm invited to.
-    groups = await getMemberGroups(user.email, false);
-  }
+  const groups = await getMemberGroups(user.email);
 
   if (!groups) {
     return res.status(404).json({ message: "Error fetching groups" });
@@ -158,8 +150,10 @@ app.get("/api/groups/:groupId", async (req, res) => {
 // Create a new group
 app.post("/api/groups", async (req, res) => {
   // TODO(tommy): create friends in the database as well.
+
   const { subscription, friends, id } = req.body; //getting subscription and friends from the front end
-  const newGroup = new Group(subscription, friends, id);
+
+  const newGroup = new Group(subscription, friends, id); // id is undefined
 
   const accessToken = req.headers.access_token;
 
@@ -169,6 +163,7 @@ app.post("/api/groups", async (req, res) => {
     user.id,
     subscription.name,
     subscription.cost,
+    subscription.billing_date,
     new Date(),
     subscription.image
   );
@@ -215,88 +210,6 @@ app.delete("/api/groups/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error deleting group:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.put("/api/accept_invite/:groupId", async (req, res) => {
-  try {
-    // Get the ID of the group to update from the request parameters
-    const groupID = req.params.groupId;
-
-    const accessToken = req.headers.access_token;
-
-    const user = await getUser(accessToken);
-
-    // Update the group status in the database when you accept invite
-
-    const success = await acceptInvitedGroup(user.email, groupID);
-
-    if (success) {
-      const groupDetails = await getGroup(user.email, groupID);
-      const groupOwner = groupDetails?.friends.find((friend) => friend.isowner);
-      console.log(groupDetails?.friends);
-      // Send email notification to the group owner
-      try {
-        await sendDecisionEmail(
-          user.email,
-          groupOwner?.email as string,
-          groupDetails?.subscription.name as string,
-          "accepted"
-        );
-        console.log("successful sent accepted email");
-      } catch (error) {
-        console.error("Error senting email for deleting group:", error);
-        res.status(500).json({ message: "Internal server error" });
-      }
-      res.json({ message: "Group updated successfully" });
-    } else {
-      res.status(404).json({ message: "Group not found or update failed" });
-    }
-  } catch (error) {
-    console.error("Error updating group:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-//To do: need to also update the balance for the remaining members in supabase
-
-app.put("/api/decline_invite/:groupId", async (req, res) => {
-  try {
-    // Get the ID of the group to delete from the request parameters
-    const groupID = req.params.groupId;
-
-    const accessToken = req.headers.access_token;
-
-    const user = await getUser(accessToken);
-
-    // delete user in the specific group in the database
-
-    const success = await declineInvitedGroup(user.email, groupID);
-
-    if (success) {
-      const groupDetails = await getGroup(user.email, groupID);
-      const groupOwner = groupDetails?.friends.find((friend) => friend.isowner);
-      // Send email notification to the group owner
-      try {
-        await sendDecisionEmail(
-          user.email,
-          groupOwner?.email as string,
-          groupDetails?.subscription.name as string,
-          "declined"
-        );
-        console.log("successful declined email");
-      } catch (error) {
-        console.error("Error senting email for deleting group:", error);
-        res.status(500).json({ message: "Internal server error" });
-      }
-
-      res.json({ message: "Group updated successfully" });
-    } else {
-      res.status(404).json({ message: "Group not found or update failed" });
-    }
-  } catch (error) {
-    console.error("Error updating group:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
