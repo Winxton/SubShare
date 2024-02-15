@@ -62,9 +62,11 @@ export async function createGroup(
   userId,
   name,
   cost,
-  billing_date,
   createdDate,
-  image
+  image,
+  billing_date,
+  next_billing_date,
+  active
 ) {
   const resp = await supabase
     .from("groups")
@@ -73,9 +75,11 @@ export async function createGroup(
         user_id: userId,
         name: name,
         cost: cost,
-        billing_date: billing_date,
         created_date: createdDate,
         image: image,
+        billing_date: billing_date,
+        next_billing_date: next_billing_date,
+        active: active,
       },
     ])
     .select();
@@ -211,51 +215,21 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
   }
 }
 
-//Function to update the accepted status of a group in the database
-export async function acceptInvitedGroup(email: string, groupID: string) {
+//Function to update the active status of a group in the database
+export async function disbandGroup(groupId: string) {
   try {
-    // Update the 'accepted' field of the member with the specified email and group ID
     const resp = await supabase
-      .from("members")
-      .update({ accepted: true })
-      .eq("email", email)
-      .eq("group_id", groupID);
+      .from("groups")
+      .update({ active: false })
+      .eq("group_id", groupId);
 
     if (resp.error) {
       console.error("Error updating group:");
-
       return false;
     }
-    // Check if the update was successful
-
     return resp;
   } catch (error) {
     console.error("Error updating group:", error);
     return false;
-  }
-}
-
-//Function to update the decline status of a group in the database
-export async function declineInvitedGroup(email: string, groupID: string) {
-  try {
-    // Attempt to delete the member with the specified email and group ID
-    const { data, error } = await supabase
-      .from("members")
-      .delete()
-      .match({ email: email, group_id: groupID });
-
-    // Check if there was an error in the deletion process
-    if (error) {
-      console.error("Error deleting user:", error.message);
-      return false; // Indicate failure
-    }
-
-    // If we reach here, the deletion was successful
-    console.log("User successfully declined invitation.");
-    return true; // Indicate success
-  } catch (error) {
-    // Log any errors that occur during the request or processing
-    console.error("Error updating group:", error);
-    return false; // Indicate failure
   }
 }

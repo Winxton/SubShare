@@ -2,17 +2,13 @@ import {
   getUser,
   createGroup,
   createMember,
-  getMembers,
-  deleteGroup,
-  acceptInvitedGroup,
-  declineInvitedGroup,
+  disbandGroup,
   getGroup,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
 import {
   sendInvitedToGroupEmail,
-  sendDecisionEmail,
-  sendDisbandedToGroupEmail,
+  sendDisbandToGroupEmail,
 } from "./service/emails";
 import { Group, Friend } from "./models/models";
 
@@ -149,8 +145,6 @@ app.get("/api/groups/:groupId", async (req, res) => {
 
 // Create a new group
 app.post("/api/groups", async (req, res) => {
-  // TODO(tommy): create friends in the database as well.
-
   const { subscription, friends, id } = req.body; //getting subscription and friends from the front end
 
   const newGroup = new Group(subscription, friends, id); // id is undefined
@@ -163,9 +157,11 @@ app.post("/api/groups", async (req, res) => {
     user.id,
     subscription.name,
     subscription.cost,
-    subscription.billing_date,
     new Date(),
-    subscription.image
+    subscription.image,
+    subscription.billing_date,
+    subscription.next_billing_date,
+    true
   );
 
   for (const memberData of friends) {
@@ -196,15 +192,34 @@ app.post("/api/groups", async (req, res) => {
   }
 });
 
-app.delete("/api/groups/:id", async (req, res) => {
+app.put("/api/groups/:id", async (req, res) => {
   try {
-    // Get the name of the group to delete from the request parameters
-    const groupID = req.params.id;
-    // Call the deleteGroup function from the database to delete the group
-    const success = await deleteGroup(groupID);
+    // Get the name of the group to disband from the request parameters
+
+    const { subscription, friends, groupId } = req.params;
+    const accessToken = req.headers.access_token;
+    const user = await getUser(accessToken);
+    // Call the disbandGroup function from the database to ghost disband the group
+    const success = await disbandGroup(groupId);
 
     if (success) {
-      res.json({ message: "Group deleted successfully" });
+      res.json({ message: "Group disband successfully" });
+      try {
+        const sendEmailPromises = friends.map((recipient) =>
+          sendDisbandToGroupEmail(
+            user.email,
+            recipient.email,
+            subscription.name
+          )
+        );
+
+        await Promise.all(sendEmailPromises);
+
+        res.status(201).send("Invitation emails sent successfully.");
+      } catch (error) {
+        console.error("Error sending emails:", error);
+        res.status(501).send("Error sending emails.");
+      }
     } else {
       res.status(404).json({ message: "Group not found" });
     }

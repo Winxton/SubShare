@@ -25,7 +25,7 @@ export async function sendInvitedToGroupEmail(
 
 /* TODO: Add subscription cancellation date */
 
-export async function sendDisbandedToGroupEmail(
+export async function sendDisbandToGroupEmail(
   senderName: string,
   recipient: string,
   groupName: string
@@ -36,18 +36,5 @@ export async function sendDisbandedToGroupEmail(
     to: recipient,
     subject: `Subshare ${groupName} group disbandment`,
     html: `${senderName} has decided to disband his ${groupName} group. \n You still have access to the ${groupName} subscription until .`,
-  });
-}
-export async function sendDecisionEmail(
-  senderName: string, // groupDetails?.friends,Users that accepts
-  recipient: string, //Group Owner
-  groupName: string,
-  decision: string
-) {
-  return resend.emails.send({
-    from: "hello@subshare.app",
-    to: recipient,
-    subject: `${senderName} has ${decision} your invitation to ${groupName}`,
-    html: ``,
   });
 }

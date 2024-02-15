@@ -1,5 +1,10 @@
 export class Subscription {
-  constructor(public name: string, public image: string, public cost: number, public billing_date: string) {}
+  constructor(
+    public name: string,
+    public image: string,
+    public cost: number,
+    public billing_date: string
+  ) {}
 }
 export class Group {
   constructor(
