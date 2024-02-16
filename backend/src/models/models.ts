@@ -21,7 +21,7 @@ export class Friend {
     public subscription_cost?: number,
     public isowner?: boolean,
     public group_id?: string,
-    public accepted?: boolean,
+    public active?: boolean,
     public accepted_date?: Date,
     public balance?: number
   ) {}

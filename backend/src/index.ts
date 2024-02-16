@@ -160,8 +160,7 @@ app.post("/api/groups", async (req, res) => {
     new Date(),
     subscription.image,
     subscription.billing_date,
-    subscription.next_billing_date,
-    true
+    subscription.next_billing_date
   );
 
   for (const memberData of friends) {
@@ -169,7 +168,7 @@ app.post("/api/groups", async (req, res) => {
       createdGroup.id, // the return data (id) when you create a group table in supabase
       memberData.email,
       memberData.isowner,
-      memberData.accepted,
+      memberData.active,
       new Date(),
       memberData.balance,
       memberData.subscription_cost
@@ -194,20 +193,43 @@ app.post("/api/groups", async (req, res) => {
 
 app.put("/api/groups/:id", async (req, res) => {
   try {
-    // Get the name of the group to disband from the request parameters
     const groupId = req.params.id;
     const accessToken = req.headers.access_token;
     const user = await getUser(accessToken);
-    // Call the disbandGroup function from the database to ghost disband the group
-    const success = await disbandGroup(groupId);
+    const group = await getGroup(user.email, groupId);
 
-    if (success) {
-      res.json({ message: "Group disband successfully" });
-    } else {
-      res.status(404).json({ message: "Group not found" });
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    const success = await disbandGroup(groupId);
+    if (!success) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    // Attempt to send emails only if disband was successful
+    try {
+      const sendEmailPromises = group.friends.map((recipient) =>
+        sendDisbandToGroupEmail(
+          user.email,
+          recipient.email as string,
+          group.subscription.name
+        )
+      );
+      await Promise.all(sendEmailPromises);
+      // Consolidate success message here, after ensuring emails are sent
+      return res
+        .status(201)
+        .json({ message: "Group disbanded and emails sent successfully." });
+    } catch (error) {
+      console.error("Error sending emails:", error);
+      // Include email error in response but don't attempt to resend a status
+      return res.status(500).json({
+        message: "Group disbanded, but an error occurred sending emails.",
+      });
     }
   } catch (error) {
-    console.error("Error deleting group:", error);
+    console.error("Error processing request:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

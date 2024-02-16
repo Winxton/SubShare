@@ -65,8 +65,7 @@ export async function createGroup(
   createdDate,
   image,
   billing_date,
-  next_billing_date,
-  active
+  next_billing_date
 ) {
   const resp = await supabase
     .from("groups")
@@ -79,7 +78,6 @@ export async function createGroup(
         image: image,
         billing_date: billing_date,
         next_billing_date: next_billing_date,
-        active: active,
       },
     ])
     .select();
@@ -97,7 +95,7 @@ export async function createMember(
   groupId,
   email,
   isowner,
-  accepted,
+  active,
   accepted_date,
   balance,
   subscription_cost
@@ -107,7 +105,7 @@ export async function createMember(
       group_id: groupId,
       email: email,
       isowner: isowner,
-      accepted: accepted,
+      active: active,
       accepted_date: accepted_date,
       balance: balance,
       subscription_cost: subscription_cost,
@@ -219,9 +217,9 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
 export async function disbandGroup(groupId: string): Promise<boolean> {
   try {
     const resp = await supabase
-      .from("groups")
+      .from("members")
       .update({ active: false })
-      .eq("id", groupId);
+      .eq("group_id", groupId);
 
     if (resp.error) {
       console.error("Error updating group:", resp.error);
