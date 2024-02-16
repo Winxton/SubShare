@@ -3,10 +3,13 @@ import { Friend } from "../models/Friend";
 import { Group } from "../models/Group";
 import { Subscription } from "../models/Subscription";
 
-export function disbandGroup(groupId: string) {
+export function disbandGroup(groupId: string, accessToken: string) {
   // Send a DELETE request to your API to delete the group
   return fetch(`${API_URL}/groups/${groupId}`, {
     method: "PUT",
+    headers: {
+      access_token: accessToken,
+    },
   })
     .then((response) => {
       if (!response.ok) {

@@ -195,8 +195,7 @@ app.post("/api/groups", async (req, res) => {
 app.put("/api/groups/:id", async (req, res) => {
   try {
     // Get the name of the group to disband from the request parameters
-
-    const { subscription, friends, groupId } = req.params;
+    const groupId = req.params.id;
     const accessToken = req.headers.access_token;
     const user = await getUser(accessToken);
     // Call the disbandGroup function from the database to ghost disband the group
@@ -204,22 +203,6 @@ app.put("/api/groups/:id", async (req, res) => {
 
     if (success) {
       res.json({ message: "Group disband successfully" });
-      try {
-        const sendEmailPromises = friends.map((recipient) =>
-          sendDisbandToGroupEmail(
-            user.email,
-            recipient.email,
-            subscription.name
-          )
-        );
-
-        await Promise.all(sendEmailPromises);
-
-        res.status(201).send("Invitation emails sent successfully.");
-      } catch (error) {
-        console.error("Error sending emails:", error);
-        res.status(501).send("Error sending emails.");
-      }
     } else {
       res.status(404).json({ message: "Group not found" });
     }

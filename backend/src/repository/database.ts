@@ -216,15 +216,16 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
 }
 
 //Function to update the active status of a group in the database
-export async function disbandGroup(groupId: string) {
+export async function disbandGroup(groupId: string): Promise<boolean> {
   try {
     const resp = await supabase
       .from("groups")
       .update({ active: false })
-      .eq("group_id", groupId);
+      .eq("id", groupId);
 
     if (resp.error) {
-      console.error("Error updating group:");
+      console.error("Error updating group:", resp.error);
+
       return false;
     }
     return resp;

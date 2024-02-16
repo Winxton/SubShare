@@ -64,7 +64,7 @@ export default function GroupList(props: { session: Session | null }) {
       return;
     }
 
-    await API.disbandGroup(groupId);
+    await API.disbandGroup(groupId, props.session!.access_token);
 
     // Remove the deleted group from the state or UI
     // (You might need to adjust this based on your application's state management)
