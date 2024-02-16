@@ -21,7 +21,7 @@ export function disbandGroup(groupId: string, accessToken: string) {
       console.error("Error disbanding group:", error);
     });
 }
-
+// get single group to view
 export function getGroup(groupId: string, accessToken: string) {
   return fetch(`${API_URL}/groups/${groupId}`, {
     headers: {
@@ -48,9 +48,9 @@ export function getGroup(groupId: string, accessToken: string) {
       );
     });
 }
-
-export function getAcceptedGroups(requestOptions: any) {
-  return fetch(`${API_URL}/groups?accepted=true`, requestOptions)
+// get all groups based on active status
+export function getGroups(requestOptions: any, active: boolean) {
+  return fetch(`${API_URL}/groups?active=${active}`, requestOptions)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -73,6 +73,7 @@ export function getAcceptedGroups(requestOptions: any) {
       });
     });
 }
+
 export function createGroup(group: Group, accessToken: string) {
   // Create an object with the data you want to send in the request body
   const data = {

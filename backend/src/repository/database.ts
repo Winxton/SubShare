@@ -120,15 +120,16 @@ export async function createMember(
 }
 //add comment
 export async function getMemberGroups(
-  userEmail: string
+  userEmail: string,
+  active: boolean
 ): Promise<Group[] | null> {
   try {
     // Fetch groups based on the user's email in the members table
     const { data: memberData, error: memberError } = await supabase
       .from("members")
       .select("group_id")
-      .eq("email", userEmail);
-
+      .eq("email", userEmail)
+      .is("active", active);
     if (memberError) {
       throw new Error(`Error getting groups for user: ${memberError.message}`);
     }
@@ -191,7 +192,8 @@ export async function getMembers(GroupId): Promise<Friend[]> {
       member.image,
       member.email,
       member.subscription_cost,
-      member.isowner
+      member.isowner,
+      member.active
     );
   });
 }

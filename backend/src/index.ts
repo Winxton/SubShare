@@ -101,12 +101,16 @@ app.get("/api/user", async (req, res) => {
 // API For Groups
 
 app.get("/api/groups", async (req, res) => {
-  const { groupName } = req.query;
+  const { groupName, active } = req.query;
 
   // Get all groups from the database
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
-  const groups = await getMemberGroups(user.email);
+
+  let groups;
+
+  // Retrieve groups based on the 'active' query parameter
+  groups = await getMemberGroups(user.email, active === "true");
 
   if (!groups) {
     return res.status(404).json({ message: "Error fetching groups" });
@@ -191,6 +195,7 @@ app.post("/api/groups", async (req, res) => {
   }
 });
 
+//disband a group
 app.put("/api/groups/:id", async (req, res) => {
   try {
     const groupId = req.params.id;
