@@ -16,7 +16,7 @@ export function Friend(props: {
   isMe?: boolean;
   onRemove?: (email: string) => void;
   isAmountEditable?: boolean;
-  subscriptionCost?: number;
+  amount?: number;
   handleSubscriptionCostChange?: (email: string, value: number) => void;
 }) {
   const gravatarUrl = `https://www.gravatar.com/avatar/${md5(
@@ -56,7 +56,7 @@ export function Friend(props: {
                 minWidth="150px"
                 type="number"
                 placeholder="Custom Amount"
-                value={props.subscriptionCost || ""}
+                value={props.amount || ""}
                 onChange={(e) => {
                   props.handleSubscriptionCostChange!(
                     props.email,
@@ -74,7 +74,7 @@ export function Friend(props: {
                 p="3"
                 boxShadow="base"
               >
-                <Text>$ {props.subscriptionCost}</Text>
+                <Text>$ {props.amount}</Text>
               </Box>
             </Flex>
           )}
