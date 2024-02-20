@@ -19,6 +19,22 @@ export async function sendInvitedToGroupEmail(
     from: "hello@subshare.app",
     to: recipient,
     subject: `Subshare Invitation to ${groupName}`,
-    html: `${senderName} has invited you to join his group ${groupName}. \nTo accept the invitation, head over to the <a href="${APP_URL}">subshare app</a>.`,
+    html: `${senderName} has invited you to join his ${groupName} group. \nTo accept the invitation, head over to the <a href="${APP_URL}">subshare app</a>.`,
+  });
+}
+
+/* TODO: Add subscription cancellation date */
+
+export async function sendDisbandToGroupEmail(
+  senderName: string,
+  recipient: string,
+  groupName: string
+  //subcriptionCancellationDate: string
+) {
+  return resend.emails.send({
+    from: "hello@subshare.app",
+    to: recipient,
+    subject: `Subshare ${groupName} group disbandment`,
+    html: `${senderName} has decided to disband his ${groupName} group. \n You still have access to the ${groupName} subscription until .`,
   });
 }

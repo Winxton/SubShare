@@ -298,7 +298,7 @@ function NewGroup(props: NewGroupProps) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email, false, 0, false);
+            const newFriend = new Friend(null, null, email, true, 0, false);
             setFriends([...friends, newFriend]);
           }}
         />
@@ -386,7 +386,6 @@ function NewGroup(props: NewGroupProps) {
               setIsCreatingGroup(true); // set isCreatingGroup to true
               // If both conditions are met, proceed to create and send the API request
               const newGroup = new Group(selectedSubscription, friends, null);
-
               setSelectedSubscription(null);
               setFriends([]);
               API.createGroup(newGroup, props.session!.access_token).then(

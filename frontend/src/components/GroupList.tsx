@@ -45,30 +45,31 @@ export default function GroupList(props: { session: Session | null }) {
   const savings = calculateSavings(groups, userEmail);
   // The group to delete, in order to show the confirmation modal
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
+  const [inactiveSubscriptions, setInactiveSubscriptions] = useState<Group[]>(
+    []
+  );
 
   useEffect(() => {
     refreshGroups();
   }, [isOpen]);
 
   async function handleDeleteGroup() {
+    //typescript checks
     if (!groupToDelete) {
       console.error("Invalid groupToDelete:", groupToDelete);
       return;
     }
 
-    // Send a DELETE request to your API to delete the group
     const groupId = groupToDelete.id;
 
     if (!groupId) {
       console.error("Invalid groupId:", groupId);
       return;
     }
+    // Send a PUT request to your API to soft delete the group
+    await API.disbandGroup(groupId, props.session!.access_token);
+    refreshGroups();
 
-    await API.deleteGroup(groupId);
-
-    // Remove the deleted group from the state or UI
-    // (You might need to adjust this based on your application's state management)
-    // For example, if using React state:
     setGroups((prevGroups) =>
       prevGroups.filter((group) => group !== groupToDelete)
     );
@@ -81,15 +82,22 @@ export default function GroupList(props: { session: Session | null }) {
       },
     };
 
-    const p1 = API.getAcceptedGroups(requestOptions)
+    const p1 = API.getGroups(requestOptions, true)
       .then((data) => {
         setGroups(data);
       })
       .catch((error) => {
         console.error("Error fetching accepted groups:", error);
       });
+    const p2 = API.getGroups(requestOptions, false)
+      .then((data) => {
+        setInactiveSubscriptions(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching all groups:", error);
+      });
 
-    p1.then(() => {
+    Promise.all([p1, p2]).then(() => {
       setLoading(false);
     });
   }
@@ -165,7 +173,7 @@ export default function GroupList(props: { session: Session | null }) {
       >
         <Flex align="center" justify="space-between">
           <Box>
-            <Text fontWeight="bold">My Groups</Text>
+            <Text fontWeight="bold">My Active Groups</Text>
           </Box>
           <Box>
             <Button colorScheme="blue" onClick={onOpen}>
@@ -197,6 +205,19 @@ export default function GroupList(props: { session: Session | null }) {
               icon={<DeleteIcon />}
               onClick={() => setGroupToDelete(group)}
             />
+          </Flex>
+        ))}
+        <Text fontWeight="bold">Soon To Be Disbanded</Text>
+        {inactiveSubscriptions.map((invitedGroup) => (
+          <Flex key={invitedGroup.subscription.name} justify="space-between">
+            <Box opacity={0.7}>
+              <SubscriptionComponent
+                image={invitedGroup?.subscription?.image}
+                myCost={invitedGroup?.subscription?.cost.toString()}
+                name={invitedGroup?.subscription?.name}
+                members={invitedGroup?.friends}
+              />
+            </Box>
           </Flex>
         ))}
       </Stack>
