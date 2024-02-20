@@ -32,6 +32,9 @@ import { Console } from "console";
 
 export default function ViewGroup(props: { session: Session }) {
   const { groupId } = useParams();
+  if (!groupId) {
+    throw new Error("Must have groupId");
+  }
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -57,7 +60,7 @@ export default function ViewGroup(props: { session: Session }) {
   );
 
   const handlePaymentSubmit = () => {
-    API.settleUp(selectGroup.id, paymentAmount, props.session.user?.email);
+    API.settleUp(groupId, paymentAmount, props.session.user?.email);
     onClose(); // Close the modal after submission
   };
 
@@ -164,7 +167,7 @@ export default function ViewGroup(props: { session: Session }) {
             <Input
               placeholder="Enter payment amount"
               value={paymentAmount}
-              onChange={(e) => setPaymentAmount(e.target.value)}
+              onChange={(e) => setPaymentAmount(parseInt(e.target.value))}
             />
           </ModalBody>
 

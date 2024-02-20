@@ -99,12 +99,11 @@ export function createGroup(group: Group, accessToken: string) {
       console.error("There was a problem with the fetch operation:", error);
     });
 }
-export function settleUp(
-  friendId: string,
-  amount: number,
-  accessToken: string
-) {
-  const data = amount;
+export function settleUp(groupId: string, amount: number, accessToken: string) {
+  const data = {
+    amount: amount,
+    groupId: groupId,
+  };
   const requestOptions = {
     method: "PUT", // HTTP request method
     headers: {
@@ -113,7 +112,7 @@ export function settleUp(
     },
     body: JSON.stringify(data), // Convert the data object to a JSON string
   };
-  return fetch(`${API_URL}/friends/${friendId}`, requestOptions)
+  return fetch(`${API_URL}/settingUp`, requestOptions)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");

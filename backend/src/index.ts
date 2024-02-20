@@ -99,12 +99,13 @@ app.get("/api/user", async (req, res) => {
 });
 
 // To take an amount and update the balance in supabase
-app.put("/api/friends/:id", async (req, res) => {
+app.put("/api/settle_up", async (req, res) => {
   try {
-    const friendId = req.params.id;
-    const amount = req.body;
-
-    const success = await updateBalance(friendId, amount);
+    const { amount, groupId } = req.body;
+    //to do
+    //fetch balance
+    //subtract balance with amount
+    const success = await updateBalance(email, groupId, amount);
     if (!success) {
       return res.status(404).json({ message: "Group not found" });
     }
