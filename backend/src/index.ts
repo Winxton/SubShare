@@ -107,10 +107,8 @@ app.get("/api/groups", async (req, res) => {
   const accessToken = req.headers.access_token;
   const user = await getUser(accessToken);
 
-  let groups;
-
   // Retrieve groups based on the 'active' query parameter
-  groups = await getMemberGroups(user.email, active === "true");
+  const groups = await getMemberGroups(user.email, active === "true");
 
   if (!groups) {
     return res.status(404).json({ message: "Error fetching groups" });
