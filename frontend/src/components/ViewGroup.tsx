@@ -36,14 +36,12 @@ export default function ViewGroup(props: { session: Session }) {
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [paymentAmount, setPaymentAmount] = useState("");
-  const userData = useFetchUserData(props.session);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (groupId) {
           const group = await API.getGroup(groupId, props.session.access_token);
-          console.log(group);
           setSelectGroup(group);
         }
       } catch (error) {
@@ -59,7 +57,7 @@ export default function ViewGroup(props: { session: Session }) {
   );
 
   const handlePaymentSubmit = () => {
-    console.log(`Payment of ${paymentAmount} submitted`); // Implement payment logic here
+    API.settleUp(selectGroup.id, paymentAmount, props.session.user?.email);
     onClose(); // Close the modal after submission
   };
 

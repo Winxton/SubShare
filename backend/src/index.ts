@@ -6,6 +6,7 @@ import {
   deleteGroup,
   acceptInvitedGroup,
   getGroup,
+  updateBalance,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
 import { sendInvitedToGroupEmail } from "./service/emails";
@@ -93,6 +94,22 @@ app.get("/api/user", async (req, res) => {
     }
   } catch (error) {
     console.error("Error getting user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// To take an amount and update the balance in supabase
+app.put("/api/friends/:id", async (req, res) => {
+  try {
+    const friendId = req.params.id;
+    const amount = req.body;
+
+    const success = await updateBalance(friendId, amount);
+    if (!success) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+  } catch (error) {
+    console.error("Error processing request:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

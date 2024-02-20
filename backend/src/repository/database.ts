@@ -236,5 +236,27 @@ export async function acceptInvitedGroup(email: string, groupID: string) {
     return false;
   }
 }
+//Function to update the balance of a friend/member in the database
+export async function updateBalance(
+  email: string,
+  groupID: string,
+  amount: number
+): Promise<boolean> {
+  try {
+    const resp = await supabase
+      .from("members")
+      .update({ balance: amount })
+      .eq("email", email)
+      .eq("group_id", groupID);
 
-//Function to update the decline status of a group in the database
+    if (resp.error) {
+      console.error("Error updating group:", resp.error);
+
+      return false;
+    }
+    return resp;
+  } catch (error) {
+    console.error("Error updating group:", error);
+    return false;
+  }
+}
