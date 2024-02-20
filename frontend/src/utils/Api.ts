@@ -41,7 +41,8 @@ export function getGroup(groupId: string, accessToken: string) {
           data.subscription.name,
           data.subscription.image,
           data.subscription.cost,
-          data.subscription.billing_date
+          data.subscription.billing_date,
+          data.subscription.next_billing_date
         ),
         data.friends,
         data.id
@@ -65,7 +66,8 @@ export function getGroups(requestOptions: any, active: boolean) {
             groupData.subscription.name,
             groupData.subscription.image,
             groupData.subscription.cost,
-            groupData.subscription.billing_date
+            groupData.subscription.billing_date,
+            groupData.subscription.next_billing_date
           ),
           groupData.friends,
           groupData.id

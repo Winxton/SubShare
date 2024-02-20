@@ -7,6 +7,7 @@ export class Subscription {
     public name: string,
     public image: string,
     public cost: number,
-    public billing_date: Date
+    public billing_date: Date,
+    public next_billing_date: Date
   ) {}
 }
