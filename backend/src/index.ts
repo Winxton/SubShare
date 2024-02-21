@@ -4,7 +4,7 @@ import {
   createMember,
   getMembers,
   deleteGroup,
-  acceptInvitedGroup,
+  //acceptInvitedGroup,
   getGroup,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
@@ -14,10 +14,11 @@ import { Group, Friend } from "./models/models";
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const bree = require("./backgroundWorker");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-
+bree.start();
 app.use(bodyParser.json());
 
 // TODO seperate this into multiple files and put in api folder
@@ -159,6 +160,7 @@ app.post("/api/groups", async (req, res) => {
     subscription.name,
     subscription.cost,
     subscription.billing_date,
+    subscription.next_billing_date,
     new Date(),
     subscription.image
   );
@@ -168,8 +170,8 @@ app.post("/api/groups", async (req, res) => {
       createdGroup.id, // the return data (id) when you create a group table in supabase
       memberData.email,
       memberData.isowner,
-      memberData.accepted,
-      new Date(),
+      //memberData.accepted,
+      //new Date(),
       memberData.balance,
       memberData.subscription_cost
     );

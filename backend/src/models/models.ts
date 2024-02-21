@@ -1,5 +1,11 @@
 export class Subscription {
-  constructor(public name: string, public image: string, public cost: number, public billing_date: string) {}
+  constructor(
+    public name: string,
+    public image: string,
+    public cost: number,
+    public billing_date: string,
+    public next_billing_date: string
+  ) {}
 }
 export class Group {
   constructor(
@@ -16,8 +22,8 @@ export class Friend {
     public subscription_cost?: number,
     public group_id?: string,
     public isowner?: boolean,
-    public accepted?: boolean,
-    public accepted_date?: Date,
-    public balance?: number,
+    //public accepted?: boolean,
+    //public accepted_date?: Date,
+    public balance?: number
   ) {}
 }

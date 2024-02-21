@@ -51,7 +51,8 @@ export async function getGroup(userEmail: string, groupId: string) {
       group.name,
       group.image,
       group.cost,
-      group.billing_date // Include billing_date when creating Subscription
+      group.billing_date, // Include billing_date when creating Subscription
+      group.next_billing_date
     ),
     members || [],
     group.id
@@ -63,6 +64,7 @@ export async function createGroup(
   name,
   cost,
   billing_date,
+  next_billing_date,
   createdDate,
   image
 ) {
@@ -74,6 +76,7 @@ export async function createGroup(
         name: name,
         cost: cost,
         billing_date: billing_date,
+        next_billing_date: next_billing_date,
         created_date: createdDate,
         image: image,
       },
@@ -93,8 +96,8 @@ export async function createMember(
   groupId,
   email,
   isowner,
-  accepted,
-  accepted_date,
+  //accepted,
+  //accepted_date,
   balance,
   subscription_cost
 ) {
@@ -103,8 +106,8 @@ export async function createMember(
       group_id: groupId,
       email: email,
       isowner: isowner,
-      accepted: accepted,
-      accepted_date: accepted_date,
+      //accepted: accepted,
+      //accepted_date: accepted_date,
       balance: balance,
       subscription_cost: subscription_cost,
     },
@@ -155,7 +158,8 @@ export async function getMemberGroups(
             group.name,
             group.image,
             group.cost,
-            group.billing_date
+            group.billing_date,
+            group.next_billing_date
           ),
           members || [],
           group.id
@@ -211,7 +215,7 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
 }
 
 //Function to update the accepted status of a group in the database
-export async function acceptInvitedGroup(email: string, groupID: string) {
+/*export async function acceptInvitedGroup(email: string, groupID: string) {
   try {
     // Update the 'accepted' field of the member with the specified email and group ID
     const resp = await supabase
@@ -233,5 +237,5 @@ export async function acceptInvitedGroup(email: string, groupID: string) {
     return false;
   }
 }
-
+*/
 //Function to update the decline status of a group in the database
