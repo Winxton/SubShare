@@ -51,7 +51,8 @@ export async function getGroup(userEmail: string, groupId: string) {
       group.name,
       group.image,
       group.cost,
-      group.billing_date // Include billing_date when creating Subscription
+      group.billing_date, // Include billing_date when creating Subscription
+      group.next_billing_date
     ),
     members || [],
     group.id
@@ -158,7 +159,8 @@ export async function getMemberGroups(
             group.name,
             group.image,
             group.cost,
-            group.billing_date
+            group.billing_date,
+            group.next_billing_date
           ),
           members || [],
           group.id
