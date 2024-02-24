@@ -305,7 +305,7 @@ function NewGroup(props: NewGroupProps) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email, true, 0, false);
+            const newFriend = new Friend(null, null, email, false, 0, false);
             setFriends([...friends, newFriend]);
           }}
         />
