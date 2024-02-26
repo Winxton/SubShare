@@ -153,7 +153,9 @@ export default function GroupList(props: { session: Session | null }) {
             <Text as="span" fontWeight="bold">
               ${totalSubscriptionCost.toFixed(2)}
             </Text>
-            /month
+            <Text as="span" fontSize="xs">
+              /month
+            </Text>
           </Text>
 
           <Text>

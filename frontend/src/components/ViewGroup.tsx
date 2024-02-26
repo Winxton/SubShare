@@ -103,15 +103,19 @@ export default function ViewGroup(props: { session: Session }) {
             Total cost of the group is $
             <Text as="span" fontWeight="bold" color="black">
               {totalCost.toFixed(2)}
-            </Text>{" "}
-            per month
+            </Text>
+            <Text as="span" fontSize="xs">
+              /month
+            </Text>
           </Text>
           <Text textAlign="center">
             You are saving $
             <Text as="span" fontWeight="bold" color="green">
               {savedAmount}
-            </Text>{" "}
-            per month
+            </Text>
+            <Text as="span" fontSize="xs">
+              /month
+            </Text>
           </Text>
         </Box>
 
