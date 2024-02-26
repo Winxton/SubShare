@@ -1,14 +1,6 @@
-import * as dotenv from "dotenv";
-const path = require("path");
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
-
 import { Friend, Group, Subscription } from "../models/models";
-const { createClient } = require("@supabase/supabase-js");
 
-const supabase = createClient(
-  process.env.REACT_APP_SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
-);
+const supabase = require("./supabase.ts");
 
 // Get User by Token
 
@@ -62,9 +54,10 @@ export async function createGroup(
   userId,
   name,
   cost,
-  billing_date,
   createdDate,
-  image
+  image,
+  billing_date,
+  next_billing_date
 ) {
   const resp = await supabase
     .from("groups")
@@ -73,9 +66,10 @@ export async function createGroup(
         user_id: userId,
         name: name,
         cost: cost,
-        billing_date: billing_date,
         created_date: createdDate,
         image: image,
+        billing_date: billing_date,
+        next_billing_date: next_billing_date,
       },
     ])
     .select();
@@ -93,7 +87,7 @@ export async function createMember(
   groupId,
   email,
   isowner,
-  accepted,
+  active,
   accepted_date,
   balance,
   subscription_cost
@@ -103,7 +97,7 @@ export async function createMember(
       group_id: groupId,
       email: email,
       isowner: isowner,
-      accepted: accepted,
+      active: active,
       accepted_date: accepted_date,
       balance: balance,
       subscription_cost: subscription_cost,
@@ -118,15 +112,16 @@ export async function createMember(
 }
 //add comment
 export async function getMemberGroups(
-  userEmail: string
+  userEmail: string,
+  active: boolean
 ): Promise<Group[] | null> {
   try {
     // Fetch groups based on the user's email in the members table
     const { data: memberData, error: memberError } = await supabase
       .from("members")
       .select("group_id")
-      .eq("email", userEmail);
-
+      .eq("email", userEmail)
+      .is("active", active);
     if (memberError) {
       throw new Error(`Error getting groups for user: ${memberError.message}`);
     }
@@ -191,7 +186,8 @@ export async function getMembers(GroupId): Promise<Friend[]> {
       member.subscription_cost,
       member.balance,
       member.group_id,
-      member.isowner
+      member.isowner,
+      member.active
     );
   });
 }
@@ -213,23 +209,19 @@ export async function deleteGroup(groupId: string): Promise<boolean> {
   }
 }
 
-//Function to update the accepted status of a group in the database
-export async function acceptInvitedGroup(email: string, groupID: string) {
+//Function to update the active status of a group in the database
+export async function disbandGroup(groupId: string): Promise<boolean> {
   try {
-    // Update the 'accepted' field of the member with the specified email and group ID
     const resp = await supabase
       .from("members")
-      .update({ accepted: true })
-      .eq("email", email)
-      .eq("group_id", groupID);
+      .update({ active: false })
+      .eq("group_id", groupId);
 
     if (resp.error) {
-      console.error("Error updating group:");
+      console.error("Error updating group:", resp.error);
 
       return false;
     }
-    // Check if the update was successful
-
     return resp;
   } catch (error) {
     console.error("Error updating group:", error);

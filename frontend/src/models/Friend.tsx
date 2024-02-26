@@ -3,11 +3,10 @@ export class Friend {
     public name: string | null,
     public image: string | null,
     public email: string,
-    public accepted: boolean | null,
+    public active: boolean | null,
     public subscription_cost: number,
     public isowner: boolean,
     public group_id?: string,
-    public accepted_date?: Date,
     public balance?: number
   ) {}
 }

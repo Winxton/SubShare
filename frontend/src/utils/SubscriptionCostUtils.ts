@@ -11,7 +11,7 @@ export const getSubscriptionCost = (groups, userEmail) => {
     });
   });
 
-  return `$${totalCost.toFixed(2)}`;
+  return totalCost;
 };
 
 export function updateSubscriptionCost(
