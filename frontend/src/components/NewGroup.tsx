@@ -72,12 +72,12 @@ function NewGroup(props: NewGroupProps) {
   const today = new Date();
 
   const subscriptions = [
-    new Subscription("Netflix", netflixImage, 20, today),
-    new Subscription("HBO", hboImage, 30, today),
-    new Subscription("Disney", disney, 25, today),
-    new Subscription("Spotify", spotify, 10, today),
-    new Subscription("Youtube", youtubeImage, 12, today),
-    new Subscription("Crunchy", crunchyrollImage, 7, today),
+    new Subscription("Netflix Premium", netflixImage, 22.99, today),
+    new Subscription("HBO", hboImage, 15.99, today),
+    new Subscription("Disney", disney, 13.99, today),
+    new Subscription("Spotify Family", spotify, 16.99, today),
+    new Subscription("Youtube Family", youtubeImage, 22.99, today),
+    new Subscription("Crunchyroll", crunchyrollImage, 14.99, today),
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
