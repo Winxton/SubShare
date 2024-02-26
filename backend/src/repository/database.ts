@@ -236,27 +236,43 @@ export async function acceptInvitedGroup(email: string, groupID: string) {
     return false;
   }
 }
-//Function to update the balance of a friend/member in the database
+//Function to update the balance of a friend/member in the database by subtracting the amount
 export async function updateBalance(
   email: string,
   groupID: string,
-  amount: number
+  subtractAmount: number
 ): Promise<boolean> {
   try {
-    const resp = await supabase
+    // First, fetch the current balance of the member
+    const { data: members, error: fetchError } = await supabase
       .from("members")
-      .update({ balance: amount })
+      .select("balance")
+      .eq("email", email)
+      .eq("group_id", groupID)
+      .single(); // Assuming each email+groupID combo is unique
+
+    if (fetchError || !members) {
+      console.error("Error fetching member balance:", fetchError);
+      return false;
+    }
+
+    // Calculate the new balance
+    const newBalance = members.balance - subtractAmount;
+
+    // Then, update the member's balance with the new value
+    const { error: updateError } = await supabase
+      .from("members")
+      .update({ balance: newBalance })
       .eq("email", email)
       .eq("group_id", groupID);
 
-    if (resp.error) {
-      console.error("Error updating group:", resp.error);
-
+    if (updateError) {
+      console.error("Error updating balance:", updateError);
       return false;
     }
-    return resp;
+    return true;
   } catch (error) {
-    console.error("Error updating group:", error);
+    console.error("Error in updateBalance function:", error);
     return false;
   }
 }

@@ -38,7 +38,7 @@ export default function ViewGroup(props: { session: Session }) {
   const navigate = useNavigate();
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,8 +60,13 @@ export default function ViewGroup(props: { session: Session }) {
   );
 
   const handlePaymentSubmit = () => {
-    API.settleUp(groupId, paymentAmount, props.session.user?.email);
-    onClose(); // Close the modal after submission
+    const email = props.session.user?.email;
+    if (email !== undefined) {
+      API.settleUp(groupId, paymentAmount, email, props.session.access_token);
+    } else {
+      console.error("Email is undefined");
+    }
+    onClose();
   };
 
   if (selectGroup === null) {

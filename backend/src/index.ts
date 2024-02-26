@@ -101,14 +101,13 @@ app.get("/api/user", async (req, res) => {
 // To take an amount and update the balance in supabase
 app.put("/api/settle_up", async (req, res) => {
   try {
-    const { amount, groupId } = req.body;
-    //to do
-    //fetch balance
-    //subtract balance with amount
+    const { amount, groupId, email } = req.body;
+
     const success = await updateBalance(email, groupId, amount);
     if (!success) {
       return res.status(404).json({ message: "Group not found" });
     }
+    res.json({ message: "Balance updated successfully" });
   } catch (error) {
     console.error("Error processing request:", error);
     res.status(500).json({ message: "Internal server error" });
