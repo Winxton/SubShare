@@ -1,12 +1,17 @@
 const Bree = require("bree");
+const path = require("path");
+const { updateMemberBalancesOnBillingDate } = require("./repository/database");
 
 const bree = new Bree({
-  root: false,
+  root: path.join(__dirname, ".."), // Assuming the service directory is one level above the repository directory
   jobs: [
     {
       name: "updateMonthlyBalance",
-      path: `./src/jobs/updateMonthlyBalance.ts`,
-      cron: "0 8 * * *", // Run at 8 AM every day
+      path: "./src/repository/database.ts",
+      cron: "*/5 * * * *", // Run every 5 sec
+      func: () => {
+        updateMemberBalancesOnBillingDate();
+      },
     },
   ],
 });
