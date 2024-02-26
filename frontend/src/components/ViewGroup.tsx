@@ -168,13 +168,15 @@ export default function ViewGroup(props: { session: Session }) {
               /month
             </Text>
           </Text>
-          <Text textAlign="center">
-            You owe the Host $
-            <Text as="span" fontWeight="bold" color="red">
-              {currentUser?.balance}
-            </Text>{" "}
-            Total
-          </Text>
+          {!isOwner && (
+            <Text textAlign="center">
+              You owe the Host $
+              <Text as="span" fontWeight="bold" color="red">
+                {currentUser?.balance}
+              </Text>{" "}
+              Total
+            </Text>
+          )}
         </Box>
 
         <VStack spacing={3} divider={<Divider borderColor="gray.200" />}>
@@ -193,9 +195,7 @@ export default function ViewGroup(props: { session: Session }) {
         </VStack>
       </Box>
       <Box display="flex" justifyContent="center" mt="4">
-        {isOwner ? (
-          <Button colorScheme="blue">Host</Button>
-        ) : (
+        {!isOwner && (
           <Button colorScheme="green" onClick={onOpen}>
             Settle
           </Button>
