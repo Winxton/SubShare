@@ -70,7 +70,7 @@ export function Friend(props: {
                 minWidth="150px"
                 type="number"
                 placeholder="Custom Amount"
-                value={props.subscriptionCost || ""}
+                value={props.subscriptionCost?.toFixed(2) || ""}
                 onChange={(e) => {
                   props.handleSubscriptionCostChange!(
                     props.email,
@@ -81,14 +81,10 @@ export function Friend(props: {
             </Flex>
           ) : (
             <Flex justifyContent="flex-end">
-              <Box
-                borderWidth="1px"
-                borderRadius="lg"
-                overflow="hidden"
-                p="3"
-                boxShadow="base"
-              >
-                <Text>$ {props.subscriptionCost}</Text>
+              <Box borderWidth="1px" borderRadius="lg" p="2" bg="gray.100">
+                <Text color="gray.700">
+                  $ {props.subscriptionCost?.toFixed(2)}
+                </Text>
               </Box>
             </Flex>
           )}
