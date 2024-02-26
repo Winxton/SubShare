@@ -7,6 +7,7 @@ import {
   acceptInvitedGroup,
   getGroup,
   updateBalance,
+  fetchBalance,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
 import { sendInvitedToGroupEmail } from "./service/emails";
@@ -101,9 +102,17 @@ app.get("/api/user", async (req, res) => {
 // To take an amount and update the balance in supabase
 app.put("/api/settle_up", async (req, res) => {
   try {
-    const { amount, groupId, email } = req.body;
-
-    const success = await updateBalance(email, groupId, amount);
+    const { payment, groupId, email } = req.body;
+    const balance = await fetchBalance(email, groupId);
+    if (balance === null) {
+      console.error("Could not fetch balance");
+      return false;
+    }
+    const newBalance = balance - payment;
+    if (newBalance < 0) {
+      return res.status(400).json({ message: "You are making a overpayment" });
+    }
+    const success = await updateBalance(email, groupId, newBalance);
     if (!success) {
       return res.status(404).json({ message: "Group not found" });
     }

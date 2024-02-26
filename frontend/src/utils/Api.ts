@@ -101,31 +101,35 @@ export function createGroup(group: Group, accessToken: string) {
 }
 export function settleUp(
   groupId: string,
-  amount: number,
+  payment: number,
   email: string,
   accessToken: string
 ) {
   const data = {
-    amount: amount,
-    groupId: groupId,
-    email: email,
+    payment,
+    groupId,
+    email,
   };
   const requestOptions = {
-    method: "PUT", // HTTP request method
+    method: "PUT",
     headers: {
-      "Content-Type": "application/json", // Set the content type to JSON
-      access_token: accessToken,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`, // Assuming the token should be in the Authorization header
     },
-    body: JSON.stringify(data), // Convert the data object to a JSON string
+    body: JSON.stringify(data),
   };
   return fetch(`${API_URL}/settle_up`, requestOptions)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+    .then((response) =>
+      response.json().then((body) => ({ status: response.status, body }))
+    )
+    .then(({ status, body }) => {
+      if (status >= 400) {
+        throw new Error(body.message || "Network response was not ok");
       }
-      return response.json(); // Parse the response body as JSON
+      return body; // Success case
     })
     .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error);
+      // Log the error or handle it as needed
+      throw error; // Re-throw the error to be caught by the caller
     });
 }

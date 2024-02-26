@@ -236,43 +236,53 @@ export async function acceptInvitedGroup(email: string, groupID: string) {
     return false;
   }
 }
-//Function to update the balance of a friend/member in the database by subtracting the amount
+// Function to update the balance of a friend/member in the database
 export async function updateBalance(
   email: string,
   groupID: string,
-  subtractAmount: number
+  amount: number
 ): Promise<boolean> {
   try {
-    // First, fetch the current balance of the member
-    const { data: members, error: fetchError } = await supabase
+    // Update the member's balance with the new value
+    const { error } = await supabase
+      .from("members")
+      .update({ balance: amount })
+      .eq("email", email)
+      .eq("group_id", groupID);
+
+    if (error) {
+      console.error("Error updating balance:", error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in updateMemberBalance function:", error);
+    return false;
+  }
+}
+
+// Function to fetch the current balance of a friend/member from the database
+export async function fetchBalance(
+  email: string,
+  groupID: string
+): Promise<number | null> {
+  try {
+    const { data, error } = await supabase
       .from("members")
       .select("balance")
       .eq("email", email)
       .eq("group_id", groupID)
       .single(); // Assuming each email+groupID combo is unique
 
-    if (fetchError || !members) {
-      console.error("Error fetching member balance:", fetchError);
-      return false;
+    if (error || !data) {
+      console.error("Error fetching member balance:", error);
+      return null;
     }
 
-    // Calculate the new balance
-    const newBalance = members.balance - subtractAmount;
-
-    // Then, update the member's balance with the new value
-    const { error: updateError } = await supabase
-      .from("members")
-      .update({ balance: newBalance })
-      .eq("email", email)
-      .eq("group_id", groupID);
-
-    if (updateError) {
-      console.error("Error updating balance:", updateError);
-      return false;
-    }
-    return true;
+    return data.balance;
   } catch (error) {
-    console.error("Error in updateBalance function:", error);
-    return false;
+    console.error("Error in fetchCurrentBalance function:", error);
+    return null;
   }
 }

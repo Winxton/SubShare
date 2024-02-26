@@ -39,6 +39,7 @@ export default function ViewGroup(props: { session: Session }) {
   const [selectGroup, setSelectGroup] = useState<Group | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,15 +59,33 @@ export default function ViewGroup(props: { session: Session }) {
   const isOwner = selectGroup?.friends.some(
     (friend) => friend.isowner && friend.email === props.session.user?.email
   );
+  const host = selectGroup?.friends.find((friend) => friend.isowner);
 
   const handlePaymentSubmit = () => {
     const email = props.session.user?.email;
-    if (email !== undefined) {
-      API.settleUp(groupId, paymentAmount, email, props.session.access_token);
+    setErrorMessage("");
+    if (email && selectGroup) {
+      API.settleUp(groupId, paymentAmount, email, props.session.access_token)
+        .then(() => {
+          console.log("Payment successful");
+          onClose();
+          // Update the local state to reflect the payment
+          const updatedFriends = selectGroup.friends.map((member) => {
+            if (member.email === email && member.balance) {
+              return { ...member, balance: member.balance - paymentAmount };
+            }
+            return member;
+          });
+          setSelectGroup({ ...selectGroup, friends: updatedFriends });
+        })
+        .catch((error) => {
+          console.error("Payment error:", error);
+          setErrorMessage(error.message);
+        });
     } else {
       console.error("Email is undefined");
+      setErrorMessage("User email is undefined.");
     }
-    onClose();
   };
 
   if (selectGroup === null) {
@@ -169,11 +188,27 @@ export default function ViewGroup(props: { session: Session }) {
           <ModalHeader>Settle Payment</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {selectGroup.friends.map((member) => {
+              if (member.email === props.session.user?.email) {
+                // This is the current user, you can access their balance here
+                return (
+                  <Text>
+                    {`You owe $${member.balance} to ${host?.email} for ${selectGroup.subscription.name}`}
+                  </Text>
+                );
+              }
+            })}
+
             <Input
               placeholder="Enter payment amount"
-              value={paymentAmount}
+              value={paymentAmount || ""}
               onChange={(e) => setPaymentAmount(parseInt(e.target.value))}
             />
+            {errorMessage && (
+              <Text color="red" mt="2">
+                {errorMessage}
+              </Text>
+            )}
           </ModalBody>
 
           <ModalFooter>
