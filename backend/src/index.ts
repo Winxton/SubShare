@@ -4,6 +4,8 @@ import {
   createMember,
   disbandGroup,
   getGroup,
+  updateBalance,
+  fetchBalance,
 } from "./repository/database";
 import { getMemberGroups } from "./repository/database";
 import {
@@ -95,6 +97,30 @@ app.get("/api/user", async (req, res) => {
     }
   } catch (error) {
     console.error("Error getting user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// To take an amount and update the balance in supabase
+app.put("/api/settle_up", async (req, res) => {
+  try {
+    const { payment, groupId, email } = req.body;
+    const balance = await fetchBalance(email, groupId);
+    if (balance === null) {
+      console.error("Could not fetch balance");
+      return false;
+    }
+    const newBalance = balance - payment;
+    if (newBalance < 0) {
+      return res.status(400).json({ message: "You are making a overpayment" });
+    }
+    const success = await updateBalance(email, groupId, newBalance);
+    if (!success) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+    res.json({ message: "Balance updated successfully" });
+  } catch (error) {
+    console.error("Error processing request:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

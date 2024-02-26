@@ -112,3 +112,37 @@ export function createGroup(group: Group, accessToken: string) {
       console.error("There was a problem with the fetch operation:", error);
     });
 }
+export function settleUp(
+  groupId: string,
+  payment: number,
+  email: string,
+  accessToken: string
+) {
+  const data = {
+    payment,
+    groupId,
+    email,
+  };
+  const requestOptions = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`, // Assuming the token should be in the Authorization header
+    },
+    body: JSON.stringify(data),
+  };
+  return fetch(`${API_URL}/settle_up`, requestOptions)
+    .then((response) =>
+      response.json().then((body) => ({ status: response.status, body }))
+    )
+    .then(({ status, body }) => {
+      if (status >= 400) {
+        throw new Error(body.message || "Network response was not ok");
+      }
+      return body; // Success case
+    })
+    .catch((error) => {
+      // Log the error or handle it as needed
+      throw error; // Re-throw the error to be caught by the caller
+    });
+}

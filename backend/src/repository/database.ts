@@ -184,6 +184,8 @@ export async function getMembers(GroupId): Promise<Friend[]> {
       member.image,
       member.email,
       member.subscription_cost,
+      member.balance,
+      member.group_id,
       member.isowner,
       member.active
     );
@@ -224,5 +226,55 @@ export async function disbandGroup(groupId: string): Promise<boolean> {
   } catch (error) {
     console.error("Error updating group:", error);
     return false;
+  }
+}
+// Function to update the balance of a friend/member in the database
+export async function updateBalance(
+  email: string,
+  groupID: string,
+  amount: number
+): Promise<boolean> {
+  try {
+    // Update the member's balance with the new value
+    const { error } = await supabase
+      .from("members")
+      .update({ balance: amount })
+      .eq("email", email)
+      .eq("group_id", groupID);
+
+    if (error) {
+      console.error("Error updating balance:", error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in updateMemberBalance function:", error);
+    return false;
+  }
+}
+
+// Function to fetch the current balance of a friend/member from the database
+export async function fetchBalance(
+  email: string,
+  groupID: string
+): Promise<number | null> {
+  try {
+    const { data, error } = await supabase
+      .from("members")
+      .select("balance")
+      .eq("email", email)
+      .eq("group_id", groupID)
+      .single(); // Assuming each email+groupID combo is unique
+
+    if (error || !data) {
+      console.error("Error fetching member balance:", error);
+      return null;
+    }
+
+    return data.balance;
+  } catch (error) {
+    console.error("Error in fetchCurrentBalance function:", error);
+    return null;
   }
 }
