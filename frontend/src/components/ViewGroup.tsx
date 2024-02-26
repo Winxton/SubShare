@@ -26,9 +26,7 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Friend } from "./Friend";
 import { Group } from "../models/Group";
 import { Session } from "@supabase/supabase-js";
-import useFetchUserData from "../utils/useFetchUserData";
 import * as API from "../utils/Api";
-import { Console } from "console";
 
 export default function ViewGroup(props: { session: Session }) {
   const { groupId } = useParams();
@@ -40,6 +38,7 @@ export default function ViewGroup(props: { session: Session }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const currentUserEmail = props.session.user?.email;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,12 +56,12 @@ export default function ViewGroup(props: { session: Session }) {
   }, [groupId, props.session.access_token]);
 
   const isOwner = selectGroup?.friends.some(
-    (friend) => friend.isowner && friend.email === props.session.user?.email
+    (friend) => friend.isowner && friend.email === currentUserEmail
   );
   const host = selectGroup?.friends.find((friend) => friend.isowner);
 
   const handlePaymentSubmit = () => {
-    const email = props.session.user?.email;
+    const email = currentUserEmail;
     setErrorMessage("");
     if (email && selectGroup) {
       API.settleUp(groupId, paymentAmount, email, props.session.access_token)
@@ -101,6 +100,10 @@ export default function ViewGroup(props: { session: Session }) {
   // Calculate savedAmount dynamically
   const numberOfMembers = selectGroup?.friends.length ?? 0;
   const savedAmount = getSavedAmount(totalCost, numberOfMembers);
+
+  const currentUser = selectGroup.friends.find(
+    (member) => member.email === currentUserEmail
+  );
 
   function getSavedAmount(totalCost: number | null, numberOfMembers: number) {
     if (totalCost !== null && numberOfMembers > 0) {
@@ -160,6 +163,13 @@ export default function ViewGroup(props: { session: Session }) {
             </Text>{" "}
             per month
           </Text>
+          <Text textAlign="center">
+            You owe the Host $
+            <Text as="span" fontWeight="bold" color="red">
+              {currentUser?.balance}
+            </Text>{" "}
+            Total
+          </Text>
         </Box>
 
         <VStack spacing={3} divider={<Divider borderColor="gray.200" />}>
@@ -171,7 +181,7 @@ export default function ViewGroup(props: { session: Session }) {
             <Friend
               key={member.email}
               email={member.email}
-              amount={member.balance}
+              amount={member.subscription_cost}
             />
           ))}
         </VStack>
@@ -200,27 +210,20 @@ export default function ViewGroup(props: { session: Session }) {
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pt={5}>
-            {selectGroup.friends.map((member) => {
-              if (member.email === props.session.user?.email) {
-                return (
-                  <Text key={member.email} fontSize="lg" mb={4}>
-                    You owe{" "}
-                    <Text as="span" fontWeight="bold">
-                      ${member.balance}
-                    </Text>{" "}
-                    to{" "}
-                    <Text as="span" fontWeight="bold">
-                      {host?.email}
-                    </Text>{" "}
-                    for{" "}
-                    <Text as="span" fontWeight="bold">
-                      {selectGroup.subscription.name}
-                    </Text>
-                  </Text>
-                );
-              }
-            })}
-
+            <Text fontSize="lg" mb={4}>
+              You owe{" "}
+              <Text as="span" fontWeight="bold">
+                ${currentUser?.balance}
+              </Text>{" "}
+              to{" "}
+              <Text as="span" fontWeight="bold">
+                {host?.email}
+              </Text>{" "}
+              for{" "}
+              <Text as="span" fontWeight="bold">
+                {selectGroup.subscription.name}
+              </Text>
+            </Text>
             <Input
               placeholder="Enter payment amount"
               value={paymentAmount || ""}
