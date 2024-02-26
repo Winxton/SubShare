@@ -182,18 +182,36 @@ export default function ViewGroup(props: { session: Session }) {
         )}
       </Box>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        motionPreset="slideInBottom"
+        isCentered
+        size="lg"
+      >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Settle Payment</ModalHeader>
+        <ModalContent borderRadius="lg" boxShadow="xl">
+          <ModalHeader borderBottomWidth="1px" borderColor="gray.200">
+            Settle Payment
+          </ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody pt={5}>
             {selectGroup.friends.map((member) => {
               if (member.email === props.session.user?.email) {
-                // This is the current user, you can access their balance here
                 return (
-                  <Text>
-                    {`You owe $${member.balance} to ${host?.email} for ${selectGroup.subscription.name}`}
+                  <Text fontSize="lg" mb={4}>
+                    You owe{" "}
+                    <Text as="span" fontWeight="bold">
+                      ${member.balance}
+                    </Text>{" "}
+                    to{" "}
+                    <Text as="span" fontWeight="bold">
+                      {host?.email}
+                    </Text>{" "}
+                    for{" "}
+                    <Text as="span" fontWeight="bold">
+                      {selectGroup.subscription.name}
+                    </Text>
                   </Text>
                 );
               }
@@ -203,19 +221,28 @@ export default function ViewGroup(props: { session: Session }) {
               placeholder="Enter payment amount"
               value={paymentAmount || ""}
               onChange={(e) => setPaymentAmount(parseInt(e.target.value))}
+              focusBorderColor="green.400"
+              borderColor="gray.300"
+              size="lg"
+              mb={3}
             />
             {errorMessage && (
-              <Text color="red" mt="2">
+              <Text color="red.500" mt="2" fontSize="md">
                 {errorMessage}
               </Text>
             )}
           </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handlePaymentSubmit}>
+          <ModalFooter borderTopWidth="1px" borderColor="gray.200">
+            <Button
+              colorScheme="green"
+              mr={3}
+              onClick={handlePaymentSubmit}
+              size="md"
+            >
               Submit Payment
             </Button>
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant="outline" colorScheme="red" onClick={onClose}>
               Cancel
             </Button>
           </ModalFooter>
