@@ -20,8 +20,15 @@ export function Subscription(props: {
         <Box marginLeft={"10px"}>
           <Text fontWeight={"medium"}>{props.name} </Text>
           <Box>
-            <Text>${props.myCost}/month · </Text>
-            <Text as="span">{numberOfMembers} members</Text>
+            <Flex>
+              <Text fontSize={"sm"}>${props.myCost}/month</Text>
+              <Text ml="1" mr="1" fontWeight={"bold"}>
+                ·
+              </Text>
+              <Text fontSize={"sm"} as="span">
+                {numberOfMembers} members
+              </Text>
+            </Flex>
             <Box>
               {" "}
               {props.members.map((member) => (

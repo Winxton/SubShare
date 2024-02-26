@@ -16,12 +16,11 @@ import {
   Flex,
   InputGroup,
   InputLeftElement,
-  InputRightElement,
   Icon,
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { GearIcon } from "@radix-ui/react-icons";
+import { RxGear } from "react-icons/rx";
 
 import {
   Modal,
@@ -72,12 +71,12 @@ function NewGroup(props: NewGroupProps) {
   const today = new Date();
 
   const subscriptions = [
-    new Subscription("Netflix", netflixImage, 20, today),
-    new Subscription("HBO", hboImage, 30, today),
-    new Subscription("Disney", disney, 25, today),
-    new Subscription("Spotify", spotify, 10, today),
-    new Subscription("Youtube", youtubeImage, 12, today),
-    new Subscription("Crunchy", crunchyrollImage, 7, today),
+    new Subscription("Netflix Premium", netflixImage, 22.99, today),
+    new Subscription("HBO", hboImage, 15.99, today),
+    new Subscription("Disney", disney, 13.99, today),
+    new Subscription("Spotify Family", spotify, 16.99, today),
+    new Subscription("Youtube Family", youtubeImage, 22.99, today),
+    new Subscription("Crunchyroll", crunchyrollImage, 14.99, today),
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
@@ -110,6 +109,8 @@ function NewGroup(props: NewGroupProps) {
       friends.forEach((friend) => {
         subscriptionBalance -= friend.subscription_cost;
       });
+
+      subscriptionBalance = parseFloat(subscriptionBalance.toFixed(2));
     } else {
       subscriptionBalance = 0;
     }
@@ -139,7 +140,7 @@ function NewGroup(props: NewGroupProps) {
               />
             ) : (
               <Icon
-                as={GearIcon}
+                as={RxGear}
                 width="50px"
                 height="50px"
                 color="gray.400"
@@ -276,7 +277,7 @@ function NewGroup(props: NewGroupProps) {
               border="1px solid lightgray"
               borderRadius={"md"}
             >
-              <Icon as={GearIcon} width="50px" height="50px" color="gray.400" />
+              <Icon as={RxGear} width="50px" height="50px" color="gray.400" />
             </Square>
           </WrapItem>
         </Wrap>
@@ -306,17 +307,20 @@ function NewGroup(props: NewGroupProps) {
         {friends.map((friend) => {
           const isUser = friend.email === props.userEmail;
           const isAmountEditable = splitMode === "byAmount"; // Determine if the amount is editable based on splitMode
+
+          const onRemove = (email) => {
+            if (!isUser) {
+              const newFriends = friends.filter((f) => f.email !== email);
+              setFriends(newFriends);
+            }
+          };
+
           return (
             <Flex key={friend.email}>
               <FriendComponent
                 email={friend.email}
                 isMe={isUser}
-                onRemove={(email) => {
-                  if (!isUser) {
-                    const newFriends = friends.filter((f) => f.email !== email);
-                    setFriends(newFriends);
-                  }
-                }}
+                onRemove={friend.isowner ? undefined : onRemove}
                 isAmountEditable={isAmountEditable}
                 subscriptionCost={friend.subscription_cost}
                 handleSubscriptionCostChange={(email, amount) => {
@@ -330,6 +334,7 @@ function NewGroup(props: NewGroupProps) {
                   // Update the state with the updated friends array
                   setFriends(updatedFriends);
                 }}
+                isHost={friend.isowner}
               ></FriendComponent>
             </Flex>
           );
