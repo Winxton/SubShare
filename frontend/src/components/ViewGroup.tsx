@@ -126,6 +126,7 @@ export default function ViewGroup(props: { session: Session }) {
 
           {selectGroup.friends.map((member) => (
             <Friend
+              key={member.email}
               email={member.email}
               subscriptionCost={member.subscription_cost}
               isHost={member.isowner}
