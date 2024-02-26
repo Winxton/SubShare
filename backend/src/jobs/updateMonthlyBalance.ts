@@ -2,7 +2,6 @@ import { supabase } from "../repository/supabase.ts";
 
 /*Finds values of next_billing_date which equals to today, increases next_billing_date by 30 days and updates the member's balance */
 async function updateMemberBalancesOnBillingDate() {
-  console.log("Update billing");
   const SUBSCRIPTION_INTERVAL_DAYS = 30;
 
   const { data, error } = await supabase
