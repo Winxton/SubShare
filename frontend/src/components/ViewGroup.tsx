@@ -124,6 +124,7 @@ export default function ViewGroup(props: { session: Session }) {
             <Friend
               email={member.email}
               subscriptionCost={member.subscription_cost}
+              isHost={member.isowner}
             />
           ))}
         </VStack>

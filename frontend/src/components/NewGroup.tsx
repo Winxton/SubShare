@@ -16,12 +16,11 @@ import {
   Flex,
   InputGroup,
   InputLeftElement,
-  InputRightElement,
   Icon,
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { GearIcon } from "@radix-ui/react-icons";
+import { RxGear } from "react-icons/rx";
 
 import {
   Modal,
@@ -139,7 +138,7 @@ function NewGroup(props: NewGroupProps) {
               />
             ) : (
               <Icon
-                as={GearIcon}
+                as={RxGear}
                 width="50px"
                 height="50px"
                 color="gray.400"
@@ -276,7 +275,7 @@ function NewGroup(props: NewGroupProps) {
               border="1px solid lightgray"
               borderRadius={"md"}
             >
-              <Icon as={GearIcon} width="50px" height="50px" color="gray.400" />
+              <Icon as={RxGear} width="50px" height="50px" color="gray.400" />
             </Square>
           </WrapItem>
         </Wrap>
@@ -306,17 +305,20 @@ function NewGroup(props: NewGroupProps) {
         {friends.map((friend) => {
           const isUser = friend.email === props.userEmail;
           const isAmountEditable = splitMode === "byAmount"; // Determine if the amount is editable based on splitMode
+
+          const onRemove = (email) => {
+            if (!isUser) {
+              const newFriends = friends.filter((f) => f.email !== email);
+              setFriends(newFriends);
+            }
+          };
+
           return (
             <Flex key={friend.email}>
               <FriendComponent
                 email={friend.email}
                 isMe={isUser}
-                onRemove={(email) => {
-                  if (!isUser) {
-                    const newFriends = friends.filter((f) => f.email !== email);
-                    setFriends(newFriends);
-                  }
-                }}
+                onRemove={friend.isowner ? undefined : onRemove}
                 isAmountEditable={isAmountEditable}
                 subscriptionCost={friend.subscription_cost}
                 handleSubscriptionCostChange={(email, amount) => {
@@ -330,6 +332,7 @@ function NewGroup(props: NewGroupProps) {
                   // Update the state with the updated friends array
                   setFriends(updatedFriends);
                 }}
+                isHost={friend.isowner}
               ></FriendComponent>
             </Flex>
           );
