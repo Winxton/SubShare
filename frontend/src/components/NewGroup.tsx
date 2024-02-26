@@ -70,16 +70,14 @@ function NewGroup(props: NewGroupProps) {
   const [friends, setFriends] = React.useState<Friend[]>([user]);
   const [splitMode, setSplitMode] = useState<"equally" | "byAmount">("equally");
   const today = new Date();
-  const next_month: Date = new Date(today.getTime()); // Cloning today's date
-  next_month.setDate(today.getDate() + 30);
 
   const subscriptions = [
-    new Subscription("Netflix", netflixImage, 20, today, next_month),
-    new Subscription("HBO", hboImage, 30, today, next_month),
-    new Subscription("Disney", disney, 25, today, next_month),
-    new Subscription("Spotify", spotify, 10, today, next_month),
-    new Subscription("Youtube", youtubeImage, 12, today, next_month),
-    new Subscription("Crunchy", crunchyrollImage, 7, today, next_month),
+    new Subscription("Netflix", netflixImage, 20, today),
+    new Subscription("HBO", hboImage, 30, today),
+    new Subscription("Disney", disney, 25, today),
+    new Subscription("Spotify", spotify, 10, today),
+    new Subscription("Youtube", youtubeImage, 12, today),
+    new Subscription("Crunchy", crunchyrollImage, 7, today),
   ];
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
@@ -201,13 +199,10 @@ function NewGroup(props: NewGroupProps) {
               value={formatDate(selectedSubscription?.billing_date)}
               onChange={(e) => {
                 const selectedDate = new Date(e.target.value + "T00:00:00");
-                const nextBillingDate = new Date(
-                  selectedDate.getTime() + 30 * 24 * 60 * 60 * 1000
-                ); // Add 30 days in milliseconds
+
                 setSelectedSubscription({
                   ...selectedSubscription,
                   billing_date: selectedDate,
-                  next_billing_date: nextBillingDate,
                 });
               }}
             />
@@ -272,7 +267,7 @@ function NewGroup(props: NewGroupProps) {
             margin="5px"
             onClick={() => {
               setSelectedSubscription(
-                new Subscription("My Subscription", "", 0, today, next_month)
+                new Subscription("My Subscription", "", 0, today)
               );
             }}
             border={"none"}
