@@ -19,7 +19,7 @@ export async function sendInvitedToGroupEmail(
     from: "hello@subshare.app",
     to: recipient,
     subject: `Subshare Invitation to ${groupName}`,
-    html: `${senderName} has invited you to join his ${groupName} group. \nTo accept the invitation, head over to the <a href="${APP_URL}">subshare app</a>.`,
+    html: `${senderName} has invited you to join his ${groupName} group. \nHead over to the <a href="${APP_URL}">subshare app</a> to check it out!`,
   });
 }
 
