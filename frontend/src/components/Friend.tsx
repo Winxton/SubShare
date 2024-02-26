@@ -79,12 +79,15 @@ export function Friend(props: {
               />
             </Flex>
           ) : (
-            <Flex justifyContent="flex-end">
+            <Flex minW="150px" justifyContent="flex-end" align="center">
               <Box borderWidth="1px" borderRadius="lg" p="2" bg="gray.100">
                 <Text color="gray.700">
                   $ {props.subscriptionCost?.toFixed(2)}
                 </Text>
               </Box>
+              <Text ml="1" fontSize={"small"}>
+                / month
+              </Text>
             </Flex>
           )}
         </GridItem>
