@@ -15,10 +15,11 @@ import { Group, Friend } from "./models/models";
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const bree = require("./backgroundWorker");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-
+bree.start();
 app.use(bodyParser.json());
 
 // TODO seperate this into multiple files and put in api folder
@@ -153,6 +154,12 @@ app.post("/api/groups", async (req, res) => {
 
   const accessToken = req.headers.access_token;
 
+  // Calculate the next_billing_date based on the provided billing_date
+  const billingDate = new Date(subscription.billing_date);
+  const nextBillingDate = new Date(
+    billingDate.getTime() + 30 * 24 * 60 * 60 * 1000
+  );
+
   const user = await getUser(accessToken);
 
   const createdGroup = await createGroup(
@@ -162,7 +169,7 @@ app.post("/api/groups", async (req, res) => {
     new Date(),
     subscription.image,
     subscription.billing_date,
-    subscription.next_billing_date
+    nextBillingDate // Use the calculated next_billing_date
   );
 
   for (const memberData of friends) {

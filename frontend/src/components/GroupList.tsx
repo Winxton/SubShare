@@ -55,7 +55,6 @@ export default function GroupList(props: { session: Session | null }) {
   }, [isOpen]);
 
   async function handleDeleteGroup() {
-    //typescript checks
     if (!groupToDelete) {
       console.error("Invalid groupToDelete:", groupToDelete);
       return;

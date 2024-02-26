@@ -1,14 +1,6 @@
-import * as dotenv from "dotenv";
-const path = require("path");
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
-
 import { Friend, Group, Subscription } from "../models/models";
-const { createClient } = require("@supabase/supabase-js");
 
-const supabase = createClient(
-  process.env.REACT_APP_SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
-);
+const supabase = require("./supabase.ts");
 
 // Get User by Token
 

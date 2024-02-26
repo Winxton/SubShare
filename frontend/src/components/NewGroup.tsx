@@ -199,9 +199,11 @@ function NewGroup(props: NewGroupProps) {
               style={{ width: "100%", padding: "0.5rem" }}
               value={formatDate(selectedSubscription?.billing_date)}
               onChange={(e) => {
+                const selectedDate = new Date(e.target.value + "T00:00:00");
+
                 setSelectedSubscription({
                   ...selectedSubscription,
-                  billing_date: new Date(e.target.value + "T00:00:00"),
+                  billing_date: selectedDate,
                 });
               }}
             />
@@ -299,7 +301,7 @@ function NewGroup(props: NewGroupProps) {
 
         <AddFriend
           onAddFriend={(email) => {
-            const newFriend = new Friend(null, null, email, true, 0, false);
+            const newFriend = new Friend(null, null, email, false, 0, false);
             setFriends([...friends, newFriend]);
           }}
         />
