@@ -207,19 +207,27 @@ export default function GroupList(props: { session: Session | null }) {
             />
           </Flex>
         ))}
-        <Text fontWeight="bold">Soon To Be Disbanded</Text>
-        {inactiveSubscriptions.map((invitedGroup) => (
-          <Flex key={invitedGroup.subscription.name} justify="space-between">
-            <Box opacity={0.7}>
-              <SubscriptionComponent
-                image={invitedGroup?.subscription?.image}
-                myCost={invitedGroup?.subscription?.cost.toString()}
-                name={invitedGroup?.subscription?.name}
-                members={invitedGroup?.friends}
-              />
-            </Box>
-          </Flex>
-        ))}
+
+        {inactiveSubscriptions.length > 0 && (
+          <>
+            <Text fontWeight="bold">Soon To Be Disbanded</Text>
+            {inactiveSubscriptions.map((invitedGroup) => (
+              <Flex
+                key={invitedGroup.subscription.name}
+                justify="space-between"
+              >
+                <Box opacity={0.7}>
+                  <SubscriptionComponent
+                    image={invitedGroup?.subscription?.image}
+                    myCost={invitedGroup?.subscription?.cost.toString()}
+                    name={invitedGroup?.subscription?.name}
+                    members={invitedGroup?.friends}
+                  />
+                </Box>
+              </Flex>
+            ))}
+          </>
+        )}
       </Stack>
 
       {isOpen && (
