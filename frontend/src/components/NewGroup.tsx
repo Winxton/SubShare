@@ -109,6 +109,8 @@ function NewGroup(props: NewGroupProps) {
       friends.forEach((friend) => {
         subscriptionBalance -= friend.subscription_cost;
       });
+
+      subscriptionBalance = parseFloat(subscriptionBalance.toFixed(2));
     } else {
       subscriptionBalance = 0;
     }

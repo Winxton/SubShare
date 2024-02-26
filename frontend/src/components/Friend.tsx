@@ -69,12 +69,11 @@ export function Friend(props: {
               <Input
                 minWidth="150px"
                 type="number"
-                placeholder="Custom Amount"
-                value={props.subscriptionCost?.toFixed(2) || ""}
-                onChange={(e) => {
+                placeholder={props.subscriptionCost?.toFixed(2) || ""}
+                onBlur={(e) => {
                   props.handleSubscriptionCostChange!(
                     props.email,
-                    parseFloat(e.target.value) || 0
+                    parseFloat(e.target.value) || props.subscriptionCost || 0
                   );
                 }}
               />
