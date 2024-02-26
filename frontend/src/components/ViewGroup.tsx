@@ -168,7 +168,11 @@ export default function ViewGroup(props: { session: Session }) {
           </Heading>
 
           {selectGroup.friends.map((member) => (
-            <Friend email={member.email} amount={member.balance} />
+            <Friend
+              key={member.email}
+              email={member.email}
+              amount={member.balance}
+            />
           ))}
         </VStack>
       </Box>
@@ -192,14 +196,14 @@ export default function ViewGroup(props: { session: Session }) {
         <ModalOverlay />
         <ModalContent borderRadius="lg" boxShadow="xl">
           <ModalHeader borderBottomWidth="1px" borderColor="gray.200">
-            Settle Payment
+            Settle Payment to Host
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pt={5}>
             {selectGroup.friends.map((member) => {
               if (member.email === props.session.user?.email) {
                 return (
-                  <Text fontSize="lg" mb={4}>
+                  <Text key={member.email} fontSize="lg" mb={4}>
                     You owe{" "}
                     <Text as="span" fontWeight="bold">
                       ${member.balance}
