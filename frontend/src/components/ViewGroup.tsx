@@ -125,7 +125,7 @@ export default function ViewGroup(props: { session: Session }) {
         color="black"
       >
         <Heading as="h1" size="lg" textAlign="center">
-          {selectGroup.subscription.name} Group
+          {selectGroup.subscription.name}
         </Heading>
       </Box>
 
