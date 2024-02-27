@@ -29,12 +29,26 @@ export async function sendDisbandToGroupEmail(
   senderName: string,
   recipient: string,
   groupName: string
-  //subcriptionCancellationDate: string
 ) {
   return resend.emails.send({
     from: "hello@subshare.app",
     to: recipient,
     subject: `Subshare ${groupName} group disbandment`,
     html: `${senderName} has decided to disband his ${groupName} group. \n You still have access to the ${groupName} subscription until .`,
+  });
+}
+
+export async function sendMemberBalanceEmail(
+  senderName: string,
+  recipient: string,
+  groupName: string,
+  subscriptionCost: number,
+  memberBalance: number
+) {
+  return resend.emails.send({
+    from: "hello@subshare.app",
+    to: recipient,
+    subject: `Balance Update : Amount Owed for ${groupName}`,
+    html: `You owe ${senderName} ${subscriptionCost} for the monthly subscription. \nAs a result, your balance owed for ${groupName} has been updated to ${memberBalance}. \nHead over to the <a href="${APP_URL}">subshare app</a> to check it out!`,
   });
 }
