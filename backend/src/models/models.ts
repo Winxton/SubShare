@@ -19,10 +19,10 @@ export class Friend {
     public image: string,
     public email?: string,
     public subscription_cost?: number,
-    public isowner?: boolean,
+    public balance?: number,
     public group_id?: string,
-    public active?: boolean,
-    public accepted_date?: Date,
-    public balance?: number
+    public isowner?: boolean,
+    public accepted?: boolean,
+    public accepted_date?: Date
   ) {}
 }
