@@ -1,5 +1,5 @@
 const supabase = require("../repository/supabase.ts");
-import { sendMemberBalanceEmail } from "../service/emails";
+const { sendMemberBalanceEmail } = require("../service/emails.ts");
 
 /*Finds values of next_billing_date which equals to today, increases next_billing_date by 30 days and updates the member's balance */
 async function updateMemberBalancesOnBillingDate() {
