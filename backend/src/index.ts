@@ -13,15 +13,16 @@ import {
   sendDisbandToGroupEmail,
 } from "./service/emails";
 import { Group, Friend } from "./models/models";
+import { bree } from "./backgroundWorker";
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const bree = require("./backgroundWorker");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 bree.start();
+
 app.use(bodyParser.json());
 
 // TODO seperate this into multiple files and put in api folder

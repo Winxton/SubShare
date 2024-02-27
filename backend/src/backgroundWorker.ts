@@ -1,6 +1,6 @@
 const Bree = require("bree");
 
-const bree = new Bree({
+export const bree = new Bree({
   root: false, // Assuming the service directory is one level above the repository directory
   jobs: [
     {
@@ -10,5 +10,3 @@ const bree = new Bree({
     },
   ],
 });
-
-module.exports = bree;

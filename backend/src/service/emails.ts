@@ -1,4 +1,4 @@
-const { Resend } = require("resend");
+import { Resend } from "resend";
 const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
