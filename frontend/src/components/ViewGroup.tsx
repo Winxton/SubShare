@@ -153,7 +153,7 @@ export default function ViewGroup(props: { session: Session }) {
           <Text textAlign="center">
             You are saving $
             <Text as="span" fontWeight="bold" color="green">
-              {savedAmount}
+              {savedAmount.toFixed(2)}
             </Text>
             <Text as="span" fontSize="xs">
               /month
