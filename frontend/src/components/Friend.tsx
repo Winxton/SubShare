@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Flex,
   Text,
@@ -7,6 +8,8 @@ import {
   Grid,
   GridItem,
   Icon,
+  InputLeftElement,
+  InputGroup,
 } from "@chakra-ui/react";
 import { Avatar } from "@chakra-ui/react";
 import md5 from "md5";
@@ -27,12 +30,22 @@ export function Friend(props: {
     props.email
   )}?s=200&d=identicon`;
 
+  // Initialize local state with props.subscriptionCost, formatted to two decimal places if it exists
+  const [subscriptionCostValue, setSubscriptionCostValue] = useState(
+    props.subscriptionCost?.toFixed(2) || ""
+  );
+
+  // Update local state when props.subscriptionCost changes
+  useEffect(() => {
+    setSubscriptionCostValue(props.subscriptionCost?.toFixed(2) || "");
+  }, [props.subscriptionCost]);
+
   return (
     <Box
       bgColor="white"
       borderRadius="lg"
       textAlign="center"
-      margin="20px"
+      m="2"
       width="100%"
     >
       <Grid
@@ -64,20 +77,34 @@ export function Friend(props: {
 
         <GridItem colSpan={1}>
           {props.isAmountEditable ? (
-            <Flex alignItems="center">
-              <Text>$ </Text>
+            <InputGroup>
+              <InputLeftElement
+                pointerEvents="none"
+                color="gray.300"
+                children="$"
+              />
               <Input
                 minWidth="150px"
-                type="number"
-                placeholder={props.subscriptionCost?.toFixed(2) || ""}
+                type="text"
+                placeholder={"0.0"}
+                value={subscriptionCostValue}
+                onChange={(e) => setSubscriptionCostValue(e.target.value)}
                 onBlur={(e) => {
+                  // Convert current input value to a number and round it
+                  const roundedValue = parseFloat(
+                    subscriptionCostValue
+                  ).toFixed(2);
+
                   props.handleSubscriptionCostChange!(
                     props.email,
-                    parseFloat(e.target.value) || props.subscriptionCost || 0
+                    parseFloat(roundedValue) || props.subscriptionCost || 0
                   );
+
+                  // Update the input to show the rounded value
+                  setSubscriptionCostValue(roundedValue);
                 }}
               />
-            </Flex>
+            </InputGroup>
           ) : (
             <Flex minW="150px" justifyContent="flex-end" align="center">
               <Box borderWidth="1px" borderRadius="lg" p="2" bg="gray.100">
