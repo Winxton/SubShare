@@ -1,6 +1,5 @@
 import { Friend, Group, Subscription } from "../models/models";
-
-const supabase = require("./supabase.ts");
+import { supabase } from "./supabase.ts";
 
 // Get User by Token
 
