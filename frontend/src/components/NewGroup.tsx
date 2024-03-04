@@ -81,6 +81,16 @@ function NewGroup(props: NewGroupProps) {
   const [isCreatingGroup, setIsCreatingGroup] = React.useState<boolean>(false); // new state
   const [selectedTab, setSelectedTab] = React.useState<number>(0); // new state
 
+  // Initialize local state with props.subscriptionCost, formatted to two decimal places if it exists
+  const [subscriptionCostValue, setSubscriptionCostValue] = useState(
+    selectedSubscription?.cost?.toFixed(2) || ""
+  );
+
+  // Update subscription Cost when selectedSubscription changes
+  useEffect(() => {
+    setSubscriptionCostValue(selectedSubscription?.cost?.toFixed(2) || "");
+  }, [selectedSubscription]);
+
   let pricePerMember = 0;
 
   if (splitMode === "equally" && selectedSubscription && friends.length > 0) {
@@ -175,13 +185,18 @@ function NewGroup(props: NewGroupProps) {
             />
             <Input
               variant="flushed"
-              value={`${selectedSubscription?.cost}`}
+              value={subscriptionCostValue}
               onChange={(e) => {
+                console.log(e.target.value);
+                setSubscriptionCostValue(e.target.value);
+              }}
+              onBlur={(e) => {
                 setSelectedSubscription({
                   ...selectedSubscription,
-                  cost: parseInt(e.target.value) || 0,
+                  cost: parseFloat(subscriptionCostValue) || 0,
                 } as Subscription);
               }}
+              type="text"
               mr="2" // Add margin right for spacing
             />
           </InputGroup>
@@ -353,7 +368,7 @@ function NewGroup(props: NewGroupProps) {
         >
           <Text>Balance Remaining</Text>
           <Text ml={2} color={subscriptionBalance !== 0 ? "red" : "green"}>
-            $ {subscriptionBalance}
+            $ {subscriptionBalance.toFixed(2)}
           </Text>
         </Flex>
       </Box>
