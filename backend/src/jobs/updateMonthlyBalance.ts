@@ -51,7 +51,7 @@ async function updateMemberBalances(groupId, groupName) {
   }
 
   members.forEach(async (member) => {
-    const newBalance = member.balance + member.subscription_;
+    const newBalance = member.balance + member.subscription_cost;
 
     await supabase
       .from("members")
