@@ -1,13 +1,13 @@
 import { supabase } from "../repository/supabase.ts";
+import { sendMemberBalanceEmail } from "../service/emails.ts";
 
 /*Finds values of next_billing_date which equals to today, increases next_billing_date by 30 days and updates the member's balance */
 async function updateMemberBalancesOnBillingDate() {
-  console.log("Update billing");
   const SUBSCRIPTION_INTERVAL_DAYS = 30;
 
   const { data, error } = await supabase
     .from("groups")
-    .select("id, next_billing_date");
+    .select("id, name, next_billing_date");
 
   if (error) {
     console.error("Error querying Supabase:", error);
@@ -34,15 +34,15 @@ async function updateMemberBalancesOnBillingDate() {
         .update({ next_billing_date: nextBillingDate })
         .eq("id", group.id);
 
-      await updateMemberBalances(group.id);
+      await updateMemberBalances(group.id, group.name);
     }
   });
 }
 
-async function updateMemberBalances(groupId) {
+async function updateMemberBalances(groupId, groupName) {
   const { data: members, error: membersError } = await supabase
     .from("members")
-    .select("id, balance, subscription_cost")
+    .select("id, balance, subscription_cost,email")
     .eq("group_id", groupId); // Using 'group_id' to identify members to increase 'Balance' in 'members' table
 
   if (membersError) {
@@ -57,6 +57,13 @@ async function updateMemberBalances(groupId) {
       .from("members")
       .update({ balance: newBalance })
       .eq("id", member.id);
+
+    await sendMemberBalanceEmail(
+      member.email,
+      groupName,
+      member.subscription_cost,
+      newBalance
+    );
   });
 }
 
