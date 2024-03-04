@@ -96,24 +96,15 @@ export default function ViewGroup(props: { session: Session }) {
   }
 
   const totalCost = selectGroup.subscription.cost;
+  const myself = selectGroup.friends.find(
+    (member) => member.email === currentUserEmail
+  )!;
 
   // Calculate savedAmount dynamically
-  const numberOfMembers = selectGroup?.friends.length ?? 0;
-  const savedAmount = getSavedAmount(totalCost, numberOfMembers);
-
+  const savedAmount = totalCost - myself.subscription_cost;
   const currentUser = selectGroup.friends.find(
     (member) => member.email === currentUserEmail
   );
-
-  function getSavedAmount(totalCost: number | null, numberOfMembers: number) {
-    if (totalCost !== null && numberOfMembers > 0) {
-      // use subscription amount column
-      const savedPerMember = totalCost - totalCost / numberOfMembers;
-      return savedPerMember.toFixed(2);
-    } else {
-      return null;
-    }
-  }
 
   return (
     <Container maxW="3xl" /*bg={theme.colors.secondary[600]}*/>
@@ -134,7 +125,7 @@ export default function ViewGroup(props: { session: Session }) {
         color="black"
       >
         <Heading as="h1" size="lg" textAlign="center">
-          {selectGroup.subscription.name} Group
+          {selectGroup.subscription.name}
         </Heading>
       </Box>
 
